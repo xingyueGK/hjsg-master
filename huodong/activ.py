@@ -274,15 +274,18 @@ class activity(fuben):
             print self.action(c='logined', m='get_reward', id=1)
 
     def chenk(self):
-        chenk = self.action(c='chicken', m='vip_index', v=2018021101)['reward']
-        member = self.action(c='member', m='index')
-        vip = member['vip']
-        print json.dumps(chenk)
-        for l in chenk:
-            #print vip,l['vip']
-            if int(l['vip']) == int(vip):
-                print self.action(c='chicken', m='get_vip_reward', id=l['id'])
-                break
+        try:
+            chenk = self.action(c='chicken', m='vip_index', v=2018021101)['reward']
+            member = self.action(c='member', m='index')
+            vip = member['vip']
+            print json.dumps(chenk)
+            for l in chenk:
+                #print vip,l['vip']
+                if int(l['vip']) == int(vip):
+                    print self.action(c='chicken', m='get_vip_reward', id=l['id'])
+                    break
+        except:
+            pass
         # print self.action(c='chicken', m='get_vip_reward', id=17)
         # print self.action(c='chicken', m='get_vip_reward', id=2)
         # print self.action(c='chicken', m='get_vip_reward', id=3)
@@ -318,14 +321,15 @@ class activity(fuben):
 
     def jioncountry(self, name):  # 加入国家
         self.action(c='member', m='index')
-        for i in range(30):
+        for i in range(1,85):
             info = self.action(c='country', m='get_rank', page=i)
             for item in info["list"]:
                 if item['name'] == name:
                     print item['name'], name
                     id = int(item['id'])
+                    print id
                     self.action(c='country', m='apply', id=id)
-                    break
+                    exit(3)
 
     def gxinfo(self):  # 国家贡献
         self.action(c='country', m='get_member_list')
@@ -558,27 +562,33 @@ class activity(fuben):
             print lasttime
             if lasttime > 3600:
                 print self.action(c='fukubukuro', m='harvest_mine', s=mineinfo['log']['site'])
-                for i in range(3, 11):
+                for i in range(2, 11):
                     mineinfo = self.action(c='fukubukuro', m='mine', p=i)['list']
                     for l in mineinfo:
                         if l['status'] == 0:
-                            self.action(c='fukubukuro', m='action_mine', p=i, id=l['id'], t=l['type'])
-                            print '退出占矿'
-                            exit(3)
+                            status = self.action(c='fukubukuro', m='action_mine', p=i, id=l['id'], t=l['type'])
+                            if status['status'] != 1:
+                                continue
+                            else:
+                                print '占矿'
+                                exit(3)
         else:
-            for i in range(3, 10):
+            for i in range(2, 11):
                 mineinfo = self.action(c='fukubukuro', m='mine', p=i)['list']
                 for l in mineinfo:
                     if l['status'] == 0:
-                        self.action(c='fukubukuro', m='action_mine', p=i, id=l['id'], t=l['type'])
-                        print '退出占矿'
-                        exit(3)
+                        status = self.action(c='fukubukuro', m='action_mine', p=i, id=l['id'], t=l['type'])
+                        if status['status'] != 1:
+                            print '占矿'
+                            continue
+                        else:
+                            exit(3)
                 # 占矿
     def robfukuang(self,username,countryname):#打劫周年礦城
         self.action(c='fukubukuro', m='index')
         self.action(c='fukubukuro',m='get_mine_discription')
         mineinfo =  self.action(c='fukubukuro',m='mine')
-        robtimes = mineinfo['log']['robtimes']
+        robtimes = mineinfo['log']['robtimes']#打劫次数
         dateline = mineinfo['dateline']
         log = mineinfo['log']
         times = log['times']
@@ -592,10 +602,13 @@ class activity(fuben):
                     info = self.action(c='fukubukuro',m='mine',p=page)['list']
                     for item in info:
                         try:
-                            if item['status'] == 1 and item['country'] == countryname:
-                                print '打劫',countryname
-                                self.action(c='fukubukuro', m='loot_mine',p=item['page'],id=item['id'],t=item['type'])
-                                exit(3)
+                            if item['status'] == 1 and item['country'] in countryname:
+                                print '打劫'
+                                status = self.action(c='fukubukuro', m='loot_mine',p=item['page'],id=item['id'],t=item['type'])
+                                if status['status'] !=1:
+                                    continue
+                                else:
+                                    exit(3)
                         except Exception as e:
                             print 'aaaaaaaaaaaaaa', e
                 except Exception as e:
@@ -709,7 +722,7 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry('光芒神殿')
+        action.jioncountry('杰克喝尿')
 
 
     def gongxian(user, apass, addr):
@@ -763,18 +776,18 @@ if __name__ == '__main__':
         action.zhounianfukuang(user)
     def robfu(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        action.robfukuang(user,u'体检了')
+        action.robfukuang(user,['体检了','杰克吃翔','杰克喝尿'])
     def chuan():
-        with open('../users/150gx.txt', 'r') as f:
+        with open('../users/149xb.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip():
                     name = i.split()[0]
                     # name = i.split()[0]
                     passwd = i.split()[1]
-                    addr = i.split()[2]
-                    #addr = 21
-                    t1 = threading.Thread(target=robfu, args=(name, passwd, addr))
+                    #addr = i.split()[2]
+                    addr = 149
+                    t1 = threading.Thread(target=jion, args=(name, passwd, addr))
                     t1.start()
                     time.sleep(0.2)
 
@@ -812,4 +825,3 @@ if __name__ == '__main__':
     #ck()
     #dg()
     chuan()
-

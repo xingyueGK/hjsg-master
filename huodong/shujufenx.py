@@ -45,10 +45,11 @@ class fuben(object):
         self.token = get_token()
     def post_url(self,data):
         # url拼接数据
-        self.url = 'http://%s/index.php?v=2017111501&v=2017111501&channel=11&imei=NoDeviceId&platform=android&lang=zh-cn&token=%s&token_uid=%s&rand=%s&' % (
-        self.addr, self.token, self.token_uid, self.rand)
+        self.data = ''
         for k,v in data.items():
-            self.url += '&%s=%s'%(k,v)
+            self.data += '&%s=%s'%(k,v)
+        self.url = 'http://%s/index.php?%s&v=2017111501&v=2017111501&channel=11&imei=NoDeviceId&platform=android&lang=zh-cn&token=%s&token_uid=%s&rand=%s&' % (
+            self.addr, self.data, self.token, self.token_uid, self.rand)
         keep_request = True
         while keep_request:
             try:

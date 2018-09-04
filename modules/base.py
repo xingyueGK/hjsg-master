@@ -69,6 +69,12 @@ class SaoDangFb(object):
                 except:
                     json.dump(token_dict,f)
     def post_url(self,data):
+        self.data = ''
+        for k,v in data.items():
+            self.data += '&%s=%s'%(k,v)
+        print self.data
+        self.url = 'http://%s/index.php?%s&v=2017111501&v=2017111501&channel=11&imei=NoDeviceId&platform=android&lang=zh-cn&token=%s&token_uid=%s&rand=%s&' % (
+            self.num, self.data, self.token, self.token_uid, self.rand)
         for k,v in data.items():
             self.url += '&%s=%s'%(k,v)
         keep_request = True
