@@ -9,7 +9,6 @@ from shujufenx import fuben
 
 
 def userinfo(username, password, addr):
-
     act = shujufenx.fuben(username, password, addr)
     info = act.action(c='blackmarket', m='index')  # 获取黑市首页
     memberInfo = act.action(c='member', m='index')
@@ -535,6 +534,7 @@ class activity(fuben):
     def fukubukuro(self):#周年福矿签到
         self.action(c='fukubukuro',m='index')
         self.action(c='fukubukuro',m='sign',type=1)
+        self.action(c='fukubukuro',m='get_general',gid=354)
     def zhounianfukuang(self,username):#周年矿
         self.action(c='fukubukuro', m='index')
         self.action(c='fukubukuro',m='get_mine_discription')
@@ -562,7 +562,7 @@ class activity(fuben):
             print lasttime
             if lasttime > 3600:
                 print self.action(c='fukubukuro', m='harvest_mine', s=mineinfo['log']['site'])
-                for i in range(2, 11):
+                for i in range(10,0,-1):
                     mineinfo = self.action(c='fukubukuro', m='mine', p=i)['list']
                     for l in mineinfo:
                         if l['status'] == 0:
@@ -573,15 +573,16 @@ class activity(fuben):
                                 print '占矿'
                                 exit(3)
         else:
-            for i in range(2, 11):
+            for i in range(10,0,-1):
                 mineinfo = self.action(c='fukubukuro', m='mine', p=i)['list']
                 for l in mineinfo:
                     if l['status'] == 0:
                         status = self.action(c='fukubukuro', m='action_mine', p=i, id=l['id'], t=l['type'])
                         if status['status'] != 1:
-                            print '占矿'
+
                             continue
                         else:
+                            print '占矿'
                             exit(3)
                 # 占矿
     def robfukuang(self,username,countryname):#打劫周年礦城
@@ -597,7 +598,7 @@ class activity(fuben):
             print '剩余打劫次数为0'
             exit(1)
         elif robtimes != "0" and fukuangstatus == "0":
-            for page in range(1,11):
+            for page in range(10,0,-1):
                 try:
                     info = self.action(c='fukubukuro',m='mine',p=page)['list']
                     for item in info:
@@ -616,6 +617,9 @@ class activity(fuben):
         else:
             print '收矿'
             self.zhounianfukuang(username)
+    def fukuang(self):
+        info = self.action(c='fukubukuro', m='index')
+        print json.dumps(info)
     def springshop(self,name):#武將商城
         spring = self.action(c='springshop',m='index')['list']
         self.action(c='springshop', m='buy', id=14)
@@ -687,11 +691,11 @@ if __name__ == '__main__':
         # action.guyu()
         # action.gongxiang()
         # action.usebuff()
-        # action.sign()
+        #action.sign()
         # action.fuka(15)
         action.fukubukuro()
-        action.holiday()
-        action.chenk()
+        #action.holiday()
+        #action.chenk()
         action.years_guard()
 
     def zhujian(user, apass, addr):
@@ -776,35 +780,32 @@ if __name__ == '__main__':
         action.zhounianfukuang(user)
     def robfu(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        action.robfukuang(user,['体检了','杰克吃翔','杰克喝尿'])
+        action.robfukuang(user,['体检了','杰克吃翔','杰克喝尿','是你学姐'])
     def chuan():
-        with open('../users/149xb.txt', 'r') as f:
+        with open('../users/gmuser.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip():
                     name = i.split()[0]
                     # name = i.split()[0]
                     passwd = i.split()[1]
-                    #addr = i.split()[2]
-                    addr = 149
-                    t1 = threading.Thread(target=jion, args=(name, passwd, addr))
+                    addr = i.split()[2]
+                    #addr = 21
+                    t1 = threading.Thread(target=zhouniankuang, args=(name, passwd, addr))
                     t1.start()
                     time.sleep(0.2)
-
 
     def ck():
         cont = ['149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt', '149xb.txt', '149lwzs.txt']
         for t in cont:
             with open('../users/%s' % t, 'r') as f:
-                # with open('../users/gongxian.txt', 'r') as f:
                 for i in f:
                     if i.strip():
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 149
-                        t1 = threading.Thread(target=chat, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=task, args=(user, passwd, addr))
                         t1.start()
-
 
     def dg():
         cont = ['149gmjrhy.txt', 'alluser.txt', '150.txt', '150lwchuan.txt', '150gx.txt']
@@ -815,9 +816,7 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 150
-                        # nickname = u'长江'+user.split('0',1)[1]+u'号'
-                        # print nickname
-                        t1 = threading.Thread(target=chat, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=task, args=(user, passwd, addr))
                         t1.start()
 
 
