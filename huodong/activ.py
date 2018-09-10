@@ -25,8 +25,10 @@ def userinfo(username, password, addr):
     vip = memberInfo['vip']
     reputation = memberInfo['reputation']  # 声望
     print '\n账号 %s 名字 %s 等级 %s vip %s 国家 %s 军令 %s 银币 %s 元宝 %s 黄宝石 %s 紫宝石 %s 声望 %s' % (
-    username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'], reputation)
-    userlist = [username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'], reputation]
+        username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'],
+        reputation)
+    userlist = [username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'],
+                reputation]
     return userlist
 
 
@@ -171,7 +173,9 @@ class activity(fuben):
         try:
             status = result['status']
             if status != 1:
-                status = self.action(c='country', m='donate', type=1)['status']
+                info = self.action(c='country', m='donate', type=1)
+                print info
+                status = info['status']
         except:
             print result
             # self.action(c='country',m='get_member_list')
@@ -279,7 +283,7 @@ class activity(fuben):
             vip = member['vip']
             print json.dumps(chenk)
             for l in chenk:
-                #print vip,l['vip']
+                # print vip,l['vip']
                 if int(l['vip']) == int(vip):
                     print self.action(c='chicken', m='get_vip_reward', id=l['id'])
                     break
@@ -288,6 +292,7 @@ class activity(fuben):
         # print self.action(c='chicken', m='get_vip_reward', id=17)
         # print self.action(c='chicken', m='get_vip_reward', id=2)
         # print self.action(c='chicken', m='get_vip_reward', id=3)
+
     def holiday(self):
         print self.action(c='act_holiday', m='index', v=2018021101)
         print self.action(c='act_holiday', m='add_login_reward', v=2018021101)
@@ -320,7 +325,7 @@ class activity(fuben):
 
     def jioncountry(self, name):  # 加入国家
         self.action(c='member', m='index')
-        for i in range(1,85):
+        for i in range(1, 85):
             info = self.action(c='country', m='get_rank', page=i)
             for item in info["list"]:
                 if item['name'] == name:
@@ -528,26 +533,29 @@ class activity(fuben):
                 genral_info[u'蔡文姬'], 0, 0, 0, 0)
         print self.action(c='matrix', m='update_matrix', list=lists, mid=4)
         print self.action(c='matrix', m='use_matrix', mid=4)
-    def years_guard(self):#周年守护签到
+
+    def years_guard(self):  # 周年守护签到
         self.action(c='years_guard', m='des_index')
-        self.action(c='years_guard',m='sign_index')
-    def fukubukuro(self):#周年福矿签到
-        self.action(c='fukubukuro',m='index')
-        self.action(c='fukubukuro',m='sign',type=1)
-        self.action(c='fukubukuro',m='get_general',gid=354)
-    def zhounianfukuang(self,username):#周年矿
+        self.action(c='years_guard', m='sign_index')
+
+    def fukubukuro(self):  # 周年福矿签到
         self.action(c='fukubukuro', m='index')
-        self.action(c='fukubukuro',m='get_mine_discription')
-        mineinfo =  self.action(c='fukubukuro',m='mine')
+        self.action(c='fukubukuro', m='sign', type=1)
+        self.action(c='fukubukuro', m='get_general', gid=354)
+
+    def zhounianfukuang(self, username):  # 周年矿
+        self.action(c='fukubukuro', m='index')
+        self.action(c='fukubukuro', m='get_mine_discription')
+        mineinfo = self.action(c='fukubukuro', m='mine')
         dateline = mineinfo['dateline']
         log = mineinfo['log']
         times = log['times']
-        fukuangstatus = log['site']#为空说明没有下矿，反之已经占领矿
+        fukuangstatus = log['site']  # 为空说明没有下矿，反之已经占领矿
         if times == '0' and fukuangstatus == '0':
-            print username,'未占矿，剩余次数为0'
+            print username, '未占矿，剩余次数为0'
             exit(1)
         elif times == '0' and fukuangstatus != '0':
-            #收取占领的矿
+            # 收取占领的矿
             print '收货抢劫矿'
             log_dateline = log['jointime']
             lasttime = int(dateline) - int(log_dateline)
@@ -562,7 +570,7 @@ class activity(fuben):
             print lasttime
             if lasttime > 3600:
                 print self.action(c='fukubukuro', m='harvest_mine', s=mineinfo['log']['site'])
-                for i in range(10,0,-1):
+                for i in range(10, 0, -1):
                     mineinfo = self.action(c='fukubukuro', m='mine', p=i)['list']
                     for l in mineinfo:
                         if l['status'] == 0:
@@ -571,9 +579,9 @@ class activity(fuben):
                                 continue
                             else:
                                 print '占矿'
-                                exit(3)
+                    #             exit(3)
         else:
-            for i in range(10,0,-1):
+            for i in range(10, 0, -1):
                 mineinfo = self.action(c='fukubukuro', m='mine', p=i)['list']
                 for l in mineinfo:
                     if l['status'] == 0:
@@ -585,51 +593,88 @@ class activity(fuben):
                             print '占矿'
                             exit(3)
                 # 占矿
-    def robfukuang(self,username,countryname):#打劫周年礦城
+
+    def robfukuang(self, username, countryname):  # 打劫周年礦城
         self.action(c='fukubukuro', m='index')
-        self.action(c='fukubukuro',m='get_mine_discription')
-        mineinfo =  self.action(c='fukubukuro',m='mine')
-        robtimes = mineinfo['log']['robtimes']#打劫次数
+        self.action(c='fukubukuro', m='get_mine_discription')
+        mineinfo = self.action(c='fukubukuro', m='mine')
+        robtimes = mineinfo['log']['robtimes']  # 打劫次数
         dateline = mineinfo['dateline']
         log = mineinfo['log']
         times = log['times']
         fukuangstatus = log['site']
-        if robtimes == "0":
-            print '剩余打劫次数为0'
+        print '剩余打劫次数为{times}'.format(times=times)
+        if robtimes == "0" and fukuangstatus == "0":
+
             exit(1)
         elif robtimes != "0" and fukuangstatus == "0":
-            for page in range(10,0,-1):
+            for page in range(10, 0, -1):
                 try:
-                    info = self.action(c='fukubukuro',m='mine',p=page)['list']
+                    info = self.action(c='fukubukuro', m='mine', p=page)['list']
                     for item in info:
                         try:
                             if item['status'] == 1 and item['country'] in countryname:
                                 print '打劫'
-                                status = self.action(c='fukubukuro', m='loot_mine',p=item['page'],id=item['id'],t=item['type'])
-                                if status['status'] !=1:
+                                status = self.action(c='fukubukuro', m='loot_mine', p=item['page'], id=item['id'],
+                                                     t=item['type'])
+                                if status['status'] != 1:
                                     continue
                                 else:
                                     exit(3)
                         except Exception as e:
                             print 'aaaaaaaaaaaaaa', e
                 except Exception as e:
-                    print 'wwwwwwwwwww',e
+                    print 'wwwwwwwwwww', e
         else:
             print '收矿'
             self.zhounianfukuang(username)
+
+    def fq(self):  # 打劫周年礦城
+        self.action(c='fukubukuro', m='index')
+        self.action(c='fukubukuro', m='get_mine_discription')
+        mineinfo = self.action(c='fukubukuro', m='mine')
+        self.action(c='fukubukuro', m='give_up')
+
     def fukuang(self):
         info = self.action(c='fukubukuro', m='index')
         print json.dumps(info)
-    def springshop(self,name):#武將商城
-        spring = self.action(c='springshop',m='index')['list']
-        self.action(c='springshop', m='buy', id=14)
-        self.action(c='springshop', m='buy', id=8)
-        self.action(c='springshop', m='buy', id=9)
+
+    def springshop(self, name=u'聊得'):  # 武將商城
+        spring = self.action(c='springshop', m='index')['list']
+        self.action(c='springshop', m='buy', id=1)
+        #self.action(c='springshop', m='buy', id=1)
+        self.action(c='springshop', m='buy', id=3)
+        self.action(c='springshop', m='buy', id=10)
+        self.action(c='springshop', m='buy', id=17)
         # for item in spring:
         #     if item['name'] == name:
         #         self.action(c='springshop', m='buy',id=item['id'])
-    def unlock(self,pwd):
+
+    def unlock(self, pwd):
         self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
+
+    def znhh(self):
+        # 周年喊话
+        result = self.action(c='act_halloween', m='index')
+        hammer = result['hammer']
+        for i in range(int(result['candy'])):
+            self.action(c='act_halloween', m='action_candy')
+        for i in range(10):
+            for i in range(1, 10):
+                self.action(c='act_halloween', m='action_pumpkin', id=i)
+
+    def zhounianshop(self):
+        medal = self.action(c='fukubukuro', m='index' )['medal']
+        print medal
+        # self.action(c='fukubukuro', m='shop', type=1,)
+        # self.action(c='fukubukuro', m='shop', type=2, )
+        # self.action(c='fukubukuro',m='shop_buy',type=1,id=24)
+        # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
+        # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
+
+
+# 周年比购物
+
 # def wx():#五行竞猜刷数据
 # for i in range(100):
 # id1 = random.randint(1, 5)
@@ -683,26 +728,27 @@ if __name__ == '__main__':
         # action.gongxiang()
         # action.lottery()#抽奖
         # action.actjubao()
-        #action.leigu()
-        #action.shenshu()
+        # action.leigu()
+        # action.shenshu()
         # action.qiandao()
-        #action.actjubao()
+        action.actjubao()
         # action.jisi()
         # action.guyu()
         # action.gongxiang()
         # action.usebuff()
-        #action.sign()
+        # action.sign()
         # action.fuka(15)
-        action.fukubukuro()
-        #action.holiday()
-        #action.chenk()
-        action.years_guard()
+        # action.fukubukuro()
+        # action.holiday()
+        # action.chenk()
+        # action.years_guard()
+
 
     def zhujian(user, apass, addr):
         while True:
             action = activity(user, apass, addr)
-            action.unlock(413728)
-            action.springshop('adf')
+            #action.unlock(413728)
+            action.act_steadily()
 
 
     def xinnain(user, apass, addr):
@@ -726,12 +772,12 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry('杰克喝尿')
+        action.jioncountry('8523')
 
 
     def gongxian(user, apass, addr):
         action = activity(user, apass, addr)
-        for i in range(10):
+        for i in range(1000):
             action.gongxiang()
 
 
@@ -768,21 +814,30 @@ if __name__ == '__main__':
 
     def guyuyinbi(user, apass, addr):  # 换古玉买银币
         action = activity(user, apass, addr)
-        action.sign()  # 购买签到声望
+        action.znhh()  # 购买签到声望
         # action.guyu()
 
 
     def rolename(user, apass, addr, name):  # 更新出征武将
         action = activity(user, apass, addr)
         action.role(name)
+
+
     def zhouniankuang(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
         action.zhounianfukuang(user)
+
+
     def robfu(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        action.robfukuang(user,['体检了','杰克吃翔','杰克喝尿','是你学姐'])
+        action.robfukuang(user, ['体检了', '杰克吃翔', '杰克喝尿', '悍龙', '梦', '炎黄天都', '杰克喝sui'])
+
+    def znshop(user, apass, addr):  # 周年福矿商店
+        action = activity(user, apass, addr)
+        action.jingcai()
+
     def chuan():
-        with open('../users/gmuser.txt', 'r') as f:
+        with open('../users/alluser.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip():
@@ -791,9 +846,11 @@ if __name__ == '__main__':
                     passwd = i.split()[1]
                     addr = i.split()[2]
                     #addr = 21
-                    t1 = threading.Thread(target=zhouniankuang, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=jion, args=(name, passwd, addr))
                     t1.start()
+                    # t1.join()
                     time.sleep(0.2)
+
 
     def ck():
         cont = ['149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt', '149xb.txt', '149lwzs.txt']
@@ -807,8 +864,9 @@ if __name__ == '__main__':
                         t1 = threading.Thread(target=task, args=(user, passwd, addr))
                         t1.start()
 
+
     def dg():
-        cont = ['149gmjrhy.txt', 'alluser.txt', '150.txt', '150lwchuan.txt', '150gx.txt']
+        cont = [  '150.txt', '150lwchuan.txt', '150gx.txt','150nm.txt','150num.txt']
         for t in cont:
             with open('../users/%s' % t, 'r') as f:
                 for i in f:
@@ -816,11 +874,11 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 150
-                        t1 = threading.Thread(target=task, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=znshop, args=(user, passwd, addr))
                         t1.start()
 
 
-    #chat('xingyue123a',413728161,148)
+    # chat('xingyue123a',413728161,148)
     #ck()
-    #dg()
-    chuan()
+    dg()
+    #chuan()
