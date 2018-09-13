@@ -215,46 +215,88 @@ class task(SaoDangFb):
             pass
 
     def herothrone(self):  # 英雄王座
-        self.action(c='herothrone', m='index')
-        for i in range(3):
-            self.action(c='herothrone', m='start')  # 开始王座
-            # 攻击:
-            while True:
-                flag = self.action(c='herothrone', m='action')['status']
-                print  '攻击王座副本'
-                if flag == -2:
-                    break
+        try:
+            vip = self.action(c='member', m='index')['vip']
+            if int(vip) < 9:
+                self.action(c='herothrone', m='index')
+                for i in range(3):
+                    self.action(c='herothrone', m='start')  # 开始王座
+                    # 攻击:
+                    while True:
+                        flag = self.action(c='herothrone', m='action')['status']
+                        print  '攻击王座副本'
+                        if flag == -2:
+                            break
+            else:
+                self.action(c='herothrone', m='index')
+                for i in range(3):
+                    self.action(c='herothrone', m='start')  # 开始王座
+                    self.action(c='herothrone', m='end_battle')
+                    self.action(c='herothrone', m='go_back')
 
+        except:
+            pass
+    def mount_stone(self):
+        try:
+            vip = self.action(c='member', m='index')['vip']
+            if int(vip) < 9:
+                self.action(c='mountstone_throne', m='index')
+                for i in range(3):
+                    self.action(c='mountstone_throne', m='start')  # 开始王座
+                    # 攻击:
+                    while True:
+                        flag = self.action(c='mountstone_throne', m='action')['status']
+                        print  '攻击符石副本'
+                        if flag == -2:
+                            break
+            else:
+                self.action(c='mountstone_throne', m='index')
+                for i in range(3):
+                    self.action(c='mountstone_throne', m='start')  # 开始王座
+                    self.action(c='mountstone_throne', m='end_battle')  # 开始王座
+                    self.action(c='mountstone_throne', m='go_back')  # 开始王座
+        except:
+            pass
     def workshop(self):  # 玉石收集
         # 收取
-        try:
-            for i in range(1, 7):
+        for i in range(1, 7):
+            try:
                 self.action(c='workshop', m='get_reward', s=i)
+            except:
+                pass
+
+    def exploit_tree(self):  # 木材收集
+        try:
+            # gather收集,site:1,第一个框
+            self.action(c='exploit_tree', m='gather', site=1)
+            self.action(c='exploit_tree', m='action', site=1)
         except:
             pass
 
-    def exploit_tree(self):  # 木材收集
-        # gather收集,site:1,第一个框
-        self.action(c='exploit_tree', m='gather', site=1)
-        self.action(c='exploit_tree', m='action', site=1)
-
     def exploit_stone(self):  # 石头收集
+        try:
         # exploit_stone，m:{gather收集,action，采集}site:1,第一个框,有三个
-        for i in range(1, 4):
-            self.action(c='exploit_stone', m='gather', site=i)
-            self.action(c='exploit_stone', m='action', site=i)
-
+            for i in range(1, 4):
+                self.action(c='exploit_stone', m='gather', site=i)
+                self.action(c='exploit_stone', m='action', site=i)
+        except:
+            pass
     def heaven(self):  # 通天塔每日奖励和扫荡
         # 获取每日奖励
-        self.action(c='heaven', m='get_reward')
-        self.times = self.action(c='heaven', m='index')['times']
-        if self.times:
-            self.action(c='heaven', m='mop_up', id=87, times=self.times)
+        try:
+            self.action(c='heaven', m='get_reward')
+            self.times = self.action(c='heaven', m='index')['times']
+            if self.times:
+                self.action(c='heaven', m='mop_up', id=87, times=self.times)
+        except:
+            pass
 
     def arena(self): #每日觉醒奖励
-        self.action(c='arena', m='index')
-        self.action(c='arena', m='get_reward')
-
+        try:
+            self.action(c='arena', m='index')
+            self.action(c='arena', m='get_reward')
+        except:
+            pass
     def zimap(self):  # 获取图片
         # levev:7,11，14是红色sh关卡s:1-9，id:6
         # 扫荡金色以上5-9
@@ -309,16 +351,6 @@ class task(SaoDangFb):
     def guyu(self):  # 获取古玉购买
         print self.action(c='actguyu', m='reward_index', id=22, num=1)
 
-    def mount_stone(self):
-        self.action(c='mountstone_throne', m='index')
-        for i in range(3):
-            self.action(c='mountstone_throne', m='start')  # 开始王座
-            # 攻击:
-            while True:
-                flag = self.action(c='mountstone_throne', m='action')['status']
-                print  '攻击符石副本'
-                if flag == -2:
-                    break
 
     def dice(self):  # 国家摇色子
         points = self.action(c='dice', m='index')['member']['points']
@@ -519,6 +551,9 @@ class task(SaoDangFb):
         self.action(c='fukubukuro', m='index')
         self.action(c='fukubukuro', m='sign', type=1)
         self.action(c='fukubukuro', m='get_general', gid=354)
+    def drink(self):#每日饮酒
+        self.action(c='drink',m='index')
+        self.action(c='drink',m='go_drink',type=1)
 def run(user,apass, addr):
     action = task(user,apass, addr)
     action.arena()  # 获取每日演武奖
@@ -542,7 +577,7 @@ def run(user,apass, addr):
     action.dice()  # 国家摇色子
     action.mouth_card()  # 月卡奖励
     action.beauty()  # 铜雀台互动
-    # action.countrymine()#国家战功
+    action.drink()#每日军令饮酒
     action.country()  # 国家奖励
     action.overseastrade()  # 海外贸易
     action.countrysacrifice()
@@ -579,13 +614,16 @@ def run(user,apass, addr):
 
 if __name__ == '__main__':
     filepath = os.path.dirname(os.path.abspath(__file__))
-    with open('%s/users/autouser.txt'%filepath, 'r') as f:
-        for i in f:
-            if i.strip() :
-                name = i.split()[0]
-                passwd = i.split()[1]
-                addr = i.split()[2]
-                t1 = threading.Thread(target=run, args=(name, passwd, addr))
-                t1.start()
-                # t1.join()
-                time.sleep(0.2)
+    cont = ['autouser.txt','']
+    for t in cont:
+        with open('%s/users/%s'%(filepath,t),'r') as f:
+            for i in f:
+                if i.strip() :
+                    name = i.split()[0]
+                    passwd = i.split()[1]
+                    addr = i.split()[2]
+                    t1 = threading.Thread(target=run, args=(name, passwd, addr))
+                    t1.start()
+                    # t1.join()
+                    time.sleep(0.2)
+        time.sleep(60)

@@ -5,6 +5,7 @@ import requests
 import time
 import json
 import  sys
+import  redis
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import threading
@@ -36,13 +37,10 @@ class SaoDangFb(object):
     def get_token(num, user, passwd):
         url = 'http://s{num}.game.hanjiangsanguo.com/index.php?u={user}&p={passwd}&v=0&c=login&&m=user&&token=&channel=150&lang=zh-cn&rand=150959405499450'.format(
             num=num, user=user, passwd=passwd)
-        token_dict = {}
+        _redis = redis.Redis(host='localhost', port=6379, decode_responses=True)
         try:
-            with open("token.json", 'r') as f:
-                json_dict = json.load(f)
-                if user not in json_dict:
-                    raise TokenErr
-                token = json_dict[user]
+            if _redis.get(user):
+                token = _redis.get(user)
                 login = 'http://s{num}.game.hanjiangsanguo.com/index.php?c=member&m=index&v=0&token={token}&channel=150&lang=zh-cn&rand=150959405499450'.format(
                     num=num, token=token)
                 r = requests.get(login)
@@ -50,24 +48,16 @@ class SaoDangFb(object):
                     raise TokenErr('token expire')
                 else:
                     return token
-        except IOError:
-            with open("token.json", 'a') as f:
-                token_dict[user] = requests.get(url).json()['token']
-                json.dump(token_dict, f)
-                return token_dict[user]
+            else:
+                raise TokenErr('token expire')
         except TokenErr:
-            with open("token.json", 'r') as f:
-                token_dict = json.load(f)
-            with open("token.json", 'w') as f:
-                print 'jishi'
-                a = time.time()
                 try:
-                    token_dict[user] = requests.get(url).json()['token']
-                    print time.time() -a
-                    json.dump(token_dict, f)
-                    return token_dict[user]
-                except:
-                    json.dump(token_dict,f)
+                    token= requests.get(url).json()['token']
+                    _redis.set(user,token)
+                    return token
+                except Exception as e:
+                    print e
+
     def post_url(self,data):
         self.data = ''
         for k,v in data.items():
