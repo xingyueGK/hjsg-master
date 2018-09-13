@@ -7,7 +7,7 @@
 
 from task.base import SaoDangFb
 import  time,threading
-import os
+import os,json
 class task(SaoDangFb):
     def copies(self):
         # 扫荡副本需要传递的参数
@@ -60,6 +60,11 @@ class task(SaoDangFb):
         for i in range(3):
             cd = hitegg_cd['list'][i]['cd']
             if cd == 0:
+                print '砸蛋成功'
+                _id = i + 1
+                self.action(c='hitegg', m='hit_egg', id=_id)
+            elif  120 > cd >0 :
+                time.sleep(cd)
                 print '砸蛋成功'
                 _id = i + 1
                 self.action(c='hitegg', m='hit_egg', id=_id)
@@ -143,12 +148,14 @@ class task(SaoDangFb):
 
     def tower(self):  # 将魂星路
         # 领取每日奖励
-        self.action(c='tower', m='reward_info')
-        self.action(c='tower', m='get_reward')
-        # 获取次数：
-        self.tower_times = self.action(c='tower', m='get_mission_list', s=7)['times']
-        print self.action(c='tower', m='mop_up', id=174, times=self.tower_times)
-
+        try:
+            self.action(c='tower', m='reward_info')
+            self.action(c='tower', m='get_reward')
+            # 获取次数：
+            self.tower_times = self.action(c='tower', m='get_mission_list', s=7)['times']
+            print self.action(c='tower', m='mop_up', id=174, times=self.tower_times)
+        except:
+            pass
     def business(self):  #
         # 获取通商次数
         business_times = self.action(c='business', m='index')['times']
@@ -161,39 +168,51 @@ class task(SaoDangFb):
         print '通商完成'
 
     def generaltask(self):  # 每日神将
-        self.number = self.action(c='generaltask', m='index')['number']  # 获取次数
-        print '开始神将扫荡，共计 %s 次' % self.number
-        # 使用长孙无忌gid=210000353508
-        # 怪物id=255
-        for count in range(int(self.number)):
-            self.action(type=0, id=255, gid='210000398930', c='generaltask', m='action')
-        print '神将10次扫荡完毕'
+        try:
+            info  = self.action(c='generaltask', m='index')  # 获取次数
+            number = info['number']
+            #默认第一个将领
+            gid = info['list'][0]['id']
+            print '开始神将扫荡，共计 %s 次' %number
+            get_list=  self.action(c='generaltask', m='get_list',p=0)
+            id = int(get_list['list'][0]['id']) - 10
+            # 使用长孙无忌gid=210000353508
+            # 怪物id=255
+            for count in range(int(number)):
+                self.action(type=0, id=id, gid=gid, c='generaltask', m='action')
+            print '神将10次扫荡完毕'
+        except:
+            pass
 
     def sanctum(self):
         # 每日宝石领奖
         try:
             print '领取每日宝石奖励'
             self.action(c='sanctum', m='get_reward', type=1, multiple=0)
+
+            # 扫荡宝石次数
+            # 获取次数
+            print '开始扫荡宝石'
+            numbers = self.action(c='sanctum', m='select_map', l=3)['times']
+            if numbers != 0:
+                self.action(c='sanctum', m='action', id=150, num=numbers)
+            else:
+                print '剩余次数为 %s 次' % numbers
+            print '宝石扫荡结束'
         except:
             print '已经领取宝石奖励'
-        # 扫荡宝石次数
-        # 获取次数
-        print '开始扫荡宝石'
-        numbers = self.action(c='sanctum', m='select_map', l=3)['times']
-        if numbers != 0:
-            self.action(c='sanctum', m='action', id=150, num=numbers)
-        else:
-            print '剩余次数为 %s 次' % numbers
-        print '宝石扫荡结束'
 
     def lottery(self):  # 每日抽奖
         # c=lottery，m=action
         # 获取每日抽奖次数
-        self.numbers = self.action(c='lottery', m='index')['log']['info']['total_num']
-        print '开始抽奖，剩余次数 %s' % self.numbers
-        for num in range(self.numbers):
-            self.action(c='lottery', m='action')
-        print '抽奖结束'
+        try:
+            self.numbers = self.action(c='lottery', m='index')['log']['info']['total_num']
+            print '开始抽奖，剩余次数 %s' % self.numbers
+            for num in range(self.numbers):
+                self.action(c='lottery', m='action')
+            print '抽奖结束'
+        except:
+            pass
 
     def herothrone(self):  # 英雄王座
         self.action(c='herothrone', m='index')
@@ -208,8 +227,11 @@ class task(SaoDangFb):
 
     def workshop(self):  # 玉石收集
         # 收取
-        for i in range(1, 7):
-            self.action(c='workshop', m='get_reward', s=i)
+        try:
+            for i in range(1, 7):
+                self.action(c='workshop', m='get_reward', s=i)
+        except:
+            pass
 
     def exploit_tree(self):  # 木材收集
         # gather收集,site:1,第一个框
@@ -306,19 +328,22 @@ class task(SaoDangFb):
             self.action(c='dice', m='shake_dice')
 
     def act_steadily(self):  # 节节高
-        info = self.action(c='act_steadily', m='index')
-        status = info['status']
-        reward_cd = info['reward_cd']
-        t = info['reward']['time']
-        if reward_cd == 0 and status == 1:
-            self.action(c='act_steadily', m='get_online_reward', t=t)
-        elif reward_cd == 0 and status != 1:
-            exit(2)
-        else:
-            print '%s分钟后领取,%s' % (reward_cd / 60, reward_cd)
+        try:
+            info = self.action(c='act_steadily', m='index')
+            status = info['status']
+            reward_cd = info['reward_cd']
+            t = info['reward']['time']
+            if reward_cd == 0 and status == 1:
+                self.action(c='act_steadily', m='get_online_reward', t=t)
+            elif reward_cd == 0 and status != 1:
+                exit(2)
+            else:
+                print '%s分钟后领取,%s' % (reward_cd / 60, reward_cd)
 
-            time.sleep(reward_cd + 1)
-            self.action(c='act_steadily', m='get_online_reward', t=t)
+                time.sleep(reward_cd + 1)
+                self.action(c='act_steadily', m='get_online_reward', t=t)
+        except:
+            pass
 
     def act_sword(self):  # 铸剑
         print self.action(c='act_sword', m='start')
@@ -349,23 +374,24 @@ class task(SaoDangFb):
         self.action(c='awaken_copy', m='every_reward_index')
         self.action(c='awaken_copy', m='get_every_reward', b=1)
 
-    def countrymine(self):  # 每日国家战功
-        # 占领采矿
-        self.action(c='countrymine', m='caikuang', p=3, id=3, t=5)
-
-    def get_countrymine(self):
-        # 收集矿
-        self.action(c='countrymine', m='index')
-        info = self.action(c='countrymine', m='get_countrymine_info', p=3, id=3, t=5)
-        timeinfo = info['info']['time']
-        # 采集矿
-        print timeinfo
-        print type(timeinfo)
-        if timeinfo == 0:
-            self.action(c='countrymine', m='get_reward', s=3)
-        else:
-            time.sleep(timeinfo + 10)
-            self.action(c='countrymine', m='get_reward', s=3)
+    def countrymine(self):#国家矿
+        try:
+            mineinfo = self.action(c='countrymine', m='index')
+            print mineinfo
+            dateline = mineinfo['dateline']
+            log = mineinfo['log']
+            if log:
+                log_dateline = log['dateline']
+                lasttime = int(dateline) - int(log_dateline)
+                print lasttime
+                for i in range(8, 10):
+                    mineinfo = self.action(c='countrymine', m='index', p=i)['list']
+                    for l in mineinfo:
+                        if l['status'] == 0:
+                            self.action(c='countrymine', m='caikuang', p=i, id=l['id'], t=l['type'])
+                            break
+        except KeyError as e:
+            print e, '没有加入国家，或是等级不够'
 
     def mouth_card(self):
         # 月卡奖励
@@ -408,7 +434,91 @@ class task(SaoDangFb):
                 status = info['status']
         except:
             print result
+    def cuju(self):  # 蹴鞠首页
+        try:
+            index = self.action(c='act_kemari', m='index')
+            for i in index['list']:
+                if i['id'] == 2 and i['times'] != 0 and i['cd'] == 0:
+                    self.action(c='act_kemari', m='action', type=2)
+                elif i['id'] == 1 and i['times'] != 0 and i['cd'] == 0:
+                    self.action(c='act_kemari', m='action', type=1)
+        except:
+            pass
 
+    def sanguo(self):  # 游历三国活动
+        try:
+            travelindex = self.action(c='act_travel', m='index')  # 获取活动
+            details = self.action(c='act_travel', m='action_travel')['details']  # 开始活动
+            print travelindex['info']['points']
+            if travelindex['info']['free'] == 1:
+                result = self.action(c='act_travel', m='action_dice')  # 掷骰子
+            if travelindex['info']['points'] != 0:
+                # #走路顺序list[4,2,3,5,8,9,10,11,12,13,14]
+                plain = [1, 4, 2, 3, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+                         29,
+                         30]
+                num = plain.index(int(details['current'])) + 1
+                stats = self.action(c='act_travel', m='plain', point=plain[num])
+        except:
+            pass
+    def jisi(self):  # 新年活动
+        try:
+            self.action(c='act_spring', m='index')
+            index = self.action(c='act_spring', m='sacrifice_index')
+            if index['price']['3']['1'] < "50":
+                self.action(c='act_spring', m='sacrifice', type=3, resource_type=1)
+            if index['price']['1']['1'] < "50":
+                self.action(c='act_spring', m='sacrifice', type=1, resource_type=1)
+                self.action(c='act_spring', m='sacrifice', type=1, resource_type=2)
+            if index['price']['2']['1'] < "50":
+                self.action(c='act_spring', m='sacrifice', type=2, resource_type=1)
+                self.action(c='act_spring', m='sacrifice', type=2, resource_type=2)
+        except:
+            pass
+    def leigu(self):
+        self.action(c='happy_guoqing', m='get_reward', type=1)
+    def chicken(self):
+        try:
+            chenk = self.action(c='chicken', m='vip_index', v=2018021101)['reward']
+            member = self.action(c='member', m='index')
+            vip = member['vip']
+            print json.dumps(chenk)
+            for l in chenk:
+                # print vip,l['vip']
+                if int(l['vip']) == int(vip):
+                    print self.action(c='chicken', m='get_vip_reward', id=l['id'])
+                    break
+        except:
+            pass
+    def holiday(self):
+        print self.action(c='act_holiday', m='index', v=2018021101)
+        print self.action(c='act_holiday', m='add_login_reward', v=2018021101)
+    def shenshu(self):  # 神树
+        index = self.action(c='sacredtree', m='index')
+        if index['time'] == 1:
+            print self.action(c='sacredtree', m='watering', type=1, v=2018021101)
+    def yuanxiao(self):
+        try:
+            index = self.action(c='act_lantern', m='index', v=2018021101)
+            if index['freetimes'] > 0:
+                self.action(c='act_lantern', m='buy', lid=1, mid=1, v=2018021101)
+                self.action(c='act_lantern', m='buy', lid=1, mid=2, v=2018021101)
+                self.action(c='act_lantern', m='buy', lid=1, mid=3, v=2018021101)
+        except:
+            pass
+    def actjubao(self):
+        self.action(c='actjubao', m='index', v=2018042801)
+        self.action(c='actjubao', m='action', type=1, v=2018042801)
+        self.action(c='actjubao', m='reward_index', v=2018042801)
+        self.action(c='actjubao', m='get_reward', id=1, v=2018042801)
+    def years_guard(self):  # 周年守护签到
+        self.action(c='years_guard', m='des_index')
+        self.action(c='years_guard', m='sign_index')
+
+    def fukubukuro(self):  # 周年福矿签到
+        self.action(c='fukubukuro', m='index')
+        self.action(c='fukubukuro', m='sign', type=1)
+        self.action(c='fukubukuro', m='get_general', gid=354)
 def run(user,apass, addr):
     action = task(user,apass, addr)
     action.arena()  # 获取每日演武奖
@@ -438,9 +548,32 @@ def run(user,apass, addr):
     action.countrysacrifice()
     for i in range(50):
         action.gongxian()
+    if action.get_act()['act_travel'] == 1:
+        action.sanguo()#游历三国
+    if action.get_act()['actkemari'] == 1:
+        action.cuju()#蹴鞠
     if action.get_act()['act_steadily'] == 1:
         while True:
             action.act_steadily()
+    if action.get_act()['act_spring'] == 1:
+        action.jisi()#游历三国
+    if action.get_act()['leigu'] == 1:
+        action.leigu()#游历三国
+    if action.get_act()['chicken'] == 1:
+        action.chicken()#游历三国
+    if action.get_act()['holiday'] == 1:
+        action.holiday()#游历三国
+    if action.get_act()['sacredtree'] == 1:
+        action.shenshu()#游历三国
+    if action.get_act()['lantern'] == 1:
+        action.yuanxiao()#游历三国
+    if action.get_act()['actjubao'] == 1:
+        action.actjubao()#游历三国
+    if action.get_act()['years_guard'] == 1:
+        action.years_guard()#游历三国
+    if action.get_act()['fukubukuro'] == 1:
+        action.fukubukuro()#游历三国
+
     # action.zimap()
     # action.hongmap()
 
