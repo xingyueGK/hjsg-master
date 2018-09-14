@@ -45,7 +45,7 @@ def act(username,passwd,addr):
         for i in uid:
             for etype,v in i.items():
                 action.strengthen(v)
-                action.eqip(gid,v,etype)
+                action.equip(gid,v,etype)
         action.saodang(1)#26级失败退出
         for i in uid:
             for etype, v in i.items():
@@ -59,12 +59,12 @@ def act(username,passwd,addr):
         for i in uid:
             for etype, v in i.items():
                 action.strengthen(v)
-                action.eqip(gid, v, etype)
+                action.equip(gid, v, etype)
             action.saodang(2)  # 级失败退出
         for i in uid:
             for etype, v in i.items():
                 action.strengthen(v)
-                action.eqip(gid, v, etype)
+                action.equip(gid, v, etype)
         action.saodang(2)#30级失败退出从第二个图开始
     if action.level()<50:
         for i  in range(2):
@@ -73,7 +73,7 @@ def act(username,passwd,addr):
         for i in uid:
             for etype, v in i.items():
                 action.strengthen(v)
-                action.eqip(gid, v, etype)
+                action.equip(gid, v, etype)
         action.muster()  # 再次突飞
         action.saodang(2)
     if action.level()  <70:#领取前60次奖励

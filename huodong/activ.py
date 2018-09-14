@@ -8,6 +8,10 @@ from shujufenx import fuben
 """每日不定期开展活动"""
 
 
+def p(message):
+    print json.dumps(message, ensure_ascii=False)
+
+
 def userinfo(username, password, addr):
     act = shujufenx.fuben(username, password, addr)
     info = act.action(c='blackmarket', m='index')  # 获取黑市首页
@@ -32,9 +36,6 @@ def userinfo(username, password, addr):
     return userlist
 
 
-
-
-
 class activity(fuben):
     def sanguo(self):  # 游历三国活动
         try:
@@ -45,13 +46,15 @@ class activity(fuben):
                 result = self.action(c='act_travel', m='action_dice')  # 掷骰子
             if travelindex['info']['points'] != 0:
                 # #走路顺序list[4,2,3,5,8,9,10,11,12,13,14]
-                plain = [1, 4, 2, 3, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+                plain = [1, 4, 2, 3, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+                         28,
                          29,
                          30]
                 num = plain.index(int(details['current'])) + 1
                 stats = self.action(c='act_travel', m='plain', point=plain[num])
         except:
             pass
+
     def jingsu(self):  # 竞速奖励
         info = self.action(c='map', m='get_reward_list', channel=11, v=2017122401)
         print info
@@ -173,16 +176,21 @@ class activity(fuben):
         except:
             pass
 
-    def gongxiang(self):  # 国家贡献
+    def gongxiang(self, num=1000):  # 国家贡献
         self.action(c='country', m='get_member_list')
         self.action(c='country', m='storage')
-        result = self.action(c='country', m='donate', type=1)
+        flag = 0
+        donate = 0
         try:
-            status = result['status']
-            if status != 1:
-                info = self.action(c='country', m='donate', type=1)
-                print info
-                status = info['status']
+            for i in range(num):
+                if flag < 10:
+                    result = self.action(c='country', m='donate', type=1)
+                    status = result['status']
+                    if status == 1:
+                        donate += 10
+                        print donate
+                    else:
+                        flag += 1
         except:
             print result
             # self.action(c='country',m='get_member_list')
@@ -215,8 +223,8 @@ class activity(fuben):
 
     def usebuff(self):
         self.action(c='country_taxes_shop', m='index')
-        self.action(c='country_taxes_shop', m='buy', id=1)
-        self.action(c='war_college', m='use_buff', need_general=1)
+        # buy = self.action(c='country_taxes_shop', m='buy', id=1)
+        p(self.action(c='war_college', m='use_buff', need_general=1))
 
     def act_sword(self):  # 铸剑
         self.action(c='act_sword', m='start')
@@ -242,12 +250,21 @@ class activity(fuben):
             time.sleep(slp * 50)
 
     def pack(self):  # 卖垃圾装备
-        index = self.action(c='pack', m='index')
-        # for equ in index:  # 遍历未穿戴装备列表
-        #     if equ['quality'] == '3' or equ['quality'] == '1' or equ['quality'] == '2':
-        #         self.action(c='pack',m='sale',id=equ['id'])
+        index1 = self.action(c='pack', m='index', type=1)  # 武器
+        index3 = self.action(c='pack', m='index', type=3)  # 铠甲
+        index4 = self.action(c='pack', m='index', type=4)  # 防御
+        index5 = self.action(c='pack', m='index', type=5)  # 兵符
+        for equ in index1['list']:  # 遍历未穿戴装备列表
+            if equ['quality'] == "3" or equ['quality'] == "1" or equ['quality'] == "2":
+                self.action(c='pack', m='sale', id=equ['id'])
+        for equ in index3['list']:  # 遍历未穿戴装备列表
+            if equ['quality'] == "3" or equ['quality'] == "1" or equ['quality'] == "2":
+                self.action(c='pack', m='sale', id=equ['id'])
+        for equ in index4['list']:  # 遍历未穿戴装备列表
+            if equ['quality'] == "3" or equ['quality'] == "1" or equ['quality'] == "2":
+                self.action(c='pack', m='sale', id=equ['id'])
         # c=pack&m=sale&id=291000378856 ,出售制定装备
-        print self.action(c='pack', m='open_box', id=5, num=40)
+        # print self.action(c='pack', m='open_box', id=5, num=40)
 
     def jisi(self):  # 新年活动
         self.action(c='act_spring', m='index')
@@ -324,6 +341,7 @@ class activity(fuben):
                 self.action(c='act_lantern', m='buy', lid=1, mid=3, v=2018021101)
         except:
             pass
+
     def message(self):
         index = self.action(c='message', m='get_notice')['status']
         for i in xrange(111):
@@ -485,10 +503,10 @@ class activity(fuben):
         index = self.action(c='overseastrade', m='index')
         print '{} 剩余贸易次数：{}'.format(user, index['info']['times'])
 
-    def peiyang(self, name, attribute='zhiliup'):
+    def peiyang(self, name, attribute='wuliup'):
         """
         :param gid: 武将名字
-        :param attribute: 培养属性
+        :param attribute: 培养属性 'zhiliup','wuliup'
         :return:
         """
         print '开始培养'
@@ -498,13 +516,13 @@ class activity(fuben):
             if v['name'] == name:
                 gid = v['id']
                 limit = str(int(v['level']) + 20)  # 属性值上限
-                initnum = v['zhiliup']  # 当前值
+                initnum = v[attribute]  # 当前值
                 print limit, initnum
                 while int(initnum) < int(limit):
                     print '=' * 20
                     index = self.action(c='cultivate', m='roll', mode=1, gid=gid)
                     print json.dumps(index)
-                    roll = index['info']['zhiliup']
+                    roll = index['info'][attribute]
                     print '智力值是：', initnum, limit
                     print '剩余银币', index['info']['silver']
                     print 'roll 值', roll
@@ -535,11 +553,11 @@ class activity(fuben):
     def update_matrix(self, mid=4):
         genral_info = self.matrix()
         if mid != 4:
-            print 'feeeeee'
+            print '下全部将领'
             lists = '0,0,0,0,0,0,0,0,0'
         else:
             lists = '%s,-1,%s,-1,%s,-1,%s,-1,%s' % (
-                genral_info[u'蔡文姬'], 0, 0, 0, 0)
+                genral_info[u'蔡文姬'], genral_info[u'神周仓'], 0, 0, 0)
         print self.action(c='matrix', m='update_matrix', list=lists, mid=4)
         print self.action(c='matrix', m='use_matrix', mid=4)
 
@@ -651,7 +669,7 @@ class activity(fuben):
     def springshop(self, name=u'聊得'):  # 武將商城
         spring = self.action(c='springshop', m='index')['list']
         self.action(c='springshop', m='buy', id=1)
-        #self.action(c='springshop', m='buy', id=1)
+        # self.action(c='springshop', m='buy', id=1)
         self.action(c='springshop', m='buy', id=3)
         self.action(c='springshop', m='buy', id=10)
         self.action(c='springshop', m='buy', id=17)
@@ -673,7 +691,7 @@ class activity(fuben):
                 self.action(c='act_halloween', m='action_pumpkin', id=i)
 
     def zhounianshop(self):
-        medal = self.action(c='fukubukuro', m='index' )['medal']
+        medal = self.action(c='fukubukuro', m='index')['medal']
         print medal
         # self.action(c='fukubukuro', m='shop', type=1,)
         # self.action(c='fukubukuro', m='shop', type=2, )
@@ -756,7 +774,7 @@ if __name__ == '__main__':
     def zhujian(user, apass, addr):
         while True:
             action = activity(user, apass, addr)
-            #action.unlock(413728)
+            # action.unlock(413728)
             action.act_steadily()
 
 
@@ -786,8 +804,7 @@ if __name__ == '__main__':
 
     def gongxian(user, apass, addr):
         action = activity(user, apass, addr)
-        for i in range(1000):
-            action.gongxiang()
+        action.gongxiang()
 
 
     def panguo(user, apass, addr):
@@ -808,6 +825,8 @@ if __name__ == '__main__':
     def buff(user, apass, addr):
         action = activity(user, apass, addr)
         action.usebuff()
+
+
     def ylsanguo(user, apass, addr):
         action = activity(user, apass, addr)
         action.sanguo()
@@ -819,14 +838,14 @@ if __name__ == '__main__':
         action.chat(u"悍将三国六周年快乐")
 
 
-    def upmatrix(user, apass, addr, mid):  # 更新出征武将
+    def upmatrix(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        action.update_matrix(mid=mid)
+        action.update_matrix(mid=4)
 
 
     def guyuyinbi(user, apass, addr):  # 换古玉买银币
         action = activity(user, apass, addr)
-        #action.sign()  # 购买签到声望
+        # action.sign()  # 购买签到声望
         action.guyu()
         # action.guyu()
 
@@ -845,9 +864,25 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         action.robfukuang(user, ['体检了', '杰克吃翔', '杰克喝尿', '悍龙', '梦', '炎黄天都', '杰克喝sui'])
 
+
     def znshop(user, apass, addr):  # 周年福矿商店
         action = activity(user, apass, addr)
         action.jingcai()
+
+
+    def practice(user, apass, addr):  # 周年福矿商店
+        action = activity(user, apass, addr)
+        action.tufei(u'神周仓', 100)
+
+
+    def equip_strengthen(user, apass, addr):  # 强化，穿戴装备
+        action = activity(user, apass, addr)
+        gid, uid = action.general()  # 获取三级装备，再次强化，并给武将穿戴上
+        for i in uid:
+            for etype, v in i.items():
+                # action.strengthen(v)
+                action.equip(gid, v, etype)
+
 
     def chuan():
         with open('../users/alluser.txt', 'r') as f:
@@ -858,11 +893,11 @@ if __name__ == '__main__':
                     # name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    #addr = 21
-                    t1 = threading.Thread(target=chat, args=(name, passwd, addr))
+                    # addr = 21
+                    t1 = threading.Thread(target=equip_strengthen, args=(name, passwd, addr))
                     t1.start()
                     # t1.join()
-                    #time.sleep(0.2)
+                    # time.sleep(0.2)
 
 
     def ck():
@@ -879,7 +914,7 @@ if __name__ == '__main__':
 
 
     def dg():
-        cont = [ '150.txt','150num.txt','150nm.txt']
+        cont = ['150.txt', '150num.txt', '150nm.txt']
         for t in cont:
             with open('../users/%s' % t, 'r') as f:
                 for i in f:
@@ -892,6 +927,6 @@ if __name__ == '__main__':
 
 
     # chat('xingyue123a',413728161,148)
-    #ck()
-    #dg()
+    # ck()
+    # dg()
     chuan()
