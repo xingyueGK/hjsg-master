@@ -312,8 +312,8 @@ class activity(fuben):
 
     def shenshu(self):  # 神树
         index = self.action(c='sacredtree', m='index')
-        if index['time'] == 1:
-            print self.action(c='sacredtree', m='watering', type=1, v=2018021101)
+        if int(index['time']) == 1:
+            self.action(c='sacredtree', m='watering', type=1, v=2018021101)
 
     def yuanxiao(self):
         try:
@@ -747,10 +747,10 @@ if __name__ == '__main__':
         # action.usebuff()
         # action.sign()
         # action.fuka(15)
-        action.fukubukuro()
-        action.holiday()
-        action.chicken()
-        action.years_guard()
+        # action.fukubukuro()
+        # action.holiday()
+        # action.chicken()
+        # action.years_guard()
 
 
     def zhujian(user, apass, addr):
@@ -808,6 +808,9 @@ if __name__ == '__main__':
     def buff(user, apass, addr):
         action = activity(user, apass, addr)
         action.usebuff()
+    def ylsanguo(user, apass, addr):
+        action = activity(user, apass, addr)
+        action.sanguo()
 
 
     def chat(user, apass, addr):
@@ -823,7 +826,7 @@ if __name__ == '__main__':
 
     def guyuyinbi(user, apass, addr):  # 换古玉买银币
         action = activity(user, apass, addr)
-        action.sign()  # 购买签到声望
+        #action.sign()  # 购买签到声望
         action.guyu()
         # action.guyu()
 
@@ -856,7 +859,7 @@ if __name__ == '__main__':
                     passwd = i.split()[1]
                     addr = i.split()[2]
                     #addr = 21
-                    t1 = threading.Thread(target=sanguo, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=chat, args=(name, passwd, addr))
                     t1.start()
                     # t1.join()
                     #time.sleep(0.2)
@@ -871,12 +874,12 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 149
-                        t1 = threading.Thread(target=guyuyinbi, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
                         t1.start()
 
 
     def dg():
-        cont = [ '150.txt','150nm.txt','150num.txt']
+        cont = [ '150.txt','150num.txt','150nm.txt']
         for t in cont:
             with open('../users/%s' % t, 'r') as f:
                 for i in f:
@@ -884,7 +887,7 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 150
-                        t1 = threading.Thread(target=guyuyinbi, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
                         t1.start()
 
 
