@@ -8,7 +8,7 @@
 from task.base import SaoDangFb
 import time, threading
 import os, json
-
+from Queue import  Queue
 
 class task(SaoDangFb):
     def copies(self):
@@ -172,11 +172,33 @@ class task(SaoDangFb):
         # 领取每日奖励
         print '将魂星路'
         try:
+            index = self.action(c='tower', m='get_scene_list')
+            for s in index['scene']:
+                if s['openstatus'] == 1 and s['killed'] == 0:
+                    scene = s['id']
+                    item = self.tower_times = self.action(c='tower', m='get_mission_list', s=scene)
+                    times = item['times']
+                    for i in range(times):
+                        item = self.tower_times = self.action(c='tower', m='get_mission_list', s=scene)
+                        now_id = item['now']['id']
+                        status = self.action(c='tower', m='pk', id=now_id)
+                        times = item['times']
+                        if status['status'] != 1 and times > 5:
+                            self.action(c='tower', m='mop_up', id=int(now_id)-1, times=5)
+                        else:
+                            self.action(c='tower', m='pk', id=int(now_id) - 1)
+                    break
+                else:
+                    print '通关'
+                    scene = len(index['scene'])
+                    item = self.tower_times = self.action(c='tower', m='get_mission_list', s=scene)
+                    times = item['times']
+                    self.action(c='tower',m='get_mopup_price',id=174)
+                    self.action(c='tower', m='mop_up', id=174, times=times)
+                    break
+            #领取奖励
             self.action(c='tower', m='reward_info')
-            self.action(c='tower', m='get_reward')
-            # 获取次数：
-            self.tower_times = self.action(c='tower', m='get_mission_list', s=7)['times']
-            self.action(c='tower', m='mop_up', id=174, times=self.tower_times)
+            self.action(c='tower', m='get_reward',type=3)
         except:
             pass
 
@@ -250,7 +272,7 @@ class task(SaoDangFb):
         try:
             vip = self.action(c='member', m='index')['vip']
             if int(vip) < 9:
-                status = self.action(c='herothrone', m='index')
+                status = self.action(c='herothrone', m='index')['status']
                 if status != 1:
                     return None
                 for i in range(3):
@@ -276,7 +298,7 @@ class task(SaoDangFb):
         try:
             vip = self.action(c='member', m='index')['vip']
             if int(vip) < 9:
-                status = self.action(c='mountstone_throne', m='index')
+                status = self.action(c='mountstone_throne', m='index')['status']
                 if status != 1:
                     return None
                 for i in range(3):
@@ -518,15 +540,7 @@ class task(SaoDangFb):
         try:
             self.action(c='country', m='get_member_list')
             self.action(c='country', m='storage')
-            result = self.action(c='country', m='donate', type=1)
-            try:
-                status = result['status']
-                if status != 1:
-                    info = self.action(c='country', m='donate', type=1)
-                    print info
-                    status = info['status']
-            except:
-                print result
+            self.action(c='country', m='donate', type=1)
         except:
             pass
 
@@ -688,9 +702,9 @@ def run(user, apass, addr):
     action.drink()  # 每日军令饮酒
     action.country()  # 国家奖励
     action.overseastrade()  # 海外贸易
-    action.countrysacrifice()
-    # for i in range(50):
-    #     action.gongxian()
+    #action.countrysacrifice()#每日免费贡献40
+    for i in range(50):
+        action.gongxian()
     activity = action.get_act()
     if activity['act_travel'] == 1:
         for i in range(3):
@@ -724,18 +738,27 @@ def run(user, apass, addr):
 
 
 if __name__ == '__main__':
+    q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))
-    cont = ['alluser.txt']
+    cont = ['autouser.txt', 'user.txt','alluser.txt', 'duguyi.txt', '149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt',
+            '149xb.txt', '149lwzs.txt','21user.txt','150.txt','150nm.txt','150num.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
                 if i.strip():
                     name = i.split()[0]
                     passwd = i.split()[1]
-                    #addr = i.split()[2]
-                    addr = 21
+                    addr = i.split()[2]
                     t1 = threading.Thread(target=run, args=(name, passwd, addr))
-                    t1.start()
-                    # t1.join()
-                    time.sleep(0.2)
-        time.sleep(10)
+                    q.put(t1)
+    while not q.empty():
+        thread = []
+        for i in xrange(50):
+            try:
+                thread.append(q.get_nowait())
+            except:
+                pass
+        for i in thread:
+            i.start()
+        for i in thread:
+            i.join()

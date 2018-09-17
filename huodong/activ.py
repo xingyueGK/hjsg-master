@@ -70,13 +70,8 @@ class activity(fuben):
     def sign(self):  # 够买签到声望
         index = self.action(c='sign', m='sign_index')
         shop = self.action(c='sign', m='sale_shop')
-        self.action(c='sign', m='get_reward', type=2, id=63)
-        self.action(c='sign', m='get_reward', type=2, id=62)
-        self.action(c='sign', m='get_reward', type=2, id=61)
-        self.action(c='sign', m='get_reward', type=2, id=60)
-        self.action(c='sign', m='get_reward', type=2, id=59)
-        self.action(c='sign', m='get_reward', type=2, id=58)
-        self.action(c='sign', m='get_reward', type=2, id=57)
+        for i in shop['reward']:
+            self.action(c='sign', m='get_reward', type=2, id=i['id'])
 
     def fuka(self, num):  # 福卡活动处理
         print '-' * 20
@@ -845,9 +840,8 @@ if __name__ == '__main__':
 
     def guyuyinbi(user, apass, addr):  # 换古玉买银币
         action = activity(user, apass, addr)
-        # action.sign()  # 购买签到声望
+        action.sign()  # 购买签到声望
         action.guyu()
-        # action.guyu()
 
 
     def rolename(user, apass, addr, name):  # 更新出征武将
@@ -893,8 +887,8 @@ if __name__ == '__main__':
                     # name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    # addr = 21
-                    t1 = threading.Thread(target=equip_strengthen, args=(name, passwd, addr))
+                    addr = 21
+                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
                     t1.start()
                     # t1.join()
                     # time.sleep(0.2)
@@ -909,9 +903,9 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 149
-                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=guyuyinbi, args=(user, passwd, addr))
                         t1.start()
-
+                        time.sleep(0.1)
 
     def dg():
         cont = ['150.txt', '150num.txt', '150nm.txt']
@@ -922,11 +916,11 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 150
-                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=guyuyinbi, args=(user, passwd, addr))
                         t1.start()
 
 
     # chat('xingyue123a',413728161,148)
-    # ck()
-    # dg()
-    chuan()
+    #ck()
+    dg()
+    #chuan()
