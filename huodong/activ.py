@@ -4,6 +4,7 @@ import time
 import json
 import shujufenx
 from shujufenx import fuben
+from Queue import Queue
 
 """每日不定期开展活动"""
 
@@ -323,9 +324,24 @@ class activity(fuben):
         print self.action(c='invitation', m='change', code='nifckpm', v=2018021101)
 
     def shenshu(self):  # 神树
-        index = self.action(c='sacredtree', m='index')
-        if int(index['time']) == 1:
-            self.action(c='sacredtree', m='watering', type=1, v=2018021101)
+        try:
+            index = self.action(c='sacredtree', m='index')
+
+            if int(index['time']) == 1:
+                self.action(c='sacredtree', m='watering', type=1, v=2018021101)
+            for i in range(5):
+                index = self.action(c='sacredtree', m='index')
+                cd = index['cd']
+                levelup_exp = int(index['levelup_exp'])
+                exp = int(index['exp'])
+                print "\r", exp, levelup_exp
+                if cd < 86400 and levelup_exp < 2000:
+                    print '浇水'
+                    self.action(c='sacredtree', m='watering', type=1, v=2018021101)
+                else:
+                    break
+        except:
+            pass
 
     def yuanxiao(self):
         try:
@@ -531,10 +547,7 @@ class activity(fuben):
                         print json.dumps(result)
                 print 'name: %s  属性值 %s' % (name, initnum)
 
-    def blackmarket(self):  # 黑市购买军令，突飞卡
-        # buy_type 1 是银币  2 是元宝 5 是紫石头
-        index = self.action(c='blackmarket', m='index')
-        times = index['info']['times']
+
 
     def matrix(self):
         genral_dict = {}
@@ -563,7 +576,7 @@ class activity(fuben):
     def fukubukuro(self):  # 周年福矿签到
         self.action(c='fukubukuro', m='index')
         self.action(c='fukubukuro', m='sign', type=1)
-        self.action(c='fukubukuro', m='get_general', gid=354)
+        self.action(c='fukubukuro', m='get_general', gid=360)
 
     def zhounianfukuang(self, username):  # 周年矿
         self.action(c='fukubukuro', m='index')
@@ -694,7 +707,8 @@ class activity(fuben):
         # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
         # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
 
-
+    def tavern(self):#批量银币贸易
+        self.action(c='tavern',m='trade_batch',option=1)
 # 周年比购物
 
 # def wx():#五行竞猜刷数据
@@ -728,6 +742,9 @@ class activity(fuben):
 # action.fuka()
 # action.messages()
 if __name__ == '__main__':
+    q = Queue()
+
+
     def act(user, apass, addr):
         action = activity(user, apass, addr)
         # action.pack()
@@ -751,7 +768,7 @@ if __name__ == '__main__':
         # action.lottery()#抽奖
         # action.actjubao()
         # action.leigu()
-        action.shenshu()
+        # action.shenshu()
         # action.qiandao()
         # action.actjubao()
         # action.jisi()
@@ -840,7 +857,7 @@ if __name__ == '__main__':
 
     def guyuyinbi(user, apass, addr):  # 换古玉买银币
         action = activity(user, apass, addr)
-        action.sign()  # 购买签到声望
+        # action.sign()  # 购买签到声望
         action.guyu()
 
 
@@ -879,7 +896,7 @@ if __name__ == '__main__':
 
 
     def chuan():
-        with open('../users/alluser.txt', 'r') as f:
+        with open('../users/150gx.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip():
@@ -887,11 +904,9 @@ if __name__ == '__main__':
                     # name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    addr = 21
-                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
-                    t1.start()
-                    # t1.join()
-                    # time.sleep(0.2)
+                    # addr = 21
+                    t1 = threading.Thread(target=guyuyinbi, args=(name, passwd, addr))
+                    q.put(t1)
 
 
     def ck():
@@ -903,9 +918,9 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 149
-                        t1 = threading.Thread(target=guyuyinbi, args=(user, passwd, addr))
-                        t1.start()
-                        time.sleep(0.1)
+                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
+                        q.put(t1)
+
 
     def dg():
         cont = ['150.txt', '150num.txt', '150nm.txt']
@@ -916,11 +931,23 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 150
-                        t1 = threading.Thread(target=guyuyinbi, args=(user, passwd, addr))
-                        t1.start()
+                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
+                        q.put(t1)
 
 
     # chat('xingyue123a',413728161,148)
-    #ck()
-    dg()
-    #chuan()
+    ck()
+    # dg()
+    # chuan()
+
+    while not q.empty():
+        thread = []
+        for i in xrange(50):
+            try:
+                thread.append(q.get_nowait())
+            except:
+                pass
+        for i in thread:
+            i.start()
+        for i in thread:
+            i.join()

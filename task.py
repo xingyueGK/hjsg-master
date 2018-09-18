@@ -622,11 +622,22 @@ class task(SaoDangFb):
             pass
 
     def shenshu(self):  # 神树
-        print '浇树'
         try:
             index = self.action(c='sacredtree', m='index')
+
             if int(index['time']) == 1:
                 self.action(c='sacredtree', m='watering', type=1, v=2018021101)
+            for i in range(5):
+                index = self.action(c='sacredtree', m='index')
+                cd = index['cd']
+                levelup_exp = int(index['levelup_exp'])
+                exp = int(index['exp'])
+                print "\r",exp,levelup_exp
+                if cd < 86400 and levelup_exp < 2000 :
+                    print '浇水'
+                    self.action(c='sacredtree', m='watering', type=1, v=2018021101)
+                else:
+                    break
         except:
             pass
     def yuanxiao(self):
@@ -658,12 +669,13 @@ class task(SaoDangFb):
         except:
             pass
 
-    def fukubukuro(self):  # 周年将签到
+    def fukubukuro(self):  # 周年将签到,
         print '周年将签到'
         try:
             self.action(c='fukubukuro', m='index')
             self.action(c='fukubukuro', m='sign', type=1)
-            self.action(c='fukubukuro', m='get_general', gid=354)
+            #合成签到将领
+            self.action(c='fukubukuro', m='get_general', gid=360)
         except:
             pass
 
@@ -678,58 +690,58 @@ class task(SaoDangFb):
 
 def run(user, apass, addr):
     action = task(user, apass, addr)
-    action.arena()  # 获取每日演武奖
-    action.qiandao()  # 每日签到
-    action.hitegg()  # 砸蛋
-    action.heaven()  # 通天塔
-    action.workshop()  # 玉石采集
-    action.exploit_tree()  # 木材采集
-    action.exploit_stone()  # 石头采集
-    action.herothrone()  # 英雄王座
-    action.sanctum()  # 每日宝石领奖
-    action.generaltask()  #
-    action.business()  # 每日通商
-    action.tower()  # 将魂星路
-    action.island()  # 金银洞
-    action.lottery()  # 每日抽奖
-    action.worldboss()  # 世界boos
-    # action.copies()  # 扫荡副本
-    action.mount_stone()  # 每日大马副本
-    action.awaken_copy()  # 觉醒奖励
-    action.dice()  # 国家摇色子
-    action.mouth_card()  # 月卡奖励
-    action.beauty()  # 铜雀台互动
-    action.drink()  # 每日军令饮酒
-    action.country()  # 国家奖励
-    action.overseastrade()  # 海外贸易
-    #action.countrysacrifice()#每日免费贡献40
-    for i in range(50):
-        action.gongxian()
     activity = action.get_act()
-    if activity['act_travel'] == 1:
-        for i in range(3):
-            action.sanguo()  # 游历三国
-    if activity['actkemari'] == 1:
-        action.cuju()  # 蹴鞠
-    if activity['act_steadily'] == 1:
-        while True:
-            action.act_steadily()
-    if activity['act_spring'] == 1:
-        action.jisi()  # 游历三国
-    if activity['happy_guoqing'] == 1:
-        action.leigu()  # 游历三国
-    if activity['chicken'] == 1:
-        action.chicken()  # 游历三国
-    if activity['holiday'] == 1:
-        action.holiday()  # 游历三国
-    if activity['sacredtree'] == 1:
-        action.shenshu()  # 游历三国
-    if activity['lantern'] == 1:
-        action.yuanxiao()  # 游历三国
-    if activity['actjubao'] == 1:
-        action.actjubao()  # 游历三国
-    if activity['years_guard'] == 1:
-        action.years_guard()  # 游历三国
+    # action.arena()  # 获取每日演武奖
+    # action.qiandao()  # 每日签到
+    # action.hitegg()  # 砸蛋
+    # action.heaven()  # 通天塔
+    # action.workshop()  # 玉石采集
+    # action.exploit_tree()  # 木材采集
+    # action.exploit_stone()  # 石头采集
+    # action.herothrone()  # 英雄王座
+    # action.sanctum()  # 每日宝石领奖
+    # action.generaltask()  #
+    # action.business()  # 每日通商
+    # action.tower()  # 将魂星路
+    # action.island()  # 金银洞
+    # action.lottery()  # 每日抽奖
+    # action.worldboss()  # 世界boos
+    # # action.copies()  # 扫荡副本
+    # action.mount_stone()  # 每日大马副本
+    # action.awaken_copy()  # 觉醒奖励
+    # action.dice()  # 国家摇色子
+    # action.mouth_card()  # 月卡奖励
+    # action.beauty()  # 铜雀台互动
+    # action.drink()  # 每日军令饮酒
+    # action.country()  # 国家奖励
+    # action.overseastrade()  # 海外贸易
+    # #action.countrysacrifice()#每日免费贡献40
+    # for i in range(50):
+    #     action.gongxian()
+    # if activity['act_travel'] == 1:
+    #     for i in range(3):
+    #         action.sanguo()  # 游历三国
+    # if activity['actkemari'] == 1:
+    #     action.cuju()  # 蹴鞠
+    # if activity['act_steadily'] == 1:
+    #     while True:
+    #         action.act_steadily()
+    # if activity['act_spring'] == 1:
+    #     action.jisi()  # 游历三国
+    # if activity['happy_guoqing'] == 1:
+    #     action.leigu()  # 游历三国
+    # if activity['chicken'] == 1:
+    #     action.chicken()  # 游历三国
+    # if activity['holiday'] == 1:
+    #     action.holiday()  # 游历三国
+    # if activity['sacredtree'] == 1:
+    #     action.shenshu()  # 游历三国
+    # if activity['lantern'] == 1:
+    #     action.yuanxiao()  # 游历三国
+    # if activity['actjubao'] == 1:
+    #     action.actjubao()  # 游历三国
+    # if activity['years_guard'] == 1:
+    #     action.years_guard()  # 游历三国
     if activity['fukubukuro'] == 1:
         action.fukubukuro()  # 游历三国
 
