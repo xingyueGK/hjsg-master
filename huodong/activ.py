@@ -58,15 +58,16 @@ class activity(fuben):
 
     def jingsu(self):  # 竞速奖励
         info = self.action(c='map', m='get_reward_list', channel=11, v=2017122401)
-        print info
+        #print info
         for i in info['list']:
             if i['open_status'] == 0:
                 print '%s 已通过未领取 ，元宝：%s' % (i['name'], i['gold'])
+                self.action(c='map', m='get_mission_reward', id=i['missionid'])
             elif i['open_status'] == 1:
                 print '%s 未通过 ，元宝：%s' % (i['name'], i['gold'])
             elif i['open_status'] == 2:
                 print '%s 已通过已领取 ，元宝：%s' % (i['name'], i['gold'])
-        # self.action(c='map',m='get_mission_reward',id=120)
+        #       self.action(c='map',m='get_mission_reward',id=i['missionid'])
 
     def sign(self):  # 够买签到声望
         index = self.action(c='sign', m='sign_index')
@@ -219,7 +220,7 @@ class activity(fuben):
 
     def usebuff(self):
         self.action(c='country_taxes_shop', m='index')
-        # buy = self.action(c='country_taxes_shop', m='buy', id=1)
+        buy = self.action(c='country_taxes_shop', m='buy', id=1)
         p(self.action(c='war_college', m='use_buff', need_general=1))
 
     def act_sword(self):  # 铸剑
@@ -861,9 +862,11 @@ if __name__ == '__main__':
         action.guyu()
 
 
-    def rolename(user, apass, addr, name):  # 更新出征武将
+    def rolename(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        action.role(name)
+        nickname = '航海'+user.split('y0')[1]
+        print nickname
+        action.role(nickname)
 
 
     def zhouniankuang(user, apass, addr):  # 更新出征武将
@@ -878,10 +881,10 @@ if __name__ == '__main__':
 
     def znshop(user, apass, addr):  # 周年福矿商店
         action = activity(user, apass, addr)
-        action.jingcai()
+        action.zhounianshop()
 
 
-    def practice(user, apass, addr):  # 周年福矿商店
+    def practice(user, apass, addr):  # 武将突飞
         action = activity(user, apass, addr)
         action.tufei(u'神周仓', 100)
 
@@ -893,10 +896,12 @@ if __name__ == '__main__':
             for etype, v in i.items():
                 # action.strengthen(v)
                 action.equip(gid, v, etype)
-
+    def getjingsu(user, apass, addr):
+        action = activity(user, apass, addr)
+        action.jingsu()
 
     def chuan():
-        with open('../users/150gx.txt', 'r') as f:
+        with open('../users/149gmjrhy.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip():
@@ -904,8 +909,8 @@ if __name__ == '__main__':
                     # name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    # addr = 21
-                    t1 = threading.Thread(target=guyuyinbi, args=(name, passwd, addr))
+                    addr = 147
+                    t1 = threading.Thread(target=zhujian, args=(name, passwd, addr))
                     q.put(t1)
 
 
@@ -936,9 +941,9 @@ if __name__ == '__main__':
 
 
     # chat('xingyue123a',413728161,148)
-    ck()
+    #ck()
     # dg()
-    # chuan()
+    chuan()
 
     while not q.empty():
         thread = []
@@ -949,5 +954,6 @@ if __name__ == '__main__':
                 pass
         for i in thread:
             i.start()
+            # i.join()
         for i in thread:
             i.join()

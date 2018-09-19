@@ -214,9 +214,9 @@ class fuben(SaoDangFb):
 
     def saodang(self, num):  # 攻击小兵
         memberindex = self.action(c='member', m='index')
-        missionlevel = memberindex['missionlevel']
-        missionsite = memberindex['missionsite']
-        missionstage = memberindex['missionstage']
+        missionlevel = int(memberindex['missionlevel'])
+        missionsite = int(memberindex['missionsite'])
+        missionstage = int(memberindex['missionstage'])
         map = self.action(c='map', m='get_mission_list')
         exit_code = 1
         if exit_code == 1:

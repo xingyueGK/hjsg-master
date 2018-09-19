@@ -39,8 +39,8 @@ class SaoDangFb(object):
             num=num, user=user, passwd=passwd)
         _redis = redis.Redis(host='localhost', port=6379, decode_responses=True)
         try:
-            if _redis.get(user):
-                token = _redis.get(user)
+            if _redis.hget(num,user):
+                token = _redis.hget(num,user)
                 login = 'http://s{num}.game.hanjiangsanguo.com/index.php?c=member&m=index&v=0&token={token}&channel=150&lang=zh-cn&rand=150959405499450'.format(
                     num=num, token=token)
                 r = requests.get(login)
@@ -53,7 +53,7 @@ class SaoDangFb(object):
         except TokenErr:
                 try:
                     token= requests.get(url).json()['token']
-                    _redis.set(user,token)
+                    _redis.hset(num,user,token)
                     return token
                 except Exception as e:
                     print e

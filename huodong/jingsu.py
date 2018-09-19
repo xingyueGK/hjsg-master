@@ -200,7 +200,7 @@ with open('../users/149gmjrhy.txt', 'r') as f:
         if i.strip():
             str = i.strip().split()[0]
             name = str
-            addr = 148
+            addr = 147
             passwd = i.split()[1]
             t1 = threading.Thread(target=act,args=(name,passwd,addr))
             t1.start()
