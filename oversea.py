@@ -6,11 +6,14 @@
 
 from task.base  import SaoDangFb
 import  threading
-import json,time
+import json,time,os
+import redis
 
 tasks ={}
 lock = threading.RLock()
 
+pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
+_redis = redis.StrictRedis(connection_pool=pool)
 class MyThread(threading.Thread):
     def __init__(self,func,args=()):
         super(MyThread,self).__init__()
@@ -20,19 +23,20 @@ class MyThread(threading.Thread):
         self.func(*self.arg)
 
 def timesCount(name,passwd,addr):#返回贸易次数
-    global lock
-    global tasks
-    lock.acquire()
     task = SaoDangFb(name,passwd,addr)
-    lock.release()
     result = task.action(c='overseastrade',m='index')
-    lock.acquire()
     try:
-        tasks[name] = result['info']['times']
-        lock.release()
+        times = result['info']['times']
     except:
-        tasks[name] = 0
-        lock.release()
+        times = 0
+    key = 'overseastrade' + str(addr)
+    TIME = time.strftime("%Y-%m-%d")
+    extime = TIME + " 23:59:59"
+    timeArray = time.strptime(extime, "%Y-%m-%d %H:%M:%S")
+    timeStamp = int(time.mktime(timeArray))
+    _redis.hset(key,name,times)
+    _redis.expireat(key, timeStamp)
+
 def jierihaiyun(name, passwd, addr,flag=True):  # 节日海外贸易
     '''
     :param name:
@@ -61,56 +65,47 @@ def jierihaiyun(name, passwd, addr,flag=True):  # 节日海外贸易
                 break
         # 组队 ，检查是否有对， 有则加入，没有则创建 ，开始贸易
         # 1获取组队列表
-        list_country = task.action(c='overseastrade', m='get_list_by_country', p=1)['list']
+        list_country = task.action(c='overseastrade', m='get_list_by_country', p=4)['list']
 
-            # 加入贸易队伍，每页有四个框，为place：1-4，每个框有两个位置site:1-2，页数为page:1-10默认为1即可，
-        status = task.action(c="overseastrade", m='join_team', id=0, place=4, site=2, page=4)
+            # 加入贸易队伍，每页有四个框，为place：1-4，每个框有两个位置site:1-2，页数为page:1-5默认为1即可，
+        if list_country:
+            status = task.action(c="overseastrade", m='join_team', id=0, place=3, site=2, page=4)
+        else:
+            status = task.action(c="overseastrade", m='join_team', id=0, place=4, site=2, page=4)
         task.action(c="overseastrade", m='trade', v=0)  # 开启
-        time.sleep(0.2)
     index = task.action(c='overseastrade', m='index')
     print '{0} 剩余贸易次数：{1}'.format(name,index['info']['times'])
 
-def makeTask(file,addr):
-    #with open('../users/150lwchuan.txt', 'r') as f:
-    with open('../users/{0}'.format(file), 'r') as f:
-        for i in f:
-            if i.strip():
-                str = i.strip().split()[0]
-                name = str
-                passwd = i.split()[1]
-                addr = addr
-                t1 = MyThread(timesCount, args=(name, passwd, addr))
-                t1.start()
-    while 1:#阻塞主进程确保任务生成
-        if threading.activeCount() == 1:
-            break
-def main(passwd,addr,file,flag,FlushCount =40):
+def makeTask(name, passwd, addr):
+    t1 = MyThread(timesCount, args=(name, passwd, addr))
+    t1.start()
+def main(file,addr,flag,FlushCount =40):
     """
     :param FlushCount: 每次同时刷船次数,默认1个
     """
-    try:
-        with open('chuaninfo.txt','r') as f:
-            try:
-                userTimes = json.load(f)
-                for k,v in userTimes.items():
-                    print 'username {0} 还剩 {1}'.format(k, v)
-                    if int(v) == 0:
+    filepath = os.path.dirname(os.path.abspath(__file__))
+    with open('%s/users/%s' % (filepath, file), 'r') as f:
+        for i in f:
+            if i.strip():
+                user = i.split()[0]
+                passwd = i.split()[1]
+                key = 'overseastrade' + str(addr)
+                if _redis.hget(key,user):
+                    userTimes = _redis.hget(key,user)
+                    print 'username {0} 还剩 {1}'.format(user, userTimes)
+                    if int(userTimes) <= 0:
                         continue
                     if FlushCount >0:
-                        jierihaiyun(k,passwd,addr,flag)#开始打劫
+                        t1 = threading.Thread(target=jierihaiyun, args=(user,passwd,addr,flag))
+                        t1.start()
+                        time.sleep(0.3)
                         FlushCount -= 1
-                        with open("chuaninfo.txt", 'w') as fw:
-                            userTimes[k] = int(v) - 1
-                            json.dump(userTimes, fw)
+                        times = int(userTimes) -1
+                        _redis.hset(key,user,times)
                     else:
                         break
-            except:
-                makeTask(file,addr)
-                with open('chuaninfo.txt', 'w') as f:
-                    json.dump(tasks, f)
-    except IOError:
-        makeTask(file,addr)
-        with open('chuaninfo.txt', 'w') as f:
-            json.dump(tasks,f)
+                else:
+                    makeTask(user,passwd,addr)
+
 if __name__ == '__main__':
-    main(413728161,21,'5user.txt',True,50)
+    main('149gmjrhy.txt',149,True,10)
