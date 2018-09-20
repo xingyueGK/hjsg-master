@@ -37,7 +37,8 @@ class SaoDangFb(object):
     def get_token(num, user, passwd):
         url = 'http://s{num}.game.hanjiangsanguo.com/index.php?u={user}&p={passwd}&v=0&c=login&&m=user&&token=&channel=150&lang=zh-cn&rand=150959405499450'.format(
             num=num, user=user, passwd=passwd)
-        _redis = redis.Redis(host='localhost', port=6379, decode_responses=True)
+        pool = redis.ConnectionPool(host='localhost', port=6379,db=0)
+        _redis = redis.StrictRedis(connection_pool=pool)
         try:
             if _redis.hget(num,user):
                 token = _redis.hget(num,user)

@@ -5,10 +5,11 @@
 from base  import SaoDangFb
 import  threading
 import json,time
-
+import redis
 tasks ={}
 lock = threading.RLock()
 
+_redis = redis.Redis(host='localhost', port=6379, decode_responses=True)
 class MyThread(threading.Thread):
     def __init__(self,func,args=()):
         super(MyThread,self).__init__()
@@ -18,19 +19,14 @@ class MyThread(threading.Thread):
         self.func(*self.arg)
 
 def timesCount(name,passwd,addr):#返回贸易次数
-    global lock
-    global tasks
-    lock.acquire()
     task = SaoDangFb(name,passwd,addr)
-    lock.release()
     result = task.action(c='overseastrade',m='index')
-    lock.acquire()
     try:
-        tasks[name] = result['info']['times']
-        lock.release()
+        times = result['info']['times']
     except:
-        tasks[name] = 0
-        lock.release()
+        times = 0
+    key = 'overseastrade'+name
+    _redis.hset(addr,key,times)
 def jierihaiyun(name, passwd, addr,flag=True):  # 节日海外贸易
     '''
     :param name:
@@ -68,8 +64,7 @@ def jierihaiyun(name, passwd, addr,flag=True):  # 节日海外贸易
     index = task.action(c='overseastrade', m='index')
     print '{0} 剩余贸易次数：{1}'.format(name,index['info']['times'])
 
-def makeTask(file,addr):
-    #with open('../users/150lwchuan.txt', 'r') as f:
+def makeTask(file,addr):#批量生成次数
     with open('../users/{0}'.format(file), 'r') as f:
         for i in f:
             if i.strip():
@@ -87,9 +82,8 @@ def main(passwd,addr,file,flag,FlushCount =40):
     :param FlushCount: 每次同时刷船次数,默认1个
     """
     try:
-        with open('chuaninfo.txt','r') as f:
             try:
-                userTimes = json.load(f)
+                userTimes = _redis.hget()
                 for k,v in userTimes.items():
                     print 'username {0} 还剩 {1}'.format(k, v)
                     if int(v) == 0:
@@ -111,4 +105,4 @@ def main(passwd,addr,file,flag,FlushCount =40):
         with open('chuaninfo.txt', 'w') as f:
             json.dump(tasks,f)
 if __name__ == '__main__':
-    main(413728161,21,'5user.txt',True,50)
+    main(666666,149,'149gmjrhy.txt',True,50)
