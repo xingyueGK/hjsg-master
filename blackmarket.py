@@ -7,34 +7,35 @@
 #每日三次刷新黑市，主要是购买军令
 
 from task.base import SaoDangFb
-import time, threading
-import os, json
+import time, threading,json
+import os,redis
 from Queue import Queue
 
+pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
+_redis = redis.StrictRedis(connection_pool=pool)
 
 class blackmarket(SaoDangFb):
     # buy_type 1 是银币  2 是元宝 3 是蓝石头 4 是黄石头 5 是紫石头
-
-
     def refresh(self):
-
         refresh = self.action(c='blackmarket', m='refresh')
         return refresh['list']
-
-    def buy(self,user):
+    def buy(self,user,refresh=0):
         buy_item = ['中级卡', '初级卡', '高级卡', '军令']
         buy_type = [1, 3, 4, 5]
         times, item = self.blackmarket()
         for k, v in item.items():
             if v['name'] in buy_item and int(v['buy_type']) in buy_type:
-                print
-                status = self.action(c='blackmarket', m='buy', id=v['id'])
+                status = self.action(c='blackmarket', m='buy', id=int(v['id']))
                 if status['status'] !=1:
                     exit(3)
                 print user,'够买'+ v['name'],int(v['value'])
                 self.buy(user)
-        print times
+                break
         if int(times) > 0:
+            self.refresh()
+            self.buy(user)
+        for i in range(refresh):
+            print '刷新次数',i
             self.refresh()
             self.buy(user)
 
@@ -51,7 +52,7 @@ def run(user, apass, addr,lockpwd):
     action = blackmarket(user, apass, addr)
     action.unlock(lockpwd)
     # action.tavern()
-    action.buy(user)
+    action.buy(user,0)
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))

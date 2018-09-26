@@ -48,8 +48,25 @@ def jierihaiyun(name, passwd, addr,flag=True):  # 节日海外贸易
     task = SaoDangFb(name, passwd, addr)
     task.action(c='message', m='index')
     index = task.action(c='overseastrade', m='index')
+
+    ite = task.action(c='overseastrade',m='item_list')
+
+    try:
+        renew=ite['member_info']['renew']
+    except:
+
+
+        list_country = task.action(c='overseastrade', m='get_list_by_country', p=4)['list']
+
+            # 加入贸易队伍，每页有四个框，为place：1-4，每个框有两个位置site:1-2，页数为page:1-5默认为1即可，
+        if list_country:
+            status = task.action(c="overseastrade", m='join_team', id=0, place=3, site=2, page=4)
+        else:
+            status = task.action(c="overseastrade", m='join_team', id=0, place=4, site=2, page=4)
+        task.action(c="overseastrade", m='trade', v=0)  # 开启
+        return None
     #购买粮食，花费银币的，id=1为粮食，id2-5为花费元宝的玛瑙等
-    if int(index['info']['times']) > 0:
+    if int(index['info']['times']) > 0 and int(renew) < 3:
         while True:
             try:
                 if flag:
@@ -98,7 +115,7 @@ def main(file,addr,flag,FlushCount =40):
                     if FlushCount >0:
                         t1 = threading.Thread(target=jierihaiyun, args=(user,passwd,addr,flag))
                         t1.start()
-                        time.sleep(0.3)
+                        time.sleep(0.5)
                         FlushCount -= 1
                         times = int(userTimes) -1
                         _redis.hset(key,user,times)
@@ -108,4 +125,4 @@ def main(file,addr,flag,FlushCount =40):
                     makeTask(user,passwd,addr)
 
 if __name__ == '__main__':
-    main('149gmjrhy.txt',149,True,10)
+    main('149gmjrhy.txt',147,True,30)

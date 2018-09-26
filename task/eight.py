@@ -21,10 +21,6 @@ class eight(SaoDangFb):
         for k,v in genral_info.items():
             pass
 
-
-
-
-
     def reset(self):
         self.action(c='eight_diagram', m='reset_point')
         self.action(c='eight_diagram', m='level_index', level=self.level)  # level：八卦等级，分为1,2,3重
@@ -73,10 +69,10 @@ class eight(SaoDangFb):
 
 
 def main():
-    ei = eight(num=21, user='xingyue123', passwd='413728161', level=3)
+    ei = eight(num=148, user='xingyue123z', passwd='413728161', level=2)
     ei.use_matrix(4)  # 使用固定阵法
     ei.condition()
-    ei.update_matrix(u'神黄权',u'神刘璋',u'神袁尚',u'神刘表',u'神卢植',4)
+    ei.update_matrix(u'神甘宁',u'神刘璋',u'神袁尚',u'神刘表',u'神卢植',4)
     point = ei.eight_index()['cost']['point']
     print '当前位置', point
     if point == '9':
@@ -85,16 +81,16 @@ def main():
         point = ei.eight_index()['cost']['point']
         if point == '7':#武将减低
             # 上谋士 u'神刘表'
-            ei.update_matrix(u'神黄权', u'神袁尚', u'神鲁肃', u'神刘表', u'神刘璋', 2)
+            ei.update_matrix(u'神甘宁', u'神刘璋', u'神袁尚', u'神刘表', u'神卢植', 4)
             ei.pk()
             print '当前位置', point
         elif point == '8':#谋士降低
-            ei.update_matrix(u'神黄权', u'神刘璋', u'神袁尚', u'神刘表', u'神卢植', 4)
+            ei.update_matrix(u'神甘宁', u'神刘璋', u'神袁尚', u'夏侯杰', u'神刘表', 4)
             ei.pk()
         else:
             ei.pk()
             print '当前位置', point
-    ei.update_matrix(u'魔张梁', u'神刘璋', u'神袁尚', u'神刘表', u'神卢植', 4)
+    ei.update_matrix(u'神刘表', u'神刘璋', u'神袁尚', u'神甘宁', u'神卢植', 4)
     ei.use_matrix(4)
 if __name__ == '__main__':
     main()

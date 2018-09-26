@@ -33,13 +33,13 @@ class task(SaoDangFb):
                                 self.action(c="copies", m="get_monster_info", id=id, diff_id=diff_id,
                                             monster_id=monster_id,
                                             d="newequip")['info']['free_times']
-                        except Exception:
-                            pass
+                        except Exception as e:
+                            print e
                         if times != '0':
                             self.action(c="copies", m="mop_up", id=id, diff_id=diff_id, monster_id=monster_id,
                                               d="newequip", times=int(times))
-        except:
-            pass
+        except Exception as e:
+            print e
     def qiandao(self):  # 签到
         try:
             print '每日签到'
@@ -50,8 +50,8 @@ class task(SaoDangFb):
             self.action(c='sign', m='sign_index')
             # c:vipwage，m:get_vip_wage，领取VIP每日奖励
             self.action(c='vipwage', m='get_vip_wage')
-        except:
-            pass
+        except Exception as e:
+            print e
     def zhengshou(self):  # 征收
         print '征收'
         try:
@@ -64,8 +64,8 @@ class task(SaoDangFb):
                     self.action(c='city', m='impose')
             else:
                 print '次数为0次'
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def hitegg(self):  # 砸蛋
         print '砸蛋'
@@ -82,8 +82,8 @@ class task(SaoDangFb):
                     print '砸蛋成功'
                     _id = i + 1
                     self.action(c='hitegg', m='hit_egg', id=_id)
-        except:
-            pass
+        except Exception as e:
+            print e
     def island(self):  # 金银洞活动
         print '金银洞活动'
         try:
@@ -99,8 +99,8 @@ class task(SaoDangFb):
                     self.action(c='island', m='pk', id=85)  # 共计通过之后的最高金银洞5次
             else:
                 print '今天已经攻击了10次不在攻打'
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def countryboos(self):  # 国家boss
         now_time = time.strftime('%H:%M:%S')
@@ -166,8 +166,8 @@ class task(SaoDangFb):
             else:
                 # 加入贸易队伍，每页有四个框，为place：1-4，每个框有两个位置site:1-2，页数为page:1-10默认为1即可，
                 self.action(c="overseastrade", m='join_team', id=0, place=4, site=2, page=1)
-        except:
-            pass
+        except Exception as e:
+            print e
     def tower(self):  # 将魂星路
         # 领取每日奖励
         print '将魂星路'
@@ -182,25 +182,24 @@ class task(SaoDangFb):
                         item = self.tower_times = self.action(c='tower', m='get_mission_list', s=scene)
                         now_id = item['now']['id']
                         status = self.action(c='tower', m='pk', id=now_id)
+                        print json.dumps(status)
                         times = item['times']
                         if status['status'] != 1 and times > 5:
                             self.action(c='tower', m='mop_up', id=int(now_id)-1, times=5)
                         else:
                             self.action(c='tower', m='pk', id=int(now_id) - 1)
-                    break
-                else:
-                    print '通关'
-                    scene = len(index['scene'])
-                    item = self.tower_times = self.action(c='tower', m='get_mission_list', s=scene)
-                    times = item['times']
-                    self.action(c='tower',m='get_mopup_price',id=174)
-                    self.action(c='tower', m='mop_up', id=174, times=times)
-                    break
+                    return None
+            print '通关'
+            scene = len(index['scene'])
+            item = self.tower_times = self.action(c='tower', m='get_mission_list', s=scene)
+            times = item['times']
+            self.action(c='tower',m='get_mopup_price',id=174)
+            self.action(c='tower', m='mop_up', id=174, times=times)
             #领取奖励
             self.action(c='tower', m='reward_info')
             self.action(c='tower', m='get_reward',type=3)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def business(self):  #
         print '通商'
@@ -214,8 +213,8 @@ class task(SaoDangFb):
                 business_id = self.action(c='business', m='index')['trader'][0]['id']
                 self.action(c='business', m='go_business', id=business_id)
             print '通商完成'
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def generaltask(self):  # 每日神将
         print '每日神将'
@@ -232,8 +231,8 @@ class task(SaoDangFb):
             for count in range(int(number)):
                 self.action(type=0, id=id, gid=gid, c='generaltask', m='action')
             print '神将10次扫荡完毕'
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def sanctum(self):
         # 每日宝石领奖
@@ -251,7 +250,7 @@ class task(SaoDangFb):
             else:
                 print '剩余次数为 %s 次' % numbers
             print '宝石扫荡结束'
-        except:
+        except Exception as e:
             print '已经领取宝石奖励'
 
     def lottery(self):  # 每日抽奖
@@ -264,8 +263,8 @@ class task(SaoDangFb):
             for num in range(self.numbers):
                 self.action(c='lottery', m='action')
             print '抽奖结束'
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def herothrone(self):  # 英雄王座
         print '英雄王座'
@@ -290,8 +289,8 @@ class task(SaoDangFb):
                     self.action(c='herothrone', m='end_battle')
                     self.action(c='herothrone', m='go_back')
 
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def mount_stone(self):#符石副本
         print '符石副本'
@@ -315,8 +314,8 @@ class task(SaoDangFb):
                     self.action(c='mountstone_throne', m='start')  # 开始王座
                     self.action(c='mountstone_throne', m='end_battle')  # 开始王座
                     self.action(c='mountstone_throne', m='go_back')  # 开始王座
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def workshop(self):  # 玉石收集
         # 收取
@@ -324,8 +323,8 @@ class task(SaoDangFb):
         for i in range(1, 7):
             try:
                 self.action(c='workshop', m='get_reward', s=i)
-            except:
-                pass
+            except Exception as e:
+                print e
 
     def exploit_tree(self):  # 木材收集
         print '木材收集'
@@ -333,8 +332,8 @@ class task(SaoDangFb):
             # gather收集,site:1,第一个框
             self.action(c='exploit_tree', m='gather', site=1)
             self.action(c='exploit_tree', m='action', site=1)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def exploit_stone(self):  # 石头收集
         print '石头收集'
@@ -343,8 +342,8 @@ class task(SaoDangFb):
             for i in range(1, 4):
                 self.action(c='exploit_stone', m='gather', site=i)
                 self.action(c='exploit_stone', m='action', site=i)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def heaven(self):  # 通天塔每日奖励和扫荡
         print '通天塔每日奖励和扫荡'
@@ -354,16 +353,16 @@ class task(SaoDangFb):
             self.times = self.action(c='heaven', m='index')['times']
             if self.times:
                 self.action(c='heaven', m='mop_up', id=87, times=self.times)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def arena(self):  # 每日觉醒奖励
         print '每日觉醒奖励'
         try:
             self.action(c='arena', m='index')
             self.action(c='arena', m='get_reward')
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def zimap(self):  # 获取图片
         # levev:7,11，14是红色sh关卡s:1-9，id:6
@@ -427,8 +426,8 @@ class task(SaoDangFb):
                 self.action(c='dice', m='get_reward', id=2)
             for i in range(1, 8):
                 self.action(c='dice', m='shake_dice')
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def act_steadily(self):  # 节节高
         print '节节高'
@@ -443,11 +442,11 @@ class task(SaoDangFb):
                 exit(2)
             else:
                 print '%s分钟后领取,%s' % (reward_cd / 60, reward_cd)
-
                 time.sleep(reward_cd + 1)
                 self.action(c='act_steadily', m='get_online_reward', t=t)
-        except:
-            pass
+            return True
+        except Exception as e:
+            return False
 
     def act_sword(self):  # 铸剑
         self.action(c='act_sword', m='start')
@@ -479,8 +478,8 @@ class task(SaoDangFb):
             self.action(c='awaken_copy', m='index')
             self.action(c='awaken_copy', m='every_reward_index')
             self.action(c='awaken_copy', m='get_every_reward', b=1)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def countrymine(self):  # 国家矿
         print '国家矿'
@@ -512,23 +511,23 @@ class task(SaoDangFb):
             status = 1
             while status == 1:
                 status = self.action(c='beauty', m='active_action', beauty_id=2, type=1)['status']
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def country(self):  # 每日国家奖励
         print '每日国家奖励'
         try:
             self.action(c='country', m='get_salary')
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def countrysacrifice(self):  # 每日贡献
         print '国家每日贡献40'
         try:
             self.action(c='countrysacrifice', m='index', id=1)
             self.action(c='countrysacrifice', m='action', id=1)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def get_act(self):#角色信息
         print '角色信息'
@@ -541,8 +540,8 @@ class task(SaoDangFb):
             self.action(c='country', m='get_member_list')
             self.action(c='country', m='storage')
             self.action(c='country', m='donate', type=1)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def cuju(self):  # 蹴鞠首页
         print '蹴鞠'
@@ -553,8 +552,8 @@ class task(SaoDangFb):
                     self.action(c='act_kemari', m='action', type=2)
                 elif i['id'] == 1 and i['times'] != 0 and i['cd'] == 0:
                     self.action(c='act_kemari', m='action', type=1)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def sanguo(self):  # 游历三国活动
         print '游历三国活动'
@@ -572,8 +571,8 @@ class task(SaoDangFb):
                          30]
                 num = plain.index(int(details['current'])) + 1
                 stats = self.action(c='act_travel', m='plain', point=plain[num])
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def jisi(self):  # 新年活动
         print '新年祭祀'
@@ -588,15 +587,15 @@ class task(SaoDangFb):
             if index['price']['2']['1'] < "50":
                 self.action(c='act_spring', m='sacrifice', type=2, resource_type=1)
                 self.action(c='act_spring', m='sacrifice', type=2, resource_type=2)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def leigu(self):  # 擂鼓
         print '擂鼓'
         try:
             self.action(c='happy_guoqing', m='get_reward', type=1)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def chicken(self):
         print '金鸡'
@@ -610,16 +609,16 @@ class task(SaoDangFb):
                 if int(l['vip']) == int(vip):
                     self.action(c='chicken', m='get_vip_reward', id=l['id'])
                     break
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def holiday(self):
         print '假日活动'
         try:
             self.action(c='act_holiday', m='index', v=2018021101)
             self.action(c='act_holiday', m='add_login_reward', v=2018021101)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def shenshu(self):  # 神树
         try:
@@ -638,8 +637,8 @@ class task(SaoDangFb):
                     self.action(c='sacredtree', m='watering', type=1, v=2018021101)
                 else:
                     break
-        except:
-            pass
+        except Exception as e:
+            print e
     def yuanxiao(self):
         print '元宵'
         try:
@@ -648,8 +647,8 @@ class task(SaoDangFb):
                 self.action(c='act_lantern', m='buy', lid=1, mid=1, v=2018021101)
                 self.action(c='act_lantern', m='buy', lid=1, mid=2, v=2018021101)
                 self.action(c='act_lantern', m='buy', lid=1, mid=3, v=2018021101)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def actjubao(self):
         print '聚宝'
@@ -658,16 +657,16 @@ class task(SaoDangFb):
             self.action(c='actjubao', m='action', type=1, v=2018042801)
             self.action(c='actjubao', m='reward_index', v=2018042801)
             self.action(c='actjubao', m='get_reward', id=1, v=2018042801)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def years_guard(self):  # 周年守护签到
         print '周年守护签到'
         try:
             self.action(c='years_guard', m='des_index')
             self.action(c='years_guard', m='sign_index')
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def fukubukuro(self):  # 周年将签到,
         print '周年将签到'
@@ -676,16 +675,16 @@ class task(SaoDangFb):
             self.action(c='fukubukuro', m='sign', type=1)
             #合成签到将领
             self.action(c='fukubukuro', m='get_general', gid=360)
-        except:
-            pass
+        except Exception as e:
+            print e
 
     def drink(self):  # 每日饮酒
         print '每日饮酒'
         try:
             self.action(c='drink', m='index')
             self.action(c='drink', m='go_drink', type=1)
-        except:
-            pass
+        except Exception as e:
+            print e
 
 
 def run(user, apass, addr):
@@ -702,7 +701,7 @@ def run(user, apass, addr):
     # action.sanctum()  # 每日宝石领奖
     # action.generaltask()  #
     # action.business()  # 每日通商
-    # action.tower()  # 将魂星路
+    action.tower()  # 将魂星路
     # action.island()  # 金银洞
     # action.lottery()  # 每日抽奖
     # action.worldboss()  # 世界boos
@@ -715,17 +714,12 @@ def run(user, apass, addr):
     # action.drink()  # 每日军令饮酒
     # action.country()  # 国家奖励
     # action.overseastrade()  # 海外贸易
-    # #action.countrysacrifice()#每日免费贡献40
-    # for i in range(50):
-    #     action.gongxian()
+    # action.countrysacrifice()#每日免费贡献40
     # if activity['act_travel'] == 1:
     #     for i in range(3):
     #         action.sanguo()  # 游历三国
     # if activity['actkemari'] == 1:
     #     action.cuju()  # 蹴鞠
-    # if activity['act_steadily'] == 1:
-    #     while True:
-    #         action.act_steadily()
     # if activity['act_spring'] == 1:
     #     action.jisi()  # 游历三国
     # if activity['happy_guoqing'] == 1:
@@ -742,9 +736,14 @@ def run(user, apass, addr):
     #     action.actjubao()  # 游历三国
     # if activity['years_guard'] == 1:
     #     action.years_guard()  # 游历三国
-    if activity['fukubukuro'] == 1:
-        action.fukubukuro()  # 游历三国
-
+    # if activity['fukubukuro'] == 1:
+    #     action.fukubukuro()  # 游历三国
+    # for i in range(50):
+    #     action.gongxian()
+    # if activity['act_steadily'] == 1:
+    #     Flag = True
+    #     while Flag:
+    #         Flag = action.act_steadily()
     # action.zimap()
     # action.hongmap()
 
@@ -752,8 +751,9 @@ def run(user, apass, addr):
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))
-    cont = ['autouser.txt', 'user.txt','alluser.txt', 'duguyi.txt', '149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt',
-            '149xb.txt', '149lwzs.txt','21user.txt','150.txt','150nm.txt','150num.txt']
+    # cont = ['autouser.txt', 'user.txt','alluser.txt', 'duguyi.txt', '149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt',
+    #         '149xb.txt', '149lwzs.txt','21user.txt','150.txt','150nm.txt','150num.txt']
+    cont = ['user.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
@@ -768,8 +768,8 @@ if __name__ == '__main__':
         for i in xrange(50):
             try:
                 thread.append(q.get_nowait())
-            except:
-                pass
+            except Exception as e:
+                print e
         for i in thread:
             i.start()
         for i in thread:

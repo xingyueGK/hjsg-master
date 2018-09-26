@@ -69,12 +69,12 @@ def act(username,passwd,addr):
     if action.level()<50:
         for i  in range(2):
             action.mainquest()#获取所有活动
-        gid, uid = action.general(25)#获取25级需要穿戴的装备强化
-        for i in uid:
-            for etype, v in i.items():
-                action.strengthen(v)
-                action.equip(gid, v, etype)
-        action.muster()  # 再次突飞
+        #gid, uid = action.general(25)#获取25级需要穿戴的装备强化
+        # for i in uid:
+        #     for etype, v in i.items():
+        #         action.strengthen(v)
+        #         action.equip(gid, v, etype)
+        # action.muster()  # 再次突飞
         action.saodang(2)
     if action.level()  <70:#领取前60次奖励
 
@@ -195,12 +195,12 @@ def wjleveup(username, passwd,addr):
 def peiyang(username,passwd,addr):
     action = activity(username, passwd,addr)
     action.peiyang('张昭')
-with open('../users/149gmjrhy.txt', 'r') as f:
+with open('../users/3user.txt', 'r') as f:
     for i in f:
         if i.strip():
             str = i.strip().split()[0]
             name = str
-            addr = 147
+            addr = 21
             passwd = i.split()[1]
             t1 = threading.Thread(target=act,args=(name,passwd,addr))
             t1.start()

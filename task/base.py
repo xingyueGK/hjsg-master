@@ -84,5 +84,9 @@ class SaoDangFb(object):
         action_data = kwargs
         serverinfo = self.post_url(action_data)
         return serverinfo
+    def level(self):
+        userinfo = self.action(c='member', m='index')
+        level = int(userinfo['level'])
+        return level
 if __name__ == '__main__':
     pass

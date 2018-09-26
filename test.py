@@ -15,8 +15,33 @@ def condition():
     # genral_info = self.matrix()
     # for k, v in genral_info.items():
     #     pass
+#
+# condition()
+# y = set(['h', 'a','c', 'm',1])
+# z= set(['a', 'h', 'm','c','a'])
 
-condition()
-y = set(['h', 'a','c', 'm',1])
-z= set(['a', 'h', 'm','c','a'])
-print y.issubset(z)
+
+import redis
+import datetime
+import time
+
+# a = "2018-10-10 23:40:00"
+#
+# import time
+# timeArray = time.strptime(a, "%Y-%m-%d %H:%M:%S")
+#
+# timeStamp = int(time.mktime(timeArray))
+# print timeStamp
+#
+# pool=redis.ConnectionPool(host='127.0.0.1',port=6379,db=0)
+# r = redis.StrictRedis(connection_pool=pool)
+#
+# print r.expireat('231', timeStamp)
+def a():
+    a = 12
+    def b():
+        print a
+        return a
+    return b
+
+a()()

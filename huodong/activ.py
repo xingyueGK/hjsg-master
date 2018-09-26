@@ -102,11 +102,11 @@ class activity(fuben):
             else:
                 break
 
-        qm_index = self.action(c='qm_card', m='get_lottery')  # 获取福卡商店首页
-        qmindex = self.action(c='qm_card', m='action_lottery', id=4)  # 用福卡买1紫宝石,2突飞卡4 1150突飞
-        while qmindex['status'] == 1:
-            self.action(c='qm_card', m='action_lottery', id=4)
-            qmindex = self.action(c='qm_card', m='action_lottery', id=1)  # 用福卡买紫宝石
+        # qm_index = self.action(c='qm_card', m='get_lottery')  # 获取福卡商店首页
+        # qmindex = self.action(c='qm_card', m='action_lottery', id=4)  # 用福卡买1紫宝石,2突飞卡4 1150突飞
+        # while qmindex['status'] == 1:
+        #     self.action(c='qm_card', m='action_lottery', id=4)
+        #     qmindex = self.action(c='qm_card', m='action_lottery', id=1)  # 用福卡买紫宝石
 
     def guyu(self):  # 古玉换银币
         info = self.action(c='actguyu', m='index')
@@ -173,7 +173,7 @@ class activity(fuben):
         except:
             pass
 
-    def gongxiang(self, num=1000):  # 国家贡献
+    def gongxiang(self, num=10000):  # 国家贡献
         self.action(c='country', m='get_member_list')
         self.action(c='country', m='storage')
         flag = 0
@@ -460,6 +460,7 @@ class activity(fuben):
         # name 就是打劫的国家[list]
         robtimes = 1
         while robtimes > 0:
+            time.sleep(0.3)
             index_result = self.action(c='overseastrade', m='index')
             try:
                 robtimes = int(index_result['info']['robtimes'])  # 获取打劫次数
@@ -477,7 +478,7 @@ class activity(fuben):
                                 rob_result = self.action(c='overseastrade', m='rob', id=id)
                                 print json.dumps(rob_result)
                 else:
-                    team_list = self.action(c='overseastrade', m='refresh', p=1)['team']['list']
+                    team_list = refresh_result['list']
                     for team in team_list:
                         if team['country_name'] in name:
                             id = team['id']
@@ -704,12 +705,23 @@ class activity(fuben):
         print medal
         # self.action(c='fukubukuro', m='shop', type=1,)
         # self.action(c='fukubukuro', m='shop', type=2, )
-        # self.action(c='fukubukuro',m='shop_buy',type=1,id=24)
+        self.action(c='fukubukuro',m='shop_buy',type=1,id=35)#天皇铠甲
+       # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
         # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
-        # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
-
+    def fukubukuro(self):  # 周年将签到,
+        print '周年将签到'
+        try:
+            self.action(c='fukubukuro', m='index')
+            self.action(c='fukubukuro', m='sign', type=1)
+            #合成签到将领
+            self.action(c='fukubukuro', m='get_general', gid=360)
+        except:
+            pass
     def tavern(self):#批量银币贸易
         self.action(c='tavern',m='trade_batch',option=1)
+    def guozhan(self):
+        self.action(c='siege',m='battle_prepare')
+        self.action(c='siege',m='join_battle')
 # 周年比购物
 
 # def wx():#五行竞猜刷数据
@@ -787,8 +799,8 @@ if __name__ == '__main__':
     def zhujian(user, apass, addr):
         while True:
             action = activity(user, apass, addr)
-            # action.unlock(413728)
-            action.act_steadily()
+            #action.unlock(413728)
+            action.act_sword()
 
 
     def xinnain(user, apass, addr):
@@ -812,12 +824,12 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry('光芒神殿')
+        action.jioncountry('杰克吃翔')
 
 
     def gongxian(user, apass, addr):
         action = activity(user, apass, addr)
-        action.gongxiang()
+        action.gongxiang(20)
 
 
     def panguo(user, apass, addr):
@@ -827,7 +839,8 @@ if __name__ == '__main__':
 
     def dajie(user, apass, addr):
         action = activity(user, apass, addr)
-        action.rob(['体检了', '8523', '英雄', '是你学姐', '杰克傻bi'], user)
+        action.rob(['体检了', '8523', '英雄', '是你学姐', '杰克傻bi','杰克吃翔'], user)
+        #time.sleep(0.3)
 
 
     def jianghun(user, apass, addr):
@@ -853,7 +866,7 @@ if __name__ == '__main__':
 
     def upmatrix(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        action.update_matrix(mid=4)
+        action.update_matrix(mid=5)
 
 
     def guyuyinbi(user, apass, addr):  # 换古玉买银币
@@ -881,7 +894,7 @@ if __name__ == '__main__':
 
     def znshop(user, apass, addr):  # 周年福矿商店
         action = activity(user, apass, addr)
-        action.zhounianshop()
+        action.fukubukuro()
 
 
     def practice(user, apass, addr):  # 武将突飞
@@ -898,10 +911,10 @@ if __name__ == '__main__':
                 action.equip(gid, v, etype)
     def getjingsu(user, apass, addr):
         action = activity(user, apass, addr)
-        action.jingsu()
+        action.guozhan()
 
     def chuan():
-        with open('../users/149gmjrhy.txt', 'r') as f:
+        with open('../users/sword.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip():
@@ -909,7 +922,7 @@ if __name__ == '__main__':
                     # name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    addr = 147
+                    #addr = 149
                     t1 = threading.Thread(target=zhujian, args=(name, passwd, addr))
                     q.put(t1)
 
