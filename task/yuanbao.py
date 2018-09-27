@@ -5,6 +5,7 @@
 # @File    : yuanbao.py
 
 #元宝放送活动
+from task.blackmarket import blackmarket
 from base import SaoDangFb
 import time, threading
 import os, json
@@ -21,12 +22,10 @@ class task(SaoDangFb):
         self.action(c='act_solt',m='draw',times=1)
     def act_solt(self):
         index = self.action(c='act_solt',m='index')
-        task1 = index['info']['task1']
-        task2 = index['info']['task2']
-        task3 = index['info']['task3']
+        task1 = int(index['info']['task1'])
+        task2 = int(index['info']['task2'])
+        task3 = int(index['info']['task3'])
         return task1,task2,task3
-    def unlock(self, pwd):  # 解锁密码
-        self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
     def refresh(self):
         ref = self.action(c='business',m='refresh')
         return ref['trader']
@@ -93,6 +92,7 @@ class task(SaoDangFb):
 
 def run(user, apass, addr,lockpwd):
     action = task(user, apass, addr)
+    task1,task2,task3 = action.act_solt()
     if action.level() > 120:
         action.unlock(lockpwd)
         action.buytimes()
@@ -100,6 +100,14 @@ def run(user, apass, addr,lockpwd):
         action.business()
     else:
         print '等级不够'
+        exit(2)
+    print task1
+    if task1 < 1000:
+        black = blackmarket(user, apass, addr)
+        blackmarkets = (1000 - int(task1))//10+1
+        print 'aaaaaa',blackmarkets
+        black.buy(user,blackmarkets)
+    action.draw()
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__)).rsplit('\\',1)[0]

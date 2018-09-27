@@ -329,17 +329,18 @@ class task(SaoDangFb):
     def exploit_tree(self):  # 木材收集
         print '木材收集'
         try:
-            # gather收集,site:1,第一个框
-            self.action(c='exploit_tree', m='gather', site=1)
-            self.action(c='exploit_tree', m='action', site=1)
+            # exploit_stone，m:{gather收集,action，采集}site:1,第一个框,有三个
+            for i in range(1, 10):
+                self.action(c='exploit_tree',m='index')
+                self.action(c='exploit_tree', m='gather', site=i)
+                self.action(c='exploit_tree', m='action', site=i)
         except Exception as e:
             print e
-
     def exploit_stone(self):  # 石头收集
         print '石头收集'
         try:
             # exploit_stone，m:{gather收集,action，采集}site:1,第一个框,有三个
-            for i in range(1, 4):
+            for i in range(1, 10):
                 self.action(c='exploit_stone', m='gather', site=i)
                 self.action(c='exploit_stone', m='action', site=i)
         except Exception as e:
