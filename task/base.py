@@ -35,7 +35,7 @@ class SaoDangFb(object):
         self.url = 'http://s{0}.game.hanjiangsanguo.com/index.php?v=0&channel=150&lang=zh-cn&token={1}&token_uid={2}&rand={3}&'.format(self.num,self.token,self.token_uid,self.rand)
     @staticmethod
     def get_token(num, user, passwd):
-        url = 'http://s{num}.game.hanjiangsanguo.com/index.php?u={user}&p={passwd}&v=0&c=login&&m=user&&token=&channel=150&lang=zh-cn&rand=150959405499450'.format(
+        url = 'http://s{num}.game.hanjiangsanguo.com/index.php?c=login&&m=user&u={user}&p={passwd}&v=2018083101&token=&channel=11&lang=zh-cn&rand=150959405499450'.format(
             num=num, user=user, passwd=passwd)
         pool = redis.ConnectionPool(host='localhost', port=6379,db=0)
         _redis = redis.StrictRedis(connection_pool=pool)
@@ -53,9 +53,14 @@ class SaoDangFb(object):
                 raise TokenErr('token expire')
         except TokenErr:
                 try:
-                    token= requests.get(url).json()['token']
-                    _redis.hset(num,user,token)
-                    return token
+                    result= requests.get(url).json()
+                    if result['status'] == 1:
+                        token = result['token']
+                        _redis.hset(num,user,token)
+                        return token
+                    else:
+                        print user,'账号密码不对'
+                        exit(2)
                 except Exception as e:
                     print e
 
@@ -88,5 +93,10 @@ class SaoDangFb(object):
         userinfo = self.action(c='member', m='index')
         level = int(userinfo['level'])
         return level
+    def unlock(self, pwd):  # 解锁密码
+        self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
+    @classmethod
+    def p(cls,message):
+        print json.dumps(message, ensure_ascii=False)
 if __name__ == '__main__':
     pass
