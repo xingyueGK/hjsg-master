@@ -53,7 +53,6 @@ class SaoDangFb(object):
                 raise TokenErr('token expire')
         except TokenErr:
                 try:
-                    print url
                     result= requests.get(url).json()
                     if result['status'] == 1:
                         token = result['token']
