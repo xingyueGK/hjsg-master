@@ -17,6 +17,9 @@ def userinfo(username, password, addr):
     act = shujufenx.fuben(username, password, addr)
     info = act.action(c='blackmarket', m='index')  # 获取黑市首页
     memberInfo = act.action(c='member', m='index')
+    sign_index = act.action(c='sign', m='sign_index')
+    sign_times = sign_index['sign_times']
+    #sale_shop_reward = act.action(c='sign', m='sale_shop')['reward']
     country = act.action(c='country', m='get_member_list')['country']
     if country:
         countryName = country['name']
@@ -29,11 +32,11 @@ def userinfo(username, password, addr):
     gold = memberInfo['gold']  # 元宝
     vip = memberInfo['vip']
     reputation = memberInfo['reputation']  # 声望
-    print '\n账号 %s 名字 %s 等级 %s vip %s 国家 %s 军令 %s 银币 %s 元宝 %s 黄宝石 %s 紫宝石 %s 声望 %s' % (
+    print '\n账号 %s 名字 %s 等级 %s vip %s 国家 %s 军令 %s 银币 %s 元宝 %s 黄宝石 %s 紫宝石 %s 声望 %s 签到 %s' % (
         username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'],
-        reputation)
+        reputation,sign_times)
     userlist = [username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'],
-                reputation]
+                reputation,sign_times]
     return userlist
 
 
@@ -871,8 +874,8 @@ if __name__ == '__main__':
 
     def guyuyinbi(user, apass, addr):  # 换古玉买银币
         action = activity(user, apass, addr)
-        # action.sign()  # 购买签到声望
-        action.guyu()
+        action.sign()  # 购买签到声望
+        #action.guyu()
 
 
     def rolename(user, apass, addr):  # 更新出征武将
@@ -954,9 +957,9 @@ if __name__ == '__main__':
 
 
     # chat('xingyue123a',413728161,148)
-    #ck()
+    ck()
     # dg()
-    chuan()
+    # chuan()
 
     while not q.empty():
         thread = []
