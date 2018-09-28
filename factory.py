@@ -41,7 +41,7 @@ class task(SaoDangFb):
         print '石头收集'
         try:
             # exploit_stone，m:{gather收集,action，采集}site:1,第一个框,有三个
-            index = self.action(c='exploit_tree', m='index')
+            index = self.action(c='exploit_stone', m='index')
             for item in index['list']:
                 if item['cd'] == 0 :
                     task.p(self.action(c='exploit_stone', m='gather', site=item['site']))
