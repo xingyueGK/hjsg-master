@@ -530,10 +530,6 @@ class task(SaoDangFb):
         except Exception as e:
             print e
 
-    def get_act(self):#角色信息
-        print '角色信息'
-        act_info = self.action(c='member', m='index')
-        return act_info
 
     def gongxian(self):  # 国家贡献
         print '国家贡献'
@@ -566,8 +562,8 @@ class task(SaoDangFb):
                 result = self.action(c='act_travel', m='action_dice')  # 掷骰子
             if travelindex['info']['points'] != 0:
                 # #走路顺序list[4,2,3,5,8,9,10,11,12,13,14]
-                plain = [1, 4, 2, 3, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
-                         28,
+                plain = [1, 4, 2, 3, 5, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 21, 20, 21, 22, 19, 23, 27, 28, 25,
+                         26,
                          29,
                          30]
                 num = plain.index(int(details['current'])) + 1
