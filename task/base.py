@@ -98,5 +98,9 @@ class SaoDangFb(object):
     @classmethod
     def p(cls,message):
         print json.dumps(message, ensure_ascii=False)
+    def get_act(self):#角色信息
+        print '角色信息'
+        act_info = self.action(c='member', m='index')
+        return act_info
 if __name__ == '__main__':
     pass

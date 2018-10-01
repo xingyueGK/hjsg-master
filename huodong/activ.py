@@ -82,28 +82,39 @@ class activity(fuben):
         print '-' * 20
         flag = True
         status = 1
-        while flag:
-            qm_card = self.action(c='qm_card', m='index')
-            index = self.action(c='qm_card', m='get_lottery')
-            print '当前福卡', int(index['lottery_num']['score'])
-            print '翻牌数', num
-            if int(index['lottery_num']['score']) < int(num) and status == 1:
-                print '本次花费: %s' % str(qm_card['cost'])
-                print '剩余福卡: %s' % str(index['lottery_num']['score'])
-                print '开始翻牌'
-                if qm_card['cost'] < '50' and status == 1:
-                    status = self.action(c='qm_card', m='draw ', v=2018061901)['status']  # 随机翻牌
-                    qm_card = self.action(c='qm_card', m='index')
-                elif qm_card['cost'] == '50' and qm_card['refresh_times'] != '0':
-                    self.action(c='qm_card', m='refresh')  # 重制翻盘
-                elif qm_card['cost'] == '50' and qm_card['refresh_times'] == '0':
-                    print 'pangzishu:%d,shedingshuzhi:%s' % (int(index['lottery_num']['score']), num)
-                    status = self.action(c='qm_card', m='draw ', v=2018061901)['status']  # 随机翻牌
-                    qm_card = self.action(c='qm_card', m='index')
-                else:
-                    flag = False
+        qm_card = self.action(c='qm_card', m='index')
+        index = self.action(c='qm_card', m='get_lottery')
+        score = int(index['lottery_num']['score'])
+        refresh_times = int(qm_card['refresh_times'])
+        print '当前福卡', int(index['lottery_num']['score'])
+        print '翻牌数', num
+        cost = str(qm_card['cost'])
+        while score < int(num) and status == 1:
+            print '本次花费: %s' % cost
+            print '剩余福卡: %s' % score
+            print '开始翻牌'
+            if cost < '50' and status == 1:
+                draw = self.action(c='qm_card', m='draw ', v=2018061901)
+                cost = draw['next_cost']
+                status = draw['status']  # 随机翻牌
+                score = int(draw['score'])
+            elif cost == '50' and refresh_times != 0:
+                self.action(c='qm_card', m='refresh')  # 重制翻盘
+                refresh_times -= 1
+            elif cost == '50' and refresh_times == 0:
+                try:
+                    print '当前福卡:%s,设定值:%s' % (score, num)
+                    draw = self.action(c='qm_card', m='draw ', v=2018061901)
+                    cost = draw['next_cost']
+                    status = draw['status']  # 随机翻牌
+                    score = int(draw['score'])
+                except KeyError as e:
+                    print e
+                    exit(1)
             else:
                 break
+        print '当前福卡', int(index['lottery_num']['score'])
+        print '翻牌数', num
 
         # qm_index = self.action(c='qm_card', m='get_lottery')  # 获取福卡商店首页
         # qmindex = self.action(c='qm_card', m='action_lottery', id=4)  # 用福卡买1紫宝石,2突飞卡4 1150突飞
@@ -325,7 +336,8 @@ class activity(fuben):
         self.action(c='sign', m='get_reward', type=2, id=95)
 
     def ivlist(self):  # 邀请好友
-        print self.action(c='invitation', m='change', code='nifckpm', v=2018021101)
+        #print self.action(c='invitation', m='change', code='nifckpm', v=2018021101)
+        print self.action(c='invitation', m='change', code='7tzwcii', v=2018021101)
 
     def shenshu(self):  # 神树
         try:
@@ -815,7 +827,8 @@ if __name__ == '__main__':
 
     def fanpai(user, apass, addr):
         action = activity(user, apass, addr)
-        action.fuka(15)
+        action.unlock(555323)
+        action.fuka(2600)
 
 
     def haiyun(user, apass, add):
@@ -827,12 +840,12 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry('杰克吃翔')
+        action.jioncountry('光芒神殿')
 
 
     def gongxian(user, apass, addr):
         action = activity(user, apass, addr)
-        action.gongxiang(20)
+        action.gongxiang(30)
 
 
     def panguo(user, apass, addr):
@@ -892,7 +905,7 @@ if __name__ == '__main__':
 
     def robfu(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        action.robfukuang(user, ['体检了', '杰克吃翔', '杰克喝尿', '悍龙', '梦', '炎黄天都', '杰克喝sui'])
+        action.robfukuang(user, ['英雄','体检了', '杰克吃翔', '杰克喝尿', '悍龙', '梦', '炎黄天都', '杰克喝sui'])
 
 
     def znshop(user, apass, addr):  # 周年福矿商店
@@ -914,10 +927,10 @@ if __name__ == '__main__':
                 action.equip(gid, v, etype)
     def getjingsu(user, apass, addr):
         action = activity(user, apass, addr)
-        action.guozhan()
+        action.ivlist()
 
     def chuan():
-        with open('../users/sword.txt', 'r') as f:
+        with open('../users/gmuser.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip():
@@ -926,7 +939,7 @@ if __name__ == '__main__':
                     passwd = i.split()[1]
                     addr = i.split()[2]
                     #addr = 149
-                    t1 = threading.Thread(target=zhujian, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
                     q.put(t1)
 
 
@@ -957,10 +970,9 @@ if __name__ == '__main__':
 
 
     # chat('xingyue123a',413728161,148)
-    ck()
+    #ck()
     # dg()
-    # chuan()
-
+    chuan()
     while not q.empty():
         thread = []
         for i in xrange(50):

@@ -12,6 +12,7 @@ from Queue import  Queue
 
 
 class task(SaoDangFb):
+
     def unlock(self, pwd):  # 解锁密码
         self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
 
