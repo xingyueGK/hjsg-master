@@ -19,7 +19,7 @@ def userinfo(username, password, addr):
     memberInfo = act.action(c='member', m='index')
     sign_index = act.action(c='sign', m='sign_index')
     sign_times = sign_index['sign_times']
-    #sale_shop_reward = act.action(c='sign', m='sale_shop')['reward']
+    # sale_shop_reward = act.action(c='sign', m='sale_shop')['reward']
     country = act.action(c='country', m='get_member_list')['country']
     if country:
         countryName = country['name']
@@ -34,9 +34,9 @@ def userinfo(username, password, addr):
     reputation = memberInfo['reputation']  # 声望
     print '\n账号 %s 名字 %s 等级 %s vip %s 国家 %s 军令 %s 银币 %s 元宝 %s 黄宝石 %s 紫宝石 %s 声望 %s 签到 %s' % (
         username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'],
-        reputation,sign_times)
+        reputation, sign_times)
     userlist = [username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'],
-                reputation,sign_times]
+                reputation, sign_times]
     return userlist
 
 
@@ -61,7 +61,7 @@ class activity(fuben):
 
     def jingsu(self):  # 竞速奖励
         info = self.action(c='map', m='get_reward_list', channel=11, v=2017122401)
-        #print info
+        # print info
         for i in info['list']:
             if i['open_status'] == 0:
                 print '%s 已通过未领取 ，元宝：%s' % (i['name'], i['gold'])
@@ -280,14 +280,16 @@ class activity(fuben):
     def jisi(self):  # 新年活动
         self.action(c='act_spring', m='index')
         index = self.action(c='act_spring', m='sacrifice_index')
-        if index['price']['3']['1'] < "50":
+        if index['price']['3']['1'] < "70":#福币
             self.action(c='act_spring', m='sacrifice', type=3, resource_type=1)
-        if index['price']['1']['1'] < "50":
+
+        if index['price']['1']['1'] < "50":#装备
             self.action(c='act_spring', m='sacrifice', type=1, resource_type=1)
-            self.action(c='act_spring', m='sacrifice', type=1, resource_type=2)
-        if index['price']['2']['1'] < "50":
-            self.action(c='act_spring', m='sacrifice', type=2, resource_type=1)
-            self.action(c='act_spring', m='sacrifice', type=2, resource_type=2)
+        if index['price']['1']['79'] < "5":
+            p(self.action(c='act_spring', m='sacrifice', type=1, resource_type=79))
+        # if index['price']['2']['1'] < "50":#将魂
+        #     self.action(c='act_spring', m='sacrifice', type=2, resource_type=1)
+        #     self.action(c='act_spring', m='sacrifice', type=2, resource_type=2)
 
     def leigu(self):
         self.action(c='happy_guoqing', m='get_reward', type=1)
@@ -336,7 +338,7 @@ class activity(fuben):
         self.action(c='sign', m='get_reward', type=2, id=95)
 
     def ivlist(self):  # 邀请好友
-        #print self.action(c='invitation', m='change', code='nifckpm', v=2018021101)
+        # print self.action(c='invitation', m='change', code='nifckpm', v=2018021101)
         print self.action(c='invitation', m='change', code='7tzwcii', v=2018021101)
 
     def shenshu(self):  # 神树
@@ -564,8 +566,6 @@ class activity(fuben):
                         print json.dumps(result)
                 print 'name: %s  属性值 %s' % (name, initnum)
 
-
-
     def matrix(self):
         genral_dict = {}
         matrix_index = self.action(c='matrix', m='index')
@@ -703,7 +703,8 @@ class activity(fuben):
         #         self.action(c='springshop', m='buy',id=item['id'])
 
     def unlock(self, pwd):
-        self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
+        stat=self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
+        print '%s,%s'%(self.user,stat)
 
     def znhh(self):
         # 周年喊话
@@ -720,23 +721,43 @@ class activity(fuben):
         print medal
         # self.action(c='fukubukuro', m='shop', type=1,)
         # self.action(c='fukubukuro', m='shop', type=2, )
-        self.action(c='fukubukuro',m='shop_buy',type=1,id=35)#天皇铠甲
-       # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
-        # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
+        self.action(c='fukubukuro', m='shop_buy', type=1, id=35)  # 天皇铠甲
+
+    # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
+    # self.action(c='fukubukuro', m='shop_buy', type=1, id=35)
     def fukubukuro(self):  # 周年将签到,
         print '周年将签到'
         try:
             self.action(c='fukubukuro', m='index')
             self.action(c='fukubukuro', m='sign', type=1)
-            #合成签到将领
+            # 合成签到将领
             self.action(c='fukubukuro', m='get_general', gid=360)
         except:
             pass
-    def tavern(self):#批量银币贸易
-        self.action(c='tavern',m='trade_batch',option=1)
+
+    def tavern(self):  # 批量银币贸易
+        self.action(c='tavern', m='trade_batch', option=1)
+
     def guozhan(self):
-        self.action(c='siege',m='battle_prepare')
-        self.action(c='siege',m='join_battle')
+        self.action(c='siege', m='battle_prepare')
+        self.action(c='siege', m='join_battle')
+
+    def priceoversea(self):
+        index = self.action(c='overseastrade', m='index')
+        if index['rob']['price'] < 100:
+            p(self.action(c='overseastrade', m='buy'))
+            self.priceoversea()
+        else:
+            print '%s alrealdy buy 5 times'%self.user
+
+    def gold_time(self):
+        self.action(c='gold_time', m='index')
+        data = self.action(c='gold_time', m='sign_reward')
+        for item in data['data']:
+            if item['receive_status'] == 1:
+                self.action(c='gold_time', m='receive_sign_reward', reward_id=item['id'])
+
+
 # 周年比购物
 
 # def wx():#五行竞猜刷数据
@@ -775,17 +796,7 @@ if __name__ == '__main__':
 
     def act(user, apass, addr):
         action = activity(user, apass, addr)
-        # action.pack()
-        # action.mooncake()
-        action.leigu()
-        # action.peiyang('张昭')
-        # action.generalpool()#
-        # action.cuju()
-        action.shenshu()
-        # action.fuka()
-        # action.caikuang()
-        # action.chenk()
-        action.jisi()
+        action.gold_time()
 
 
     def task(user, apass, addr):  # 节节高买突飞
@@ -797,13 +808,13 @@ if __name__ == '__main__':
         # action.actjubao()
         # action.leigu()
         # action.shenshu()
-        # action.qiandao()
+        #action.qiandao()
         # action.actjubao()
-        # action.jisi()
+        action.jisi()
         # action.guyu()
         # action.gongxiang()
         # action.usebuff()
-        # action.sign()
+        #action.sign()
         # action.fuka(15)
         # action.fukubukuro()
         # action.holiday()
@@ -814,7 +825,7 @@ if __name__ == '__main__':
     def zhujian(user, apass, addr):
         while True:
             action = activity(user, apass, addr)
-            #action.unlock(413728)
+            # action.unlock(413728)
             action.act_sword()
 
 
@@ -840,12 +851,12 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry('光芒神殿')
+        action.jioncountry('杰克吃翔')
 
 
     def gongxian(user, apass, addr):
         action = activity(user, apass, addr)
-        action.gongxiang(30)
+        action.gongxiang(10)
 
 
     def panguo(user, apass, addr):
@@ -855,8 +866,8 @@ if __name__ == '__main__':
 
     def dajie(user, apass, addr):
         action = activity(user, apass, addr)
-        action.rob(['体检了', '8523', '英雄', '是你学姐', '杰克傻bi','杰克吃翔'], user)
-        #time.sleep(0.3)
+        action.rob(['体检了', '8523', '英雄', '是你学姐', '杰克傻bi', '杰克吃翔'], user)
+        # time.sleep(0.3)
 
 
     def jianghun(user, apass, addr):
@@ -887,13 +898,14 @@ if __name__ == '__main__':
 
     def guyuyinbi(user, apass, addr):  # 换古玉买银币
         action = activity(user, apass, addr)
-        action.sign()  # 购买签到声望
-        #action.guyu()
+        #action.sign()  # 购买签到声望
+        action.guyu()
 
 
     def rolename(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        nickname = '航海'+user.split('y0')[1]
+        #nickname = 'mmp' + user.split('y0')[1]
+        nickname = 'mmp' + user.split('m0')[1]
         print nickname
         action.role(nickname)
 
@@ -905,7 +917,7 @@ if __name__ == '__main__':
 
     def robfu(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        action.robfukuang(user, ['英雄','体检了', '杰克吃翔', '杰克喝尿', '悍龙', '梦', '炎黄天都', '杰克喝sui'])
+        action.robfukuang(user, ['英雄', '体检了', '杰克吃翔', '杰克喝尿', '悍龙', '梦', '炎黄天都', '杰克喝sui'])
 
 
     def znshop(user, apass, addr):  # 周年福矿商店
@@ -925,9 +937,22 @@ if __name__ == '__main__':
             for etype, v in i.items():
                 # action.strengthen(v)
                 action.equip(gid, v, etype)
+
+
     def getjingsu(user, apass, addr):
         action = activity(user, apass, addr)
-        action.ivlist()
+        action.jingsu()
+
+
+    def buysea(user, apass, addr, lockpwd):
+        action = activity(user, apass, addr)
+        action.unlock(lockpwd)
+        action.priceoversea()
+
+
+    def goldtime(user, apass, addr):
+        action = activity(user, apass, addr)
+        action.gold_time()
 
     def chuan():
         with open('../users/gmuser.txt', 'r') as f:
@@ -938,8 +963,12 @@ if __name__ == '__main__':
                     # name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    #addr = 149
-                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
+                    try:
+                        lockpwd = i.split()[3]
+                    except:
+                        lockpwd = None
+                    #addr = 21
+                    t1 = threading.Thread(target=dajie, args=(name, passwd, addr))
                     q.put(t1)
 
 
@@ -952,26 +981,32 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = 149
-                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=guyuyinbi, args=(user, passwd, addr))
                         q.put(t1)
 
 
     def dg():
-        cont = ['150.txt', '150num.txt', '150nm.txt']
+        cont = ['150.txt', '150num.txt', '150nm.txt', '150taohua.txt', '150bank.txt']
+        # cont = ['autouser.txt', 'user.txt', 'alluser.txt', 'duguyi.txt', '149cnm.txt', '149dgj.txt', '149gx1.txt',
+        # '149xx.txt',
+        # '149xb.txt', '149lwzs.txt', '21user.txt', '150.txt', '150gx.txt', '150nm.txt', '150num.txt',
+        # '150taohua.txt', '150bank.txt']
+
         for t in cont:
             with open('../users/%s' % t, 'r') as f:
                 for i in f:
                     if i.strip():
                         user = i.split()[0]
                         passwd = i.split()[1]
-                        addr = 150
-                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
+                        addr = i.split()[2]
+                        t1 = threading.Thread(target=guyuyinbi, args=(user, passwd, addr))
                         q.put(t1)
 
 
+
     # chat('xingyue123a',413728161,148)
-    #ck()
     # dg()
+    # ck()
     chuan()
     while not q.empty():
         thread = []

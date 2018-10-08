@@ -682,7 +682,12 @@ class task(SaoDangFb):
             self.action(c='drink', m='go_drink', type=1)
         except Exception as e:
             print e
-
+    def gold_time(self):
+        self.action(c='gold_time', m='index')
+        data = self.action(c='gold_time', m='sign_reward')
+        for item in data['data']:
+            if item['receive_status'] == 1:
+                self.action(c='gold_time', m='receive_sign_reward', reward_id=item['id'])
 
 def run(user, apass, addr):
     action = task(user, apass, addr)
@@ -718,23 +723,25 @@ def run(user, apass, addr):
     # if activity['actkemari'] == 1:
     #     action.cuju()  # 蹴鞠
     # if activity['act_spring'] == 1:
-    #     action.jisi()  # 游历三国
+    #     action.jisi()  # 新年祭祀
     # if activity['happy_guoqing'] == 1:
-    #     action.leigu()  # 游历三国
+    #     action.leigu()  # 欢度国庆
     # if activity['chicken'] == 1:
-    #     action.chicken()  # 游历三国
+    #     action.chicken()  # 吃鸡
     # if activity['holiday'] == 1:
-    #     action.holiday()  # 游历三国
+    #     action.holiday()  # 假日礼包
     # if activity['sacredtree'] == 1:
-    #     action.shenshu()  # 游历三国
+    #     action.shenshu()  # 神树
     # if activity['lantern'] == 1:
-    #     action.yuanxiao()  # 游历三国
+    #     action.yuanxiao()  # 元宵
     # if activity['actjubao'] == 1:
-    #     action.actjubao()  # 游历三国
+    #     action.actjubao()  # 聚宝
     # if activity['years_guard'] == 1:
-    #     action.years_guard()  # 游历三国
+    #     action.years_guard()  # 周年守护
     # if activity['fukubukuro'] == 1:
-    #     action.fukubukuro()  # 游历三国
+    #     #     action.fukubukuro()  # 福矿
+    # if activity['gold_time'] == 1:
+    #     action.gold_time()  # 黄金时间
     # for i in range(50):
     #     action.gongxian()
     # if activity['act_steadily'] == 1:

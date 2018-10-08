@@ -212,7 +212,7 @@ class fuben(SaoDangFb):
         self.action(c='levelgift', m='index')  # 打开奖励页面
         self.action(c='levelgift', m='get_reward', level=level)  # 获取30级奖励
 
-    def saodang(self, num):  # 攻击小兵
+    def saodang(self, num=12):  # 攻击小兵
         memberindex = self.action(c='member', m='index')
         missionlevel = int(memberindex['missionlevel'])
         missionsite = int(memberindex['missionsite'])
@@ -220,7 +220,7 @@ class fuben(SaoDangFb):
         map = self.action(c='map', m='get_mission_list')
         exit_code = 1
         if exit_code == 1:
-            for level in range(missionlevel, 12):  # 遍历每一个图
+            for level in range(missionlevel, num):  # 遍历每一个图
                 print '开始攻击第 %s 个图' % level
                 self.action(c='map', m='get_scene_list', l=level)
                 site = len(self.action(c='map', m='get_scene_list', l=level)['list']) + 1
