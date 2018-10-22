@@ -1,0 +1,189 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>国家审核</title>
+    <style>
+        form {
+            width: 300px;
+            padding: 18px 20px 0;
+            margin:20px auto;
+            background-color: #0064cd;
+            background-image: -khtml-gradient(linear, left top, left bottom, from(#049cdb), to(#0064cd));
+            background-image: -moz-linear-gradient(#049cdb, #0064cd);
+            background-image: -ms-linear-gradient(#049cdb, #0064cd);
+            background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #049cdb), color-stop(100%, #0064cd));
+            background-image: -webkit-linear-gradient(#049cdb, #0064cd);
+            background-image: -o-linear-gradient(#049cdb, #0064cd);
+            background-image: linear-gradient(#049cdb, #0064cd);
+            -webkit-border-radius: 10px;
+            -moz-border-radius: 10px;
+            -khtml-border-radius: 10px;
+            border-radius: 10px;
+            -webkit-box-shadow: 0 5px 12px rgba(0,0,0,.4);
+            -moz-box-shadow: 0 5px 12px rgba(0,0,0,.4);
+            -khtml-box-shadow: 0 5px 12px rgba(0,0,0,.4);
+            box-shadow: 0 5px 12px rgba(0,0,0,.4);
+        }
+        table {
+            background-color: black;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        td {
+            background-color: white;
+        }
+
+        .title {
+            color: blue;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .info > td {
+            color: green;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<script language="javascript">
+    //全选和全不选（第一个参数为复选框名称，第二个参数为是全选还是全不选）
+    function allCheck(name, boolValue) {
+        var allvalue = document.getElementsByName(name);
+        for (var i = 0; i < allvalue.length; i++) {
+            if (allvalue[i].type == "checkbox")
+                allvalue[i].checked = boolValue;
+        }
+    }
+
+    //反选 参数为复选框名称
+    function reserveCheck(name) {
+        var revalue = document.getElementsByName(name);
+        for (i = 0; i < revalue.length; i++) {
+            if (revalue[i].checked == true)
+                revalue[i].checked = false;
+            else
+                revalue[i].checked = true;
+        }
+    }
+</script>
+<body>
+<h1 style="text-align:center;font-weight:bold;">国家人员信息审核</h1>
+<h1 style="text-align:center;font-weight:bold;">人员审核</h1>
+<form action="{{url_for('country')}}" method="POST">
+    <div>
+        {% for item in audit_list %}
+        <label><input type="checkbox" name="choice" id="choice" value="{{item.uid}}" width="30px;"/></label>{{item.nickname}}
+        {{item.level}}<br/>
+        {% endfor %}
+        <p></p>
+        <a href="javascript:allCheck('choice',true)">全选</a>
+        <a href="javascript:allCheck('choice',false)">全不选</a>
+        <a href="javascript:reserveCheck('choice')">反选</a>
+        <p></p>
+    </div>
+    <div><input type="submit" name="submit" value="同意">
+        <input type="submit" name= "submit" value="忽略"></div>
+</form>
+</table>
+    <table width="45%" cellspacing="1px" cellpadding="1px" border="0px">
+         <tr>
+        <td colspan="6" class="title">国家信息</td>
+    </tr>
+        <tr class="info">
+            <td>排名</td>
+            <td>国号</td>
+            <td>等级</td>
+            <td>人数</td>
+            <td>君主</td>
+            <td>申请人数</td>
+        </tr>
+        <tr>
+            <td>{{country.city_status}}</td>
+            <td>{{country.name}}</td>
+            <td> {{country.level}}</td>
+            <td>{{country.member}}</td>
+            <td>{{country.nickname}}</td>
+            <td>{{info.audit}}</td>
+        </tr>
+    </table>
+    <br><br>
+<table width="45%" cellspacing="1px" cellpadding="1px" border="0px">
+    <td colspan="8" class="title">人员信息</td>
+        <tr class="info">
+            <td>编号</td>
+            <td>玩家</td>
+            <td>当前职务</td>
+            <td>系统职务</td>
+            <td>等级</td>
+            <td>今日贡献</td>
+            <td>总贡献</td>
+            <td>登录</td>
+        </tr>
+        {% for item in info.list %}
+        <tr>
+            <td>{{loop.index}}.</td>
+            <td>{{item.nickname}}</td>
+            <td>{{item.job_name}}</td>
+            <td>{{item.level}}</td>
+            <td>{{item.contribute}}</td>
+            <td>{{item.allcontribute}}</td>
+            <td>{{item.worshipdateline}}</td>
+        </tr>
+        {% endfor %}
+君主
+丞相
+大将军
+大都督
+都督
+骠骑将军
+车骑将军
+辅国将军
+前将军
+左将军
+右将军
+后将军
+征东将军
+征南将军
+征西将军
+征北将军
+镇东将军
+镇南将军
+镇西将军
+镇北将军
+安东将军
+安南将军
+安西将军
+安北将军
+平东将军
+平南将军
+平西将军
+平北将军
+振武中郎将
+建义中郎将
+奉义中郎将
+平虏中郎将
+典军中郎将
+抚军中郎将
+武卫中郎将
+司金中郎将
+司律中郎将
+率善中郎将
+司隶校尉
+戊已校尉
+平虏校尉
+建忠校尉
+护羌校尉
+西戎校尉
+东夷校尉
+中护军
+监军
+百人长
+什长
+伍长</td>
+    </table>
+</body>
+</html>

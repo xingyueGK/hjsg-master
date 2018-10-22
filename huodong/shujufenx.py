@@ -208,9 +208,11 @@ class fuben(SaoDangFb):
         self.action(c='general', m='equip', gid=gid, eid=eid, etype=etype)
     def unequip(self,gid, eid, etype):
         self.action(c='general', m='unequip', gid=gid, eid=eid, etype=etype,position=etype)
-    def levelgift(self, level):  # 获取等级奖励
-        self.action(c='levelgift', m='index')  # 打开奖励页面
-        self.action(c='levelgift', m='get_reward', level=level)  # 获取30级奖励
+    def levelgift(self):  # 获取等级奖励
+        res=self.action(c='levelgift', m='index')  # 打开奖励页面
+        for item in res['list']:
+            if item['type'] == 1:
+                self.action(c='levelgift', m='get_reward', level=item['level'])  # 获取30级奖励
 
     def saodang(self, num=12):  # 攻击小兵
         memberindex = self.action(c='member', m='index')

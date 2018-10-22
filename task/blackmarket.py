@@ -46,8 +46,6 @@ class blackmarket(SaoDangFb):
         # 免费刷新次数
     def tavern(self):#批量银币贸易
         self.action(c='tavern',m='trade_batch',option=1)
-    def unlock(self, pwd):
-        self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
 def run(user, apass, addr,lockpwd):
     action = blackmarket(user, apass, addr)
     action.unlock(lockpwd)

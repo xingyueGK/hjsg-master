@@ -8,8 +8,9 @@
 from __future__ import unicode_literals
 from task.base import SaoDangFb
 import time, threading
-import os, json, sys
-
+import os, sys
+from Queue import Queue
+q = Queue()
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -180,8 +181,9 @@ class fuben(SaoDangFb):
             if int(i['status']) == 1:  # 获取奖励
                 self.action(c='mainquest', m='get_task_reward', id=i['task_id'])
                 print '领取奖励', i['task_id']
-
-
+    def gjzb(self):#国家争霸
+        self.action(c='country_gvg',m='index')
+        self.action(c='country_gvg',m='member_entry')
 def act(username,passwd,addr):
     action = fuben(username,passwd,addr)
     try:
@@ -234,7 +236,7 @@ def act(username,passwd,addr):
         action.saodang1()
     action.saodang1()
 def chuan():
-    with open('../users/149cnm1.txt', 'r') as f:
+    with open('../users/1000share.txt', 'r') as f:
         # with open('../users/duguyi.txt', 'r') as f:
         for i in f:
             if i.strip():
@@ -249,5 +251,17 @@ def chuan():
                     lockpwd = None
                 #addr = 149
                 t1 = threading.Thread(target=act, args=(name, passwd, addr))
-                t1.start()
+                q.put(t1)
 chuan()
+while not q.empty():
+        thread = []
+        for i in xrange(50):
+            try:
+                thread.append(q.get_nowait())
+            except:
+                pass
+        for i in thread:
+            i.start()
+            # i.join()
+        for i in thread:
+           i.join()

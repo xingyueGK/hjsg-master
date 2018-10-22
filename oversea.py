@@ -125,4 +125,4 @@ def main(file,addr,flag,FlushCount =40):
                     makeTask(user,passwd,addr)
 
 if __name__ == '__main__':
-    main('149gmjrhy.txt',145,True,40)
+    main('149gmjrhy.txt',145,True,1)

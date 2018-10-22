@@ -688,7 +688,19 @@ class task(SaoDangFb):
         for item in data['data']:
             if item['receive_status'] == 1:
                 self.action(c='gold_time', m='receive_sign_reward', reward_id=item['id'])
-
+    def assist_card(self):#助阵系统
+        rest = self.action(c='assist_card',m='index')
+        assist_conjure = self.action(c='assist_conjure',m='index')
+        try:
+            if assist_conjure['data']['const']['free_times'] ==1:
+                #每日免费抽奖
+                self.action(c='assist_conjure', m='conjure',conjure_type=1)
+            rest = self.action(c='assist_copy',m='index')
+            if rest['data']['total_remain_times'] == 15 :
+                self.action(c='assist_copy',m='sweep',mission_id= 1,times=10)
+                self.action(c='assist_copy', m='sweep', mission_id=1, times=5)
+        except Exception:
+            pass
 def run(user, apass, addr):
     action = task(user, apass, addr)
     activity = action.get_act()

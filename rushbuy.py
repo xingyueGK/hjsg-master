@@ -19,7 +19,9 @@ class task(SaoDangFb):
     def springshop(self, name=u'聊得'):  # 周末武將商城
         # id 列表对应 1-20 即为购买武将1-20
         spring = self.action(c='springshop', m='index')['list']
-        self.action(c='springshop', m='buy', id=1)
+        result = self.action(c='springshop', m='buy', id=1)
+        if result['status'] == 1:
+            exit(1)
         # self.action(c='springshop', m='buy', id=1)
         self.action(c='springshop', m='buy', id=3)
         self.action(c='springshop', m='buy', id=10)
