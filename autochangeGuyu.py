@@ -59,8 +59,7 @@ def run(user, apass, addr):
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))
-    cont = ['149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt',
-            '149xb.txt', '149lwzs.txt','21user.txt','150.txt','150nm.txt','150num.txt']
+    cont = ['1000share.txt','149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt', '149xb.txt', '149lwzs.txt','150.txt', '150num.txt', '150nm.txt', '150taohua.txt', '150bank.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:

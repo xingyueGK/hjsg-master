@@ -189,8 +189,12 @@ class activity(fuben):
             pass
 
     def gongxiang(self, num=100000):  # 国家贡献
+        memberInfo = self.action(c='member', m='index')
         self.action(c='country', m='get_member_list')
         self.action(c='country', m='storage')
+        if int(memberInfo['level']) > 90:
+            print '等级大于90'
+            return
         flag = 0
         donate = 0
         try:
@@ -804,6 +808,30 @@ class activity(fuben):
             uid = info['uid']
             player = self.action(c='information', m='index', uid=uid)['player']
             print '%s %s %s '%(player['nickname'],player['level'],player['vip'])
+    def usurp(self):#国家升官
+        p(self.action(c='country', m='get_member_list'))
+        status = 1
+        while status == 1:
+            info = self.action(c='country', m='get_usurp_info')
+            p(info)
+            try:
+                if info['type'] == 2:
+                    break
+            except:
+                break
+            rest = self.action(c='country',m='usurp')
+            status = rest['status']
+    def mount_stone(self):#符石合成
+        index = self.action(c='mount_stone', m='index')
+        allpage = index['allpage']
+        rest = self.action(c='mount_stone', m='get_mount_by_page',page= allpage)
+        #hecheng
+        self.action(c='mount_stone', m='get_mount_by_page', page=allpage)
+        stone_id = [i for i in range(61,74)]
+        for id in stone_id:
+            merge_index= self.action(c='mount_stone', m='merge_index', id=id)
+            num = merge_index['all_count']
+            self.action(c='mount_stone', m='merge', id=id,num=num)
 
 
 # 周年比购物
@@ -899,7 +927,7 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry(u'光芒神殿')
+        action.jioncountry(u'是你学姐')
 
 
     def gongxian(user, apass, addr):
@@ -1007,8 +1035,12 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         action.gold_time()
 
+    def shenguan(user, apass, addr):
+        action = activity(user, apass, addr)
+        action.usurp()
+
     def chuan():
-        with open('../users/gmhy1.txt', 'r') as f:
+        with open('../users/gmhy.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip():
@@ -1020,7 +1052,7 @@ if __name__ == '__main__':
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
-                    addr = 148
+                    addr = 147
                     t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
                     q.put(t1)
 
@@ -1060,8 +1092,8 @@ if __name__ == '__main__':
     #chat('pock520',5553230,149)
     #chat('123456789', 987654321, 135)
     # dg()
-    #gm()
-    chuan()
+    gm()
+    # chuan()
     while not q.empty():
         thread = []
         for i in xrange(50):
@@ -1071,6 +1103,6 @@ if __name__ == '__main__':
                 pass
         for i in thread:
             i.start()
-            # i.join()
+            #i.join()
         for i in thread:
            i.join()

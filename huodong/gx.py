@@ -236,7 +236,7 @@ def act(username,passwd,addr):
         action.saodang1()
     action.saodang1()
 def chuan():
-    with open('../users/1000share.txt', 'r') as f:
+    with open('../users/haiyun.txt', 'r') as f:
         # with open('../users/duguyi.txt', 'r') as f:
         for i in f:
             if i.strip():
@@ -255,7 +255,7 @@ def chuan():
 chuan()
 while not q.empty():
         thread = []
-        for i in xrange(50):
+        for i in xrange(200):
             try:
                 thread.append(q.get_nowait())
             except:

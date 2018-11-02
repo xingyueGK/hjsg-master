@@ -47,3 +47,7 @@ def buy(user, refresh=0):
         buy(user)
 
 buy('aa',30)
+
+import socket
+
+s = socket.socket(socket.AF_INET)

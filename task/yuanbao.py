@@ -28,6 +28,7 @@ class task(SaoDangFb):
         return task1,task2,task3
     def refresh(self):
         ref = self.action(c='business',m='refresh')
+        print ref
         return ref['trader']
     def buytimes(self):
         #购买次数并缓存到redis，三日内最多购买24次

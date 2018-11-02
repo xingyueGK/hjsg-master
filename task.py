@@ -683,15 +683,20 @@ class task(SaoDangFb):
         except Exception as e:
             print e
     def gold_time(self):
+        print '黄金时刻'
         self.action(c='gold_time', m='index')
         data = self.action(c='gold_time', m='sign_reward')
         for item in data['data']:
             if item['receive_status'] == 1:
                 self.action(c='gold_time', m='receive_sign_reward', reward_id=item['id'])
     def assist_card(self):#助阵系统
-        rest = self.action(c='assist_card',m='index')
-        assist_conjure = self.action(c='assist_conjure',m='index')
         try:
+
+            rest = self.action(c='assist_card',m='index')
+            self.action(c='assist_copy', m='index')
+            self.action(c='assist_copy', m='daily_reward_preview')
+            self.action(c='assist_copy', m='get_daily_reward',gold_price=0)
+            assist_conjure = self.action(c='assist_conjure',m='index')
             if assist_conjure['data']['const']['free_times'] ==1:
                 #每日免费抽奖
                 self.action(c='assist_conjure', m='conjure',conjure_type=1)
@@ -701,60 +706,115 @@ class task(SaoDangFb):
                 self.action(c='assist_copy', m='sweep', mission_id=1, times=5)
         except Exception:
             pass
+
+    def drugrefresh(self):#经脉刷新
+        self.action(c='drug', m='refresh')
+    def drug(self):#经脉
+        try:
+            index = self.action(c='drug', m='index')
+            shop_index= self.action(c='drug', m='shop_index')
+            remain_freetimes = shop_index['remain_freetimes']
+            for i in range(remain_freetimes):
+                for  item in shop_index['list']:
+                    # sub_type 为1 使用元宝购买  goods_type 为 82 暂时用不到的金丹
+                    if item['goods_type'] == "82" or item['sub_type'] == "1":
+                        continue
+                    # 购买经脉
+                    id = item['id']
+                    print self.action(c='drug',m='reward_index',id=id)
+                self.drugrefresh()
+        except Exception as e:
+            print e
+    def lucky_dice(self):#幸运骰子
+        try:
+            index = self.action(c='lucky_dice',m='index')
+            free_times  = index['free_times']
+            for i in range(free_times):
+                self.action(c='lucky_dice',m='farkle_dice')
+            #领取奖励
+            index = self.action(c='lucky_dice', m='index')
+            lucky_reward = index['index']
+            for item in lucky_reward:
+                if item['status'] ==1:
+                    id = item['id']
+                    self.action(c='lucky_dice',m='get_lucky_reward',id=id)
+        except Exception as e:
+            print e
+    def act_fight(self):#征战八方
+        try:
+            index = self.action(c='act_fight',m='index')
+            for item in index['info']:
+                if item['status'] == 1:
+                    id = item['id']
+                    self.action(c='act_fight', m='get_reward',id=id)
+        except Exception as e:
+            print e
+    def break_egg(self):#砸金蛋
+        try:
+            index = self.action(c='break_egg',m='index')
+            free_time = int(index['user_info']['free_time'])
+            if free_time == 1:
+                self.action(c='break_egg', m='go_break',type=1)
+        except Exception as e:
+            print e
 def run(user, apass, addr):
     action = task(user, apass, addr)
     activity = action.get_act()
-    # action.arena()  # 获取每日演武奖
-    # action.qiandao()  # 每日签到
-    # action.hitegg()  # 砸蛋
-    # action.heaven()  # 通天塔
-    # action.workshop()  # 玉石采集
-    # action.exploit_tree()  # 木材采集
-    # action.exploit_stone()  # 石头采集
-    # action.herothrone()  # 英雄王座
-    # action.sanctum()  # 每日宝石领奖
-    # action.generaltask()  #
-    # action.business()  # 每日通商
+    action.arena()  # 获取每日演武奖
+    action.qiandao()  # 每日签到
+    action.hitegg()  # 砸蛋
+    action.heaven()  # 通天塔
+    action.workshop()  # 玉石采集
+    action.exploit_tree()  # 木材采集
+    action.exploit_stone()  # 石头采集
+    action.herothrone()  # 英雄王座
+    action.sanctum()  # 每日宝石领奖
+    action.generaltask()  #
+    action.business()  # 每日通商
     action.tower()  # 将魂星路
-    # action.island()  # 金银洞
-    # action.lottery()  # 每日抽奖
-    # action.worldboss()  # 世界boos
-    # # action.copies()  # 扫荡副本
-    # action.mount_stone()  # 每日大马副本
-    # action.awaken_copy()  # 觉醒奖励
-    # action.dice()  # 国家摇色子
-    # action.mouth_card()  # 月卡奖励
-    # action.beauty()  # 铜雀台互动
-    # action.drink()  # 每日军令饮酒
-    # action.country()  # 国家奖励
-    # action.overseastrade()  # 海外贸易
-    # action.countrysacrifice()#每日免费贡献40
-    # if activity['act_travel'] == 1:
-    #     for i in range(3):
-    #         action.sanguo()  # 游历三国
-    # if activity['actkemari'] == 1:
-    #     action.cuju()  # 蹴鞠
-    # if activity['act_spring'] == 1:
-    #     action.jisi()  # 新年祭祀
-    # if activity['happy_guoqing'] == 1:
-    #     action.leigu()  # 欢度国庆
-    # if activity['chicken'] == 1:
-    #     action.chicken()  # 吃鸡
-    # if activity['holiday'] == 1:
-    #     action.holiday()  # 假日礼包
-    # if activity['sacredtree'] == 1:
-    #     action.shenshu()  # 神树
-    # if activity['lantern'] == 1:
-    #     action.yuanxiao()  # 元宵
-    # if activity['actjubao'] == 1:
-    #     action.actjubao()  # 聚宝
-    # if activity['years_guard'] == 1:
-    #     action.years_guard()  # 周年守护
-    # if activity['fukubukuro'] == 1:
-    #     #     action.fukubukuro()  # 福矿
-    # if activity['gold_time'] == 1:
-    #     action.gold_time()  # 黄金时间
-    # for i in range(50):
+    action.island()  # 金银洞
+    action.lottery()  # 每日抽奖
+    action.worldboss()  # 世界boos
+    # action.copies()  # 扫荡副本
+    action.mount_stone()  # 每日大马副本
+    action.awaken_copy()  # 觉醒奖励
+    action.dice()  # 国家摇色子
+    action.mouth_card()  # 月卡奖励
+    action.beauty()  # 铜雀台互动
+    action.drink()  # 每日军令饮酒
+    action.country()  # 国家奖励
+    action.overseastrade()  # 海外贸易
+    action.countrysacrifice()#每日免费贡献40
+    if activity['act_travel'] == 1:
+        for i in range(3):
+            action.sanguo()  # 游历三国
+    if activity['actkemari'] == 1:
+        action.cuju()  # 蹴鞠
+    if activity['act_spring'] == 1:
+        action.jisi()  # 新年祭祀
+    if activity['happy_guoqing'] == 1:
+        action.leigu()  # 欢度国庆
+    if activity['chicken'] == 1:
+        action.chicken()  # 吃鸡
+    if activity['holiday'] == 1:
+        action.holiday()  # 假日礼包
+    if activity['sacredtree'] == 1:
+        action.shenshu()  # 神树
+    if activity['lantern'] == 1:
+        action.yuanxiao()  # 元宵
+    if activity['actjubao'] == 1:
+        action.actjubao()  # 聚宝
+    if activity['years_guard'] == 1:
+        action.years_guard()  # 周年守护
+    if activity['fukubukuro'] == 1:
+        action.fukubukuro()  # 福矿
+    if activity['gold_time'] == 1:
+        action.gold_time()  # 黄金时间
+    if activity['lucky_dice'] == 1:
+        action.lucky_dice()  # 摇骰子
+    if activity['break_egg'] == 1:
+        action.break_egg()  # 砸蛋
+    # for i in range(100):
     #     action.gongxian()
     # if activity['act_steadily'] == 1:
     #     Flag = True
@@ -767,9 +827,9 @@ def run(user, apass, addr):
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))
-    # cont = ['autouser.txt', 'user.txt','alluser.txt', 'duguyi.txt', '149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt',
+    # cont = ['1000share.txt','autouser.txt', 'user.txt','alluser.txt', 'duguyi.txt', '149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt',
     #         '149xb.txt', '149lwzs.txt','21user.txt','150.txt','150nm.txt','150num.txt']
-    cont = ['user.txt']
+    cont = ['haiyun.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:

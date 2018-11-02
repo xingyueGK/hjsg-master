@@ -1,42 +1,38 @@
 #!/usr/bin/env python
-# -*- coding:utf-8 -*-
-import json
+# -*- coding: utf-8 -*-
+# @Time    : 2018/10/31 11:06
+# @Author  : xingyue
+# @File    : allInOne.py
 
-from base import SaoDangFb
-
+from task.base import SaoDangFb
+import  time,threading
+import os,json
 
 class eight(SaoDangFb):
     def __init__(self, level, user, passwd, num):
         super(eight, self).__init__(user, passwd, num)
         self.level = level
-
-    def condition(self):
-        #level 3 ['神黄权','神陆抗'] [['神卢植','神刘璋'],['神文丑','神董卓']]
-        a=['神黄权','神陆抗']
-        b= [['神卢植','神刘璋'],['神文丑','神董卓']]
-        condition = [ (i,k[0],k[1]) for i in a for k in b]
-
-        print json.dumps(condition)
-        genral_info = self.matrix()
-        for k,v in genral_info.items():
-            pass
-
+    def muster(self):
+        #所有将领数量
+        muster=self.action(c='muster', m='index',page= 1,perpage=999)['list']
+        return muster
     def reset(self):
         self.action(c='eight_diagram', m='reset_point')
         self.action(c='eight_diagram', m='level_index', level=self.level)  # level：八卦等级，分为1,2,3重
 
     def eight_index(self):
-        level_index = self.action(c='eight_diagram', m='level_index', level=self.level)
-        return level_index
+        now_level = self.action(c='eight_diagram', m='index')['now_level']
+        level_index = self.action(c='eight_diagram', m='level_index', level=now_level)
+        return level_index,now_level
 
     def pk(self):
         self.action(c='eight_diagram', m='pk', level=self.level)
 
     def matrix(self):
+        #出征将领
         genral_dict = {}
         matrix_index = self.action(c='matrix', m='index')
         general = matrix_index['general']
-        print json.dumps(general)
         for k, v in general.items():
             name = v['name']
             genral_dict[name] = v['id']
@@ -68,29 +64,31 @@ class eight(SaoDangFb):
             self.action(c='matrix', m='update_matrix', list=lists4, mid=mid)
 
 
-def main():
-    ei = eight(num=148, user='xingyue123z', passwd='413728161', level=2)
-    ei.use_matrix(4)  # 使用固定阵法
-    ei.condition()
-    ei.update_matrix(u'神甘宁',u'神刘璋',u'神袁尚',u'神刘表',u'神卢植',4)
-    point = ei.eight_index()['cost']['point']
-    print '当前位置', point
-    if point == '9':
+def run(user,apass, addr):
+    ei = eight(num=addr, user=user, passwd=apass, level=3)
+    # ei.use_matrix(4)  # 使用固定阵法
+    index,now_level = ei.eight_index()
+    reset_times = int(index['reset_times'])
+    point = index['cost']['point']
+    print '%s 八卦等级 %s 当前位置%s 重置八卦次数%s'%(user,now_level,point,reset_times)
+    if point == '9' and reset_times == 1:
         ei.reset()
+    else:
+        print '已经通关没有次数了'
+        exit(1)
     for i in range(12):
-        point = ei.eight_index()['cost']['point']
-        if point == '7':#武将减低
-            # 上谋士 u'神刘表'
-            ei.update_matrix(u'神甘宁', u'神刘璋', u'神袁尚', u'神刘表', u'神卢植', 4)
-            ei.pk()
-            print '当前位置', point
-        elif point == '8':#谋士降低
-            ei.update_matrix(u'神甘宁', u'神刘璋', u'神袁尚', u'夏侯杰', u'神刘表', 4)
-            ei.pk()
-        else:
-            ei.pk()
-            print '当前位置', point
-    ei.update_matrix(u'神刘表', u'神刘璋', u'神袁尚', u'神甘宁', u'神卢植', 4)
+        ei.pk()
     ei.use_matrix(4)
 if __name__ == '__main__':
-    main()
+    print os.path.split(os.path.abspath(__file__))
+    filepath = os.path.dirname(os.path.abspath(__file__))
+    cont = ['eight.txt']
+    for t in cont:
+        with open('%s/users/%s'%(filepath,t),'r') as f:
+            for i in f:
+                if i.strip() :
+                    name = i.split()[0]
+                    passwd = i.split()[1]
+                    addr = i.split()[2]
+                    t1 = threading.Thread(target=run, args=(name, passwd, addr))
+                    t1.start()
