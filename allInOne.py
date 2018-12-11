@@ -64,31 +64,41 @@ class eight(SaoDangFb):
             self.action(c='matrix', m='update_matrix', list=lists4, mid=mid)
 
 
-def run(user,apass, addr):
-    ei = eight(num=addr, user=user, passwd=apass, level=3)
-    # ei.use_matrix(4)  # 使用固定阵法
+def run(user,apass, addr,mid,level):
+    ei = eight(num=addr, user=user, passwd=apass, level=level)
+    ei.use_matrix(mid)  # 使用固定阵法
     index,now_level = ei.eight_index()
     reset_times = int(index['reset_times'])
     point = index['cost']['point']
     print '%s 八卦等级 %s 当前位置%s 重置八卦次数%s'%(user,now_level,point,reset_times)
     if point == '9' and reset_times == 1:
         ei.reset()
+    elif point != '9' and reset_times != 1:
+        for i in range(12):
+            index, now_level = ei.eight_index()
+            point = index['cost']['point']
+            print point
+            ei.pk()
     else:
         print '已经通关没有次数了'
         exit(1)
     for i in range(12):
+        index, now_level = ei.eight_index()
+        point = index['cost']['point']
+        print point
         ei.pk()
     ei.use_matrix(4)
 if __name__ == '__main__':
-    print os.path.split(os.path.abspath(__file__))
     filepath = os.path.dirname(os.path.abspath(__file__))
     cont = ['eight.txt']
     for t in cont:
         with open('%s/users/%s'%(filepath,t),'r') as f:
             for i in f:
-                if i.strip() :
-                    name = i.split()[0]
-                    passwd = i.split()[1]
-                    addr = i.split()[2]
-                    t1 = threading.Thread(target=run, args=(name, passwd, addr))
-                    t1.start()
+                if i.strip() and not i.startswith('#'):
+                        name = i.split()[0]
+                        passwd = i.split()[1]
+                        addr = i.split()[2]
+                        mid = i.split()[3]
+                        level = i.split()[4]
+                        t1 = threading.Thread(target=run, args=(name, passwd, addr,mid,level))
+                        t1.start()

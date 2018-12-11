@@ -29,8 +29,10 @@ class task(SaoDangFb):
         except:
             return False
 def run(user, apass, addr):
-    action = task(user, apass, addr)
-    action = action.act_steadily()
+    Flag = True
+    while Flag:
+        action = task(user, apass, addr)
+        Flag = action.act_steadily()
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))

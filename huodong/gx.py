@@ -130,7 +130,7 @@ class fuben(SaoDangFb):
         num = int(memberindex['missionlevel'])
         exit_code = 1
         if exit_code == 1 :
-            for level in range(num,3):#遍历每一个图
+            for level in range(num,15):#遍历每一个图
                 print '开始攻击第 %s 个图'%level
                 print  self.action(c='map',m='get_scene_list',l=level)
                 site = len(self.action(c='map',m='get_scene_list',l=level)['list'])
@@ -190,8 +190,11 @@ def act(username,passwd,addr):
         print '账号：%s   等级为：%s' % (username, action.level())
     except :
         print 'zhanghao ###################################### ',username
-    if action.level() >= 50:
+    if action.level() >= 260:
         exit()
+    if action.level() >= 50:
+        action.saodang(6)
+        #exit()
     if  action.level() <10:
         action.saodang(1)#16级 失败退出
         action.levelgift(16)  # 领取16级奖励
@@ -234,9 +237,9 @@ def act(username,passwd,addr):
         action.muster()  # 再次突飞
         action.saodang(2)
         action.saodang1()
-    action.saodang1()
+    # action.saodang1()
 def chuan():
-    with open('../users/haiyun.txt', 'r') as f:
+    with open('../users/xing.txt', 'r') as f:
         # with open('../users/duguyi.txt', 'r') as f:
         for i in f:
             if i.strip():
@@ -249,7 +252,7 @@ def chuan():
                     lockpwd = i.split()[3]
                 except:
                     lockpwd = None
-                #addr = 149
+                #addr = 150
                 t1 = threading.Thread(target=act, args=(name, passwd, addr))
                 q.put(t1)
 chuan()

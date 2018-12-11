@@ -1,7 +1,9 @@
-nova453  b036380bvc 26 2
-zhaofei3   728420 26 3
-cocoyezi4   16778284 22 3
-ywwoaini1314 YWwoaini1314 22 3
-niuwen00    niuwenbb 21 2
-linying  13718738160 21 2
-gt867e7 770131 21 1
+#一阵通关八卦使用
+#账号 密码 大区 阵法id 八卦等级
+nova453  b036380bvc 26 3 2
+zhaofei3   728420 26 3 3
+cocoyezi4   16778284 22  3 3
+ywwoaini1314 YWwoaini1314 22 3 3
+niuwen00    niuwenbb 21 3 2
+linying  13718738160 21 3 2
+gt867e7 770131 21 3 2

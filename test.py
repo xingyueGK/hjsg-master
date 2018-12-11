@@ -37,17 +37,18 @@ import time
 # r = redis.StrictRedis(connection_pool=pool)
 #
 # print r.expireat('231', timeStamp)
-def buy(user, refresh=0):
-    buy_item = ['中级卡', '初级卡', '高级卡', '军令']
-    buy_type = [1, 3, 4, 5]
-    print refresh
-    buy(user)
-    for i in range(refresh):
-        print '刷新次数', i
-        buy(user)
+# def buy(user, refresh=0):
+#     buy_item = ['中级卡', '初级卡', '高级卡', '军令']
+#     buy_type = [1, 3, 4, 5]
+#     print refresh
+#     buy(user)
+#     for i in range(refresh):
+#         print '刷新次数', i
+#         buy(user)
+#
+# buy('aa',30)
+#
+# import socket
+#
+# s = socket.socket(socket.AF_INET)
 
-buy('aa',30)
-
-import socket
-
-s = socket.socket(socket.AF_INET)

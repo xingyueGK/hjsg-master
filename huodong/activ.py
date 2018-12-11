@@ -5,7 +5,7 @@ import json
 import shujufenx
 from shujufenx import fuben
 from Queue import Queue
-
+from random import choice
 """每日不定期开展活动"""
 
 
@@ -170,10 +170,14 @@ class activity(fuben):
 
     def generalpool(self):  # 武将池
         self.action(c='act_generalpool', m='index')
-        # 免费武将1谋士，2武将
-        self.action(c='act_generalpool', m='lottery', type=1)
-        self.action(c='act_generalpool', m='lottery', type=2)
+        result = self.action(c='act_generalpool', m='general_chip')
 
+        # 免费武将1谋士，2武将
+        #self.action(c='act_generalpool', m='lottery', type=1)
+        #self.action(c='act_generalpool', m='lottery', type=2)
+
+        #self.action(c='act_generalpool', m='lottery_ten', type=1,shop=2)#10次卢植刘璋
+        self.action(c='act_generalpool', m='recruit', gid=gid)
     def messages(self):
         print  self.action(c='message', m='get_notice')
 
@@ -188,7 +192,7 @@ class activity(fuben):
         except:
             pass
 
-    def gongxiang(self, num=100000):  # 国家贡献
+    def gongxiang(self):  # 国家贡献
         memberInfo = self.action(c='member', m='index')
         self.action(c='country', m='get_member_list')
         self.action(c='country', m='storage')
@@ -198,7 +202,7 @@ class activity(fuben):
         flag = 0
         donate = 0
         try:
-            for i in range(num):
+            while True:
                 if flag < 10:
                     result = self.action(c='country', m='donate', type=1)
                     status = result['status']
@@ -308,13 +312,22 @@ class activity(fuben):
             status = index['status']
 
     def jianghun(self):
-        index = self.action(c='soul', m='index')
-        info = index['pack']['list']
-        memberInfo = self.action(c='member', m='index')
-        name = memberInfo['nickname']  # 账号
-        for i in info:
-            if i['name'] in ['穷变战魂', '移山战魂', '形虚战魂']:
-                print '账号 :%s ,%s' % (self.username, i['name'])
+        try:
+            index = self.action(c='soul', m='index')
+            info = index['pack']['list']
+            memberInfo = self.action(c='member', m='index')
+            pages = index['pack']['pages']
+            name = memberInfo['nickname']  # 账号
+            for i in info:
+                if i['name'] in ['穷变战魂', '移山战魂', '形虚战魂']:
+                    print '账号 :%s ,%s' % (self.username, i['name'])
+            for page in range(1,pages):
+                result = self.action(c='soul',m='get_pack_info',page = page)
+                for i in result['info']['list']:
+                    if i['name'] in ['穷变战魂', '移山战魂', '形虚战魂']:
+                        print '账号 :%s ,%s' % (self.username, i['name'])
+        except:
+            pass
 
     def meiri(self):
         for i in range(1, 16):
@@ -397,6 +410,14 @@ class activity(fuben):
         #     p(self.action(c='country', m='apply', id=id))
         # else:
         #     print '国家不存在'
+        info  = self.action(c='country', m='search', name=name)
+
+        if info['status'] ==1 :
+            uid = info['country']['id']
+            print uid
+            print self.action(c='country', m='apply', id=uid)
+            return
+        print 'assssssss'
         for i in range(1, 85):
             info = self.action(c='country', m='get_rank', page=i)
             for item in info["list"]:
@@ -484,13 +505,13 @@ class activity(fuben):
         self.action(c='arena', m='get_reward')
 
     def role(self, name):  # 注册名字
-        self.action(c='member', m='select_role', sex=2, name=name)
+        p(self.action(c='member', m='select_role', sex=2, name=name))
 
     def chat(self, ms):  # 获取聊天信息
         chat_index = self.action(c='chat', m='index')
-        for message in chat_index['list']:
-            print u'%s' % message['nickname'] + ":" + u'%s' % message['message']
-        #print self.action(c='chat', m='send', message=ms)  # 发送消息
+        # for message in chat_index['list']:
+        #     print u'%s' % message['nickname'] + ":" + u'%s' % message['message']
+        print self.action(c='chat', m='send', message=ms)  # 发送消息
 
     def rob(self, name, user):  # 海运打劫
         # name 就是打劫的国家[list]
@@ -500,7 +521,7 @@ class activity(fuben):
             index_result = self.action(c='overseastrade', m='index')
             try:
                 robtimes = int(index_result['info']['robtimes'])  # 获取打劫次数
-                print '剩余打劫次数{robtimes}'.format(robtimes=robtimes)
+                print '{user} 剩余打劫次数 {robtimes}\r'.format(user=user,robtimes=robtimes)
             except:
                 pass
             try:
@@ -801,11 +822,17 @@ class activity(fuben):
         if self.user != 'sunzi1' and win != -2 :
             self.action(c='arena', m='send_to_chat', touid = touid,report=report,win=win)
     def information(self,uid):#获取角色vip
-        #top = self.action(c='worldarena',m='index')
-        top = self.action(c='country', m='get_member_list')
+        #top = self.action(c='worldarena',m='index')#演武榜top10
+        top = self.action(c='country', m='get_member_list')#国家列表
+        #top = self.action(c='act_kemari', m='kemari_rank')#蹴鞠排行榜
+        #top = self.action(c='friend',m='index',p=1,l=100)#好友列表
+        print json.dumps(top)
         # for info in top['top']:
         for info in top['list']:
-            uid = info['uid']
+            try:
+                uid = info['uid']
+            except:
+                uid = info['fuid']
             player = self.action(c='information', m='index', uid=uid)['player']
             print '%s %s %s '%(player['nickname'],player['level'],player['vip'])
     def usurp(self):#国家升官
@@ -822,16 +849,49 @@ class activity(fuben):
             rest = self.action(c='country',m='usurp')
             status = rest['status']
     def mount_stone(self):#符石合成
-        index = self.action(c='mount_stone', m='index')
-        allpage = index['allpage']
-        rest = self.action(c='mount_stone', m='get_mount_by_page',page= allpage)
-        #hecheng
-        self.action(c='mount_stone', m='get_mount_by_page', page=allpage)
-        stone_id = [i for i in range(61,74)]
-        for id in stone_id:
-            merge_index= self.action(c='mount_stone', m='merge_index', id=id)
-            num = merge_index['all_count']
-            self.action(c='mount_stone', m='merge', id=id,num=num)
+        try:
+            index = self.action(c='mount_stone', m='index')
+            allpage = index['allpage']
+            rest = self.action(c='mount_stone', m='get_mount_by_page',page= allpage)
+            #hecheng
+            self.action(c='mount_stone', m='get_mount_by_page', page=allpage)
+            stone_id = [i for i in range(61,74)]
+            for id in stone_id:
+                merge_index= self.action(c='mount_stone', m='merge_index', id=id)
+                if merge_index['status'] ==1 :
+                    num = merge_index['all_count']
+                    if num > 0:
+                        p(self.action(c='mount_stone', m='merge', id=id,num=num))
+        except KeyError as e:
+            pass
+    def god(self):#战神殿
+        self.action(c='god',m='index')
+        self.action(c='god', m='entry')#报名
+    def gjzb(self):#国家争霸
+        self.action(c='country_gvg',m='index')
+        self.action(c='country_gvg',m='member_entry')
+    def war(self):#武斗会
+        self.action(c='war', m='index')
+        self.action(c='war', m='entry')  # 报名争霸
+    def treasuremap(self):#海运藏宝图
+        """ type 1 2 3 对应上中下
+            quality 1,2,3,4,5,6 对应级别， 6位红色
+            m = exit_team 解散
+            create_team  创建
+            join_team tid=  加入指定队伍
+            sale 出售宝图
+        """
+        result = self.action(c='treasuremap', m='index')
+        maytype = result['map']['type']
+        if result['map']['quality'] != "6":
+            for item in result['list']:
+                if item['quality'] ==6:
+                    for id in item['list']:
+                        if id['type'] != maytype:
+                            self.action(c='treasuremap',m='join_team',tid=item['id'])
+            self.action()
+            pass
+
 
 
 # 周年比购物
@@ -868,7 +928,6 @@ class activity(fuben):
 # action.messages()
 if __name__ == '__main__':
     q = Queue()
-
 
     def act(user, apass, addr):
         action = activity(user, apass, addr)
@@ -927,7 +986,7 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry(u'是你学姐')
+        action.jioncountry(u'杰克喝尿')
 
 
     def gongxian(user, apass, addr):
@@ -942,11 +1001,11 @@ if __name__ == '__main__':
 
     def dajie(user, apass, addr):
         action = activity(user, apass, addr)
-        action.rob(['体检了', '8523', '英雄', '是你学姐', '杰克傻bi', '杰克吃翔'], user)
+        action.rob(['体检了', '8523', '英雄', '是你学姐', '杰克傻bi','杰克喝sui' ,'杰克喝尿','杰克吃翔','haiyun1','haiyun2','haiyun3'], user)
         # time.sleep(0.3)
 
 
-    def jianghun(user, apass, addr):
+    def teshujianghun(user, apass, addr):
         action = activity(user, apass, addr)
         action.jianghun()
 
@@ -961,13 +1020,13 @@ if __name__ == '__main__':
         action.sanguo()
 
 
-    def chat(user, apass, addr):
+    def chats(user, apass, addr):
         action = activity(user, apass, addr)
         #action.chat('sssssse')
-        action.gxinfo()
-        action.information(123)
+        #action.gxinfo()
+        #action.information(123)
         #action.get_audit_list()
-        #action.chat(u"悍将三国六周年快乐")
+        action.chat(u"悍将三国六周年快乐")
 
 
     def upmatrix(user, apass, addr):  # 更新出征武将
@@ -977,16 +1036,36 @@ if __name__ == '__main__':
 
     def guyuyinbi(user, apass, addr):  # 换古玉买银币
         action = activity(user, apass, addr)
-        # action.sign()  # 购买签到声望
+        action.sign()  # 购买签到声望
         action.guyu()
 
 
     def rolename(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
         #nickname = 'mmp' + user.split('y0')[1]
-        nickname = '你看什么看' + user.split('g')[1]
-        print nickname
-        action.role(nickname)
+        nicklist = ['天','下','无','贼','越']
+        #nicklist = ['G更健康','G更好','G你倒是处理啊','哎呦喂G']
+        name = user.split(r'duo',1)
+        if name[0] == 'gmsd':
+            nickname = 'gmsd' + user.split(r'0',1)[1]
+            print nickname
+            action.role(nickname)
+        elif name[0] == 'lwzs':
+            nickname = 'lwzs' + user.split(r'0',1)[1]
+            print nickname
+            action.role(nickname)
+        elif name[0] == 'cnm':
+            nickname = 'nmp' + user.split(r'0',1)[1]
+            print nickname
+            action.role(nickname)
+        elif name[0] == 'dgj':
+            nickname = 'dgj' + user.split(r'0',1)[1]
+            print nickname
+            action.role(nickname)
+        else:
+            nickname = choice(nicklist) + name[1].title()
+            print nickname
+            action.role(nickname)
 
 
     def zhouniankuang(user, apass, addr):  # 更新出征武将
@@ -996,7 +1075,7 @@ if __name__ == '__main__':
 
     def robfu(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
-        action.robfukuang(user, ['英雄', '体检了', '杰克吃翔', '杰克喝尿', '悍龙', '梦', '炎黄天都', '杰克喝sui'])
+        action.robfukuang(user, ['英雄', '体检了', '杰克吃翔', '杰克喝尿', '悍龙', '是你学姐', '炎黄天都', '杰克喝sui','haiyun1','haiyun2','haiyun3'])
 
 
     def znshop(user, apass, addr):  # 周年福矿商店
@@ -1035,15 +1114,27 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         action.gold_time()
 
-    def shenguan(user, apass, addr):
+    def shenguan(user, apass, addr):#国家升官
         action = activity(user, apass, addr)
         action.usurp()
 
+    def godentry(user, apass, addr):#战神殿报名
+        action = activity(user, apass, addr)
+        action.god()
+    def country_zb(user, apass, addr):#国家争霸
+        action = activity(user, apass, addr)
+        action.gjzb()
+    def warentry(user, apass, addr):#武斗会报名
+        action = activity(user, apass, addr)
+        action.war()
+    def mountStone(user, apass, addr):#石头合成
+        action = activity(user, apass, addr)
+        action.mount_stone()
     def chuan():
-        with open('../users/gmhy.txt', 'r') as f:
+        with open('../users/user.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
-                if i.strip():
+                if i.strip() and not i.startswith('#'):
                     name = i.split()[0]
                     # name = i.split()[0]
                     passwd = i.split()[1]
@@ -1052,20 +1143,21 @@ if __name__ == '__main__':
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
-                    addr = 147
+                    #addr = 150
                     t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
                     q.put(t1)
 
 
     def gm():
-        cont = ['149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt', '149xb.txt', '149lwzs.txt']
+        cont = ['149cnm.txt', '149dgj.txt', '149gx1.txt', '149xx.txt', '149xb.txt', '149lwzs.txt','148gx.txt']
         for t in cont:
             with open('../users/%s' % t, 'r') as f:
                 for i in f:
                     if i.strip():
                         user = i.split()[0]
                         passwd = i.split()[1]
-                        addr = 149
+                        addr = i.split()[2]
+                        #addr = 149
                         t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
                         q.put(t1)
 
@@ -1080,7 +1172,7 @@ if __name__ == '__main__':
         for t in cont:
             with open('../users/%s' % t, 'r') as f:
                 for i in f:
-                    if i.strip():
+                    if i.strip() and not i.startswith('#'):
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = i.split()[2]
@@ -1092,8 +1184,8 @@ if __name__ == '__main__':
     #chat('pock520',5553230,149)
     #chat('123456789', 987654321, 135)
     # dg()
-    gm()
-    # chuan()
+    #gm()
+    chuan()
     while not q.empty():
         thread = []
         for i in xrange(50):
@@ -1103,6 +1195,6 @@ if __name__ == '__main__':
                 pass
         for i in thread:
             i.start()
-            #i.join()
+            # i.join()
         for i in thread:
            i.join()

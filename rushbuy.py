@@ -9,37 +9,114 @@ from task.base import SaoDangFb
 import time, threading
 import os, json
 from Queue import  Queue
+import requests
+import redis
 
+pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
+_redis = redis.StrictRedis(connection_pool=pool)
 
+tasks = {}
+lock = threading.RLock()
 class task(SaoDangFb):
 
     def unlock(self, pwd):  # 解锁密码
-        self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
+        print json.dumps(self.action(c='member', m='resource_unlock',pwd=pwd)),self.user
 
-    def springshop(self, name=u'聊得'):  # 周末武將商城
+    def springshop(self, id):  # 周末武將商城
         # id 列表对应 1-20 即为购买武将1-20
-        spring = self.action(c='springshop', m='index')['list']
-        result = self.action(c='springshop', m='buy', id=1)
-        if result['status'] == 1:
-            exit(1)
-        # self.action(c='springshop', m='buy', id=1)
-        self.action(c='springshop', m='buy', id=3)
-        self.action(c='springshop', m='buy', id=10)
-        self.action(c='springshop', m='buy', id=17)
-
+        global lock
+        _redis.hsetnx(self.user, id, 0)
+        print _redis.hget(self.user, id)
+        if _redis.hget(self.user, id) == '0':
+            result = self.action(c='springshop', m='buy', id=id)
+            self.p(result)
+            if result['status'] == 1:
+                _redis.hset(self.user, id, 1)
+                TIME = time.strftime("%Y-%m-%d")
+                extime = TIME + " 23:59:59"
+                lock.acquire()
+                timeArray = time.strptime(extime, "%Y-%m-%d %H:%M:%S")
+                timeStamp = int(time.mktime(timeArray))
+                lock.release()
+                _redis.expireat(self.user, timeStamp)
     def countryshop(self):  # 抢购国家商城
         # id 2 20税金，300蓝石头，13 40税金600蓝石头
         # id 3 40税金150黄石头   14 80 300黄
         # id 7 80两千声望   18 150 4000声望
+        shop_id = [2,3,7,13,14,18]
         self.action(c='country_taxes_shop', m='index')
-        self.action(c='country_taxes_shop', m='buy', id=2)  #
-        self.action(c='country_taxes_shop', m='buy', id=3)  #
-        self.action(c='country_taxes_shop', m='buy', id=7)  # 购买声望80个税金2000个
-        self.action(c='country_taxes_shop', m='buy', id=13)
-        self.action(c='country_taxes_shop', m='buy', id=14)  #
-        self.action(c='country_taxes_shop', m='buy', id=18)
+        for id in shop_id:
+            print  self.action(c='country_taxes_shop', m='buy', id=id)
+    def SecKillInfo(self):
+        try:
+            num = 0
+            index = self.action(c='shopping_feast', m='index', time_limit=None)
+            cdtime = index['cd']
+            time_limit = index['time_limit']  # 抢购类型
+            rid1 = index['list'][0]['id']
+            rid2 = index['list'][1]['id']
+            return time_limit,rid1,rid2
+        except:
+            self.SecKillInfo()
+    def shoppingFeastSecKill(self,time_limit, rid1, rid2):#双十一秒杀活动
+        try:
+            #print 'sleep secend time',cdtime
+            #print rid1,rid2,time_limit
+            #time.sleep(cdtime-3)
+            url1 = 'http://s{addr}.game.hanjiangsanguo.com/index.php?v=0&c=shopping_feast&' \
+                  'time_limit={time_limit}&rid={rid2}&' \
+                  'm=seckill&&token_uid=14900008572777&' \
+                  'token={token}&channel=150&lang=zh-cn&rand=154200349070171'.format(addr=self.num,time_limit=time_limit,rid2=rid1,token=self.token)
+            url2 = 'http://s{addr}.game.hanjiangsanguo.com/index.php?v=0&c=shopping_feast&' \
+                  'time_limit={time_limit}&rid={rid2}&' \
+                  'm=seckill&&token_uid=14900008572777&' \
+                  'token={token}&channel=150&lang=zh-cn&rand=154200349070171'.format(addr=self.num,time_limit=time_limit,rid2=rid2,token=self.token)
+            _redis.hsetnx(self.user,rid1,0)
+            _redis.hsetnx(self.user, rid2,0)
+            if _redis.hget(self.user,rid1) == '0':
+                result =requests.get(url1).json()
+                print result
+                if result['status'] == 1:
+                     _redis.hset(self.user,rid1,1)
+            if _redis.hget(self.user,rid2) == 0:
+                print result
+                result =requests.get(url2).json()
+                if result['status'] == 1:
+                     _redis.hset(self.user,rid2,1)
+        except Exception as e:
+            print e
+            self.shoppingFeastSecKill(time_limit, rid1, rid2)
+    def shoppingFeastSecKill1(self,time_limit, rid1, rid2):#双十一秒杀活动
+        try:
+            #print 'sleep secend time',cdtime
+            #print rid1,rid2,time_limit
+            #time.sleep(cdtime-3)
+            url1 = 'http://s{addr}.game.hanjiangsanguo.com/index.php?v=0&c=shopping_feast&' \
+                  'time_limit={time_limit}&rid={rid2}&' \
+                  'm=seckill&&token_uid=14900008572777&' \
+                  'token={token}&channel=150&lang=zh-cn&rand=154200349070171'.format(addr=self.num,time_limit=time_limit,rid2=rid1,token=self.token)
+            url2 = 'http://s{addr}.game.hanjiangsanguo.com/index.php?v=0&c=shopping_feast&' \
+                  'time_limit={time_limit}&rid={rid2}&' \
+                  'm=seckill&&token_uid=14900008572777&' \
+                  'token={token}&channel=150&lang=zh-cn&rand=154200349070171'.format(addr=self.num,time_limit=time_limit,rid2=rid2,token=self.token)
 
-
+            result1 =requests.get(url1).json()
+            print result1
+            result2 =requests.get(url2).json()
+            print result2
+        except Exception as e:
+            print e
+            self.shoppingFeastSecKill1(time_limit, rid1, rid2)
+def run(name, passwd, addr,lockpwd,general):
+    action = task(name, passwd, addr)
+    action.unlock(lockpwd)
+    while True:
+        for id in general:
+            threading.Thread(target=action.springshop, args=(id,)).start()
+        time.sleep(0.3)
+    # time_limit, rid1, rid2 = action.SecKillInfo()
+    # while True:
+    #     threading.Thread(target=action.shoppingFeastSecKill, args=(time_limit, rid1, rid2)).start()
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))
@@ -47,20 +124,17 @@ if __name__ == '__main__':
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
-                if i.strip():
+                if i.strip() and not i.startswith('#'):
+                    print i
                     name = i.split()[0]
                     passwd = i.split()[1]
                     try:
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
+                    try:
+                        general = eval(i.split()[4])
+                    except:
+                        general = None
                     addr = i.split()[2]
-                    action = task(name, passwd, addr)
-                    action.unlock(lockpwd)
-                    now_time = time.strftime('%H:%M:%S')
-                    while True:
-                        now_time = time.strftime('%H:%M:%S')
-                        # if now_time >= '16:01:00' or now_time < '15:58:00':
-                        #     break
-                        # else:
-                        threading.Thread(target=action.countryshop).start()
+                    threading.Thread(target=run,args=(name, passwd, addr,lockpwd,general)).start()

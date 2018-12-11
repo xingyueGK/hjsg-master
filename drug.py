@@ -17,13 +17,21 @@ class task(SaoDangFb):
             index = self.action(c='drug', m='index')
             shop_index= self.action(c='drug', m='shop_index')
             remain_freetimes = shop_index['remain_freetimes']
+            print '%s 剩余刷新次数 %s'%(self.user,remain_freetimes)
             for i in range(remain_freetimes):
                 for  item in shop_index['list']:
-                    # sub_type 为1 使用元宝购买  goods_type 为 82 暂时用不到的金丹
-                    if item['goods_type'] != "82" or item['sub_type'] != "1":
+                    # sub_type 为1 使用元宝购买  goods_type 为 82 暂时用不到的金丹 status 为1 是可以购买物品
+                    if item['goods_type'] != "82" and item['sub_type'] != "1" and item['status'] ==1:
                         # 购买经脉
                         id = item['id']
                         reward_index=self.action(c='drug', m='reward_index', id=id)
+                        if reward_index['status'] == 6 :
+                            exit(1)
+                        elif reward_index['status'] != 1 :
+                            print json.dumps(reward_index, ensure_ascii=False)
+                            time.sleep(1)
+                            self.drug()
+                            return
                         print json.dumps(reward_index)
                 self.drugrefresh()
         except Exception as e:

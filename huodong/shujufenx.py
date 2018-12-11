@@ -194,6 +194,7 @@ class fuben(SaoDangFb):
         self.action(c='general', m='index')
         self.action(c='strengthen', m='index')
         id_info = self.action(c='strengthen', m='strengthen_info', id=id)
+        print id_info
         newlevel = id_info['info']['level']  # 获取当前装备的强化等级
         print '当前等级', newlevel
         try:
@@ -214,7 +215,7 @@ class fuben(SaoDangFb):
             if item['type'] == 1:
                 self.action(c='levelgift', m='get_reward', level=item['level'])  # 获取30级奖励
 
-    def saodang(self, num=12):  # 攻击小兵
+    def saodang(self, num=18):  # 攻击小兵
         memberindex = self.action(c='member', m='index')
         missionlevel = int(memberindex['missionlevel'])
         missionsite = int(memberindex['missionsite'])
@@ -343,13 +344,17 @@ class fuben(SaoDangFb):
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = fuben(user, apass, addr)
-        action.mapinfo()
-        # action.general(1)
-        # action.mingjiang()
-        # action.saodang(9)
+        # for id in [251000286202,251000286205,251000287442,
+        #            251000290229,251000290232,251000290914,
+        #            251000293070,251000293073,251000293680,
+        #            251000295775,251000295778,251000296527]:
+        #     action.strengthen(id)
+        # # action.general(1)
+        # # action.mingjiang()
+        action.saodang(20)
 
 
-    with open('../users/149gmjrhy.txt', 'r') as f:
+    with open('../users/rush.txt', 'r') as f:
         for i in f:
             str = i.strip().split()[0]
             name = str
