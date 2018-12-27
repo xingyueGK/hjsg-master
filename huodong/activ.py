@@ -169,15 +169,14 @@ class activity(fuben):
         self.action(c='act_mooncake', m='action', type=3)
 
     def generalpool(self):  # 武将池
-        self.action(c='act_generalpool', m='index')
-        result = self.action(c='act_generalpool', m='general_chip')
+        #self.action(c='act_generalpool', m='index')
+        #result = self.action(c='act_generalpool', m='general_chip')
 
         # 免费武将1谋士，2武将
         #self.action(c='act_generalpool', m='lottery', type=1)
         #self.action(c='act_generalpool', m='lottery', type=2)
-
-        #self.action(c='act_generalpool', m='lottery_ten', type=1,shop=2)#10次卢植刘璋
-        self.action(c='act_generalpool', m='recruit', gid=gid)
+        self.action(c='act_generalpool', m='lottery_ten', type=1,shop=2)#10次卢植刘璋
+        #self.action(c='act_generalpool', m='recruit', gid=gid)合成武将
     def messages(self):
         print  self.action(c='message', m='get_notice')
 
@@ -484,19 +483,21 @@ class activity(fuben):
     def countrymine(self):
         try:
             mineinfo = self.action(c='countrymine', m='index')
-            print mineinfo
             dateline = mineinfo['dateline']
             log = mineinfo['log']
             if log:
                 log_dateline = log['dateline']
                 lasttime = int(dateline) - int(log_dateline)
-                print lasttime
-                for i in range(8, 10):
+                if lasttime > 900:
+                    s=log['site']
+                    self.p(self.action(c='countrymine', m='get_reward', s=s))
+                print self.user,lasttime
+                for i in range(2, 10):
                     mineinfo = self.action(c='countrymine', m='index', p=i)['list']
                     for l in mineinfo:
                         if l['status'] == 0:
                             self.action(c='countrymine', m='caikuang', p=i, id=l['id'], t=l['type'])
-                            break
+                            return
         except KeyError as e:
             print e, '没有加入国家，或是等级不够'
 
@@ -532,14 +533,14 @@ class activity(fuben):
                         for team in team_list:
                             if team['country_name'] in name:
                                 id = team['id']
-                                rob_result = self.action(c='overseastrade', m='rob', id=id)
+                                rob_result = self.action(c='overseastrade', m='rob', body={"id":id})
                                 print json.dumps(rob_result)
                 else:
                     team_list = refresh_result['list']
                     for team in team_list:
                         if team['country_name'] in name:
                             id = team['id']
-                            rob_result = self.action(c='overseastrade', m='rob', id=id)
+                            rob_result = self.action(c='overseastrade', m='rob', body={"id":id})
                             print json.dumps(rob_result)
 
             except Exception as e:
@@ -892,9 +893,18 @@ class activity(fuben):
             self.action()
             pass
 
+    def advance(self):
+        result=self.action(c='advanced', m='index')
+        for item in result['list']:
+            gid=item['id']
+            for i in range(6):
+                for t in range(1,5):
+                    for w in range(6):
+                        print self.action(c='advanced',m='level_up',gid=gid,t=t)
+                self.p(self.action(c='advanced', m='start_advanced', gid=gid))
 
 
-# 周年比购物
+# 周年比购物start_advanced
 
 # def wx():#五行竞猜刷数据
 # for i in range(100):
@@ -986,7 +996,7 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry(u'杰克喝尿')
+        action.jioncountry(u'是你学姐')
 
 
     def gongxian(user, apass, addr):
@@ -1038,6 +1048,10 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         action.sign()  # 购买签到声望
         action.guyu()
+
+    def countrycaikuang(user, apass, addr):  # 下国家矿
+        action = activity(user, apass, addr)
+        action.countrymine()
 
 
     def rolename(user, apass, addr):  # 更新出征武将
@@ -1130,8 +1144,12 @@ if __name__ == '__main__':
     def mountStone(user, apass, addr):#石头合成
         action = activity(user, apass, addr)
         action.mount_stone()
+
+    def wjc(user, apass, addr):#石头合成
+        action = activity(user, apass, addr)
+        action.advance()
     def chuan():
-        with open('../users/user.txt', 'r') as f:
+        with open('../users/gmuser.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1143,8 +1161,8 @@ if __name__ == '__main__':
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
-                    #addr = 150
-                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
+                    addr = 150
+                    t1 = threading.Thread(target=dajie, args=(name, passwd, addr))
                     q.put(t1)
 
 
@@ -1176,8 +1194,9 @@ if __name__ == '__main__':
                         user = i.split()[0]
                         passwd = i.split()[1]
                         addr = i.split()[2]
-                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
-                        q.put(t1)
+                        for i in range(1000):
+                            t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
+                            q.put(t1)
 
 
     #chat('xingyue123', 413728161, 21)

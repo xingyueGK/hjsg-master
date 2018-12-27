@@ -17,7 +17,14 @@ headers = {
     'Content-Type':'application/json',
     'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
 }
-
+postheaders = {
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Connection':'keep-alive',
+    'Upgrade-Insecure-Requests':'1',
+    'Content-Type':'application/x-www-form-urlencoded',
+    'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
+}
 class TokenErr(Exception):
     pass
 
@@ -64,7 +71,7 @@ class SaoDangFb(object):
                 except Exception as e:
                     print e
 
-    def post_url(self,data):
+    def post_url(self,body,data):
         self.data = ''
         for k,v in data.items():
             self.data += '&%s=%s'%(k,v)
@@ -73,7 +80,10 @@ class SaoDangFb(object):
         keep_request = True
         while keep_request:
             try:
-                r = requests.post(self.url,headers=headers,timeout=20)
+                if body:
+                    r = requests.post(self.url, headers=postheaders,data=body,timeout=20)
+                else:
+                    r = requests.post(self.url,headers=headers,timeout=20)
                 keep_request = False
                 if r.status_code != 200:
                     r = requests.post(self.url, headers=headers,timeout=20)
@@ -83,11 +93,11 @@ class SaoDangFb(object):
             except Exception as e:
                 print e
                 time.sleep(0.3)
-    def action(self,**kwargs):
+    def action(self,body=0,**kwargs):
         """动作参数m={'index':'获取基础账号密码等信息',‘get_monster_list’：“获取副本怪物列表信息”}
         """
         action_data = kwargs
-        serverinfo = self.post_url(action_data)
+        serverinfo = self.post_url(body,action_data)
         return serverinfo
     def level(self):
         userinfo = self.action(c='member', m='index')

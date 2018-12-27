@@ -86,6 +86,7 @@ class fuben(SaoDangFb):
                     isturn = v['isturn']  # 武将师是否到转生级别
                     wjlevel = v['level']
             print '武将等级', wjlevel
+            print freetimes
             while status == 1 and freetimes != '0':  # 队伍将进行突飞
                 if int(isturn) == 1 and int(wjlevel) <= level:
                     print '武将转生'
@@ -191,6 +192,7 @@ class fuben(SaoDangFb):
 
     def strengthen(self, id):  # 强化装备
         levelinfo = self.level()
+        print levelinfo
         self.action(c='general', m='index')
         self.action(c='strengthen', m='index')
         id_info = self.action(c='strengthen', m='strengthen_info', id=id)
@@ -344,22 +346,28 @@ class fuben(SaoDangFb):
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = fuben(user, apass, addr)
-        # for id in [251000286202,251000286205,251000287442,
-        #            251000290229,251000290232,251000290914,
-        #            251000293070,251000293073,251000293680,
-        #            251000295775,251000295778,251000296527]:
-        #     action.strengthen(id)
+        for id in [251000328574,251000303542,251000306837,
+                   251000338820,251000306839,251000316317,
+                   251000316318,251000303540,251000300615,
+                   251000293681,251000283979,251000287441]:
+            action.strengthen(id)
         # # action.general(1)
         # # action.mingjiang()
-        action.saodang(20)
+        # for i in ['孙权','张梁','张角',
+        #           '张宝','鲁肃','小乔','曹洪',
+        #           '韩遂', '张梁', '张角', '周泰',
+        #           '周泰', '张梁', '张角', '周泰'
+        #           ]:
+        #     action.tufei(i,300)
 
 
     with open('../users/rush.txt', 'r') as f:
         for i in f:
-            str = i.strip().split()[0]
-            name = str
-            passwd = i.strip().split()[1]
-            addr = 149
-            t1 = threading.Thread(target=act, args=(name, passwd, addr))
-            t1.start()
-            time.sleep(0.1)
+            if i.strip() and not i.startswith('#'):
+                str = i.strip().split()[0]
+                name = str
+                passwd = i.strip().split()[1]
+                addr = i.strip().split()[2]
+                t1 = threading.Thread(target=act, args=(name, passwd, addr))
+                t1.start()
+                time.sleep(0.1)

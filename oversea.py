@@ -136,4 +136,4 @@ def main(file, addr, flag, FlushCount=40):
 
 
 if __name__ == '__main__':
-    main('gmhy1.txt', 149, True,4 )
+    main('haiyun.txt', 21, True,5 )

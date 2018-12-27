@@ -78,11 +78,15 @@ class task(SaoDangFb):
                 print result
                 if result['status'] == 1:
                      _redis.hset(self.user,rid1,1)
+                elif result['status'] == -9:
+                     _redis.hset(self.user,rid1,9)
             if _redis.hget(self.user,rid2) == 0:
                 print result
                 result =requests.get(url2).json()
                 if result['status'] == 1:
                      _redis.hset(self.user,rid2,1)
+                elif result['status'] == -9:
+                     _redis.hset(self.user,rid1,9)
         except Exception as e:
             print e
             self.shoppingFeastSecKill(time_limit, rid1, rid2)
@@ -107,13 +111,29 @@ class task(SaoDangFb):
         except Exception as e:
             print e
             self.shoppingFeastSecKill1(time_limit, rid1, rid2)
+
+    def generalpool(self):  # 武将池
+        #self.action(c='act_generalpool', m='index')
+        #result = self.action(c='act_generalpool', m='general_chip')
+
+        # 免费武将1谋士，2武将
+        #self.action(c='act_generalpool', m='lottery', type=1)
+        #self.action(c='act_generalpool', m='lottery', type=2)
+        #self.action(c='act_generalpool', m='lottery_ten', type=2,shop=2)#10次卢植刘璋
+        self.p(self.action(c='tavern',m='buy',generalid=1001,num=10000))
+        #self.p(self.action(c='tavern', m='buy', generalid=1001, num=100000))
+        #self.p(self.action(c='tavern', m='buy', generalid=1002, num=100000))
 def run(name, passwd, addr,lockpwd,general):
     action = task(name, passwd, addr)
     action.unlock(lockpwd)
+    count =0
     while True:
-        for id in general:
-            threading.Thread(target=action.springshop, args=(id,)).start()
-        time.sleep(0.3)
+        count +=1
+        print count
+        threading.Thread(target=action.generalpool).start()
+        #for id in general:
+        #    threading.Thread(target=action.springshop, args=(id,)).start()
+        #time.sleep(0.3)
     # time_limit, rid1, rid2 = action.SecKillInfo()
     # while True:
     #     threading.Thread(target=action.shoppingFeastSecKill, args=(time_limit, rid1, rid2)).start()

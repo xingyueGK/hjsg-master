@@ -185,7 +185,6 @@ class task(SaoDangFb):
                         item = self.tower_times = self.action(c='tower', m='get_mission_list', s=scene)
                         now_id = item['now']['id']
                         status = self.action(c='tower', m='pk', id=now_id)
-                        print json.dumps(status)
                         times = item['times']
                         if status['status'] != 1 and times > 5:
                             self.action(c='tower', m='mop_up', id=int(now_id)-1, times=5)
@@ -463,7 +462,6 @@ class task(SaoDangFb):
     def act_sword(self):  # 铸剑
         self.action(c='act_sword', m='start')
         info = self.action(c='act_sword', m='index')
-        print  info
         self.action(c='act_sword', m='get_rank_reward', type=1)
         self.action(c='act_sword', m='get_rank_reward', type=0)
         # print json.dumps(info)
@@ -502,7 +500,7 @@ class task(SaoDangFb):
             setup = [] #攻击步长三步为最佳
             points = unicode(len(unions)) #总共点数
             setup3 = points
-            print '当前关卡 %s 总共点数 %s,最后一步%s 列表 %s'%(check,points,setup3,unions)
+            #print '当前关卡 %s 总共点数 %s,最后一步%s 列表 %s'%(check,points,setup3,unions)
             for k in unions[0]:
                 k = int(k)
                 setup1 = k
@@ -523,7 +521,7 @@ class task(SaoDangFb):
                 status = self.action(c='awaken_copy', m='battle', check=check, point=point)
 
             result = self.action(c='awaken_copy', m='reset_check') #每次打到最后都需要重置
-            self.p(result)
+
 
         except Exception as e:
             print e
@@ -532,7 +530,6 @@ class task(SaoDangFb):
         print '国家矿'
         try:
             mineinfo = self.action(c='countrymine', m='index')
-            print mineinfo
             dateline = mineinfo['dateline']
             log = mineinfo['log']
             if log:
@@ -605,7 +602,6 @@ class task(SaoDangFb):
         try:
             travelindex = self.action(c='act_travel', m='index')  # 获取活动
             details = self.action(c='act_travel', m='action_travel')['details']  # 开始活动
-            print travelindex['info']['points']
             if travelindex['info']['free'] == 1:
                 result = self.action(c='act_travel', m='action_dice')  # 掷骰子
             if travelindex['info']['points'] != 0:
@@ -648,7 +644,6 @@ class task(SaoDangFb):
             chenk = self.action(c='chicken', m='vip_index', v=2018021101)['reward']
             member = self.action(c='member', m='index')
             vip = member['vip']
-            print json.dumps(chenk)
             for l in chenk:
                 # print vip,l['vip']
                 if int(l['vip']) == int(vip):
@@ -676,7 +671,6 @@ class task(SaoDangFb):
                 cd = index['cd']
                 levelup_exp = int(index['levelup_exp'])
                 exp = int(index['exp'])
-                print "\r",exp,levelup_exp
                 if cd < 86400 and levelup_exp < 2000 :
                     print '浇水'
                     self.action(c='sacredtree', m='watering', type=1, v=2018021101)
@@ -772,11 +766,9 @@ class task(SaoDangFb):
                         id = item['id']
                         reward_index=self.action(c='drug', m='reward_index', id=id)
                         if reward_index['status'] != 1:
-                            print json.dumps(reward_index, ensure_ascii=False)
                             time.sleep(1)
                             self.drug()
                             return
-                        print json.dumps(reward_index)
                 self.drugrefresh()
         except Exception as e:
             print e
@@ -789,13 +781,11 @@ class task(SaoDangFb):
                 self.action(c='lucky_dice',m='farkle_dice')
             #领取奖励
             index = self.action(c='lucky_dice', m='index')
-            print json.dumps(index)
             lucky_reward = index['lucky_reward']
             for item in lucky_reward:
                 if item['status'] ==1:
                     id = item['id']
-
-                    print self.action(c='lucky_dice',m='get_lucky_reward',id=id)
+                    self.action(c='lucky_dice',m='get_lucky_reward',id=id)
         except Exception as e:
             print e
     def act_fight(self):#征战八方
@@ -840,8 +830,6 @@ class task(SaoDangFb):
                             for i in range(counts):
                                 print cityid,bossid
                                 status = self.action(c='japan', m='pk',cityid=cityid,bossid=bossid)
-                                self.p(status)
-                                print self.user
                                 if status !=1 :
                                     time.sleep(0.3)
                                     self.japan()
@@ -865,7 +853,7 @@ class task(SaoDangFb):
                     id = item['id']
                     for i in item['diff_array_info']:
                         diff_id = i['diff_id']
-                        self.p(self.action(c='essence_map', m='sweep', d='newequip',id=id,diff_id=diff_id,check=1))
+                        self.action(c='essence_map', m='sweep', d='newequip',id=id,diff_id=diff_id,check=1)
         except Exception as e:
             print e
 def run(user, apass, addr):
