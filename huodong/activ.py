@@ -6,6 +6,7 @@ import shujufenx
 from shujufenx import fuben
 from Queue import Queue
 from random import choice
+import hashlib
 """每日不定期开展活动"""
 
 
@@ -111,7 +112,7 @@ class activity(fuben):
                     score = int(draw['score'])
                 except KeyError as e:
                     print e
-                    exit(1)
+                    continue
             else:
                 break
         print '当前福卡', int(index['lottery_num']['score'])
@@ -516,6 +517,11 @@ class activity(fuben):
 
     def rob(self, name, user):  # 海运打劫
         # name 就是打劫的国家[list]
+        #authorization 需要 hd5key
+        #udi:用户角色id信息 ，robkey：zykj
+        #"rob" + uid +robkey + robid)
+        uid = self.get_act()['uid']
+        robkey="zykj"
         robtimes = 1
         while robtimes > 0:
             time.sleep(0.3)
@@ -533,14 +539,19 @@ class activity(fuben):
                         for team in team_list:
                             if team['country_name'] in name:
                                 id = team['id']
-                                rob_result = self.action(c='overseastrade', m='rob', body={"id":id})
+                                key = "rob" + uid + robkey + id
+                                authorization = hashlib.md5(key).hexdigest()
+                                rob_result = self.action(c='overseastrade', m='rob', body={"id":id,"authorization":authorization})
                                 print json.dumps(rob_result)
                 else:
                     team_list = refresh_result['list']
                     for team in team_list:
                         if team['country_name'] in name:
                             id = team['id']
-                            rob_result = self.action(c='overseastrade', m='rob', body={"id":id})
+                            key = "rob" + uid + robkey + id
+                            authorization = hashlib.md5(key).hexdigest()
+                            rob_result = self.action(c='overseastrade', m='rob',
+                                                     body={"id": id, "authorization": authorization})
                             print json.dumps(rob_result)
 
             except Exception as e:
@@ -893,7 +904,7 @@ class activity(fuben):
             self.action()
             pass
 
-    def advance(self):
+    def advance(self):#宝石合成
         result=self.action(c='advanced', m='index')
         for item in result['list']:
             gid=item['id']
@@ -983,8 +994,8 @@ if __name__ == '__main__':
 
     def fanpai(user, apass, addr):
         action = activity(user, apass, addr)
-        action.unlock(555323)
-        action.fuka(500)
+        action.unlock(123456)
+        action.fuka(2600)
 
 
     def haiyun(user, apass, add):
@@ -1149,7 +1160,7 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         action.advance()
     def chuan():
-        with open('../users/gmuser.txt', 'r') as f:
+        with open('../users/1000share.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1161,8 +1172,8 @@ if __name__ == '__main__':
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
-                    addr = 150
-                    t1 = threading.Thread(target=dajie, args=(name, passwd, addr))
+                    #addr = 150
+                    t1 = threading.Thread(target=jion, args=(name, passwd, addr))
                     q.put(t1)
 
 
@@ -1216,4 +1227,4 @@ if __name__ == '__main__':
             i.start()
             # i.join()
         for i in thread:
-           i.join()
+          i.join()

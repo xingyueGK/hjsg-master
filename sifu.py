@@ -156,9 +156,11 @@ class SaoDangFb(object):
             print '武将等级', wjlevel
             print freetimes
             while status == 1 and freetimes != '0':  # 队伍将进行突飞
+                time.sleep(0.1)
+                print isturn
                 if int(isturn) == 1 and int(wjlevel) <= level:
                     print '武将转生'
-                    self.action(c='practice', m='turn', gid=gid)
+                    print self.action(c='practice', m='turn', gid=gid)
                 self.action(c='practice', m='mop', times=100, gid=gid)
                 self.action(c='practice', m='mop', times=50, gid=gid)
                 self.action(c='practice', m='mop', times=10, gid=gid)
@@ -207,21 +209,46 @@ class SaoDangFb(object):
 
         except Exception as e:
             print e
+    def herothrone(self):  # 英雄王座
+        print '英雄王座'
+        try:
+            vip = self.action(c='member', m='index')['vip']
+            print vip
+            if int(vip) < 9:
+                status = self.action(c='herothrone', m='index')['status']
+                print status
+                # if status != 1 or status != 3:
+                #     return None
+                for i in range(3):
+                    self.action(c='herothrone', m='start')  # 开始王座
+                    # 攻击:
+                    while True:
+                        flag = self.action(c='herothrone', m='action')['status']
+                        print  '攻击王座副本'
+                        time.sleep(0.3)
+                        if flag == -2:
+                            break
+            else:
+                self.action(c='herothrone', m='index')
+                for i in range(3):
+                    self.action(c='herothrone', m='start')  # 开始王座
+                    self.action(c='herothrone', m='end_battle')
+                    self.action(c='herothrone', m='go_back')
+
+        except Exception as e:
+            print e
+
 def task():
     action = SaoDangFb('kankan', '123456', 1)
-    # action.herothrone()
-    action.saodang(17)
+    action.herothrone()
+    #action.saodang(21)
     # count = 0
     # while True:
     #     count += 1
     #     print count
     #     threading.Thread(target=action.change).start()
 if __name__ == '__main__':
-    # action = SaoDangFb('kankan','123456',1)
-    # for i in ['韩信', '项羽', '李广',
-    #           '廖化', '鲁肃', '小乔', '曹洪',
-    #           '韩遂', '张梁', '张角', '周泰',
-    #           '周泰', '张梁', '张角', '周泰'
-    #           ]:
+    action = SaoDangFb('kankan','123456',1)
+    # for i in ['魔邓艾','魔张宝','曹操','童渊','管辂']:
     #     action.tufei(i, 300)
     task()

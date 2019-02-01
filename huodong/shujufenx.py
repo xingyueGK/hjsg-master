@@ -346,10 +346,8 @@ class fuben(SaoDangFb):
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = fuben(user, apass, addr)
-        for id in [251000328574,251000303542,251000306837,
-                   251000338820,251000306839,251000316317,
-                   251000316318,251000303540,251000300615,
-                   251000293681,251000283979,251000287441]:
+        for id in [251000222530,2701000026161,251000218144,
+                   251000218143,2701000026162]:
             action.strengthen(id)
         # # action.general(1)
         # # action.mingjiang()

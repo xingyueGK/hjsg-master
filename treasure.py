@@ -37,6 +37,7 @@ class treasure(SaoDangFb):
             self.send_gift(3,3,12)
     def send_gift(self,snow_type,sid,tid):
         """发送两次送"""
+        print 'seng_gift'
         data = {"snow_type": snow_type,
                 "sid": sid,
                 "tid": tid,
@@ -51,7 +52,7 @@ class treasure(SaoDangFb):
     def pick_index(self):
         """摘礼物"""
         try:
-            print self.action(c='treasure', m='index')
+            self.action(c='treasure', m='index')
             pick_index = self.action(c='treasure', m='pick_index')
             white_pick = pick_index['white_pick']
             gold_pick = pick_index['gold_pick']
@@ -67,7 +68,6 @@ class treasure(SaoDangFb):
                 "page": page
             }
             pick_list = self.action(c='treasure',m='pick_list',body=FormData)
-            print pick_list
             if pick_list['list']:
                 id = pick_list['list'][0]['id']
                 FormData = {
@@ -75,41 +75,92 @@ class treasure(SaoDangFb):
                     "check": 1
                 }
                 status =11
-                while status == 11:
-                    print 'sisunnnn'
+                while status != 1:
                     status = self.action(c='treasure', m='pick',body=FormData)['status']
-                    print status
+                    print self.user,status
+                    time.sleep(0.5)
+                    if status == -8:
+                        self.pick(snow_type)
+                        break
                 FormData = {
                     "id": id,
                 }
-
                 self.action(c='treasure', m='pick', body=FormData)
         except KeyError as e:
             print e
             #self.pick(snow_type)
     def pick_list(self):
-        print 'pick_list'
-        print self.pick_index()
         white_pick, gold_pick, colour_pick = self.pick_index()
+        print self.pick_index()
         if white_pick == 1:
             self.pick(1)
         if gold_pick == 1:
             self.pick(2)
         if colour_pick == 1:
             self.pick(3)
-    def rob_list(self):
+    def rob_list(self,snow_type,page=1):
         """抢夺礼物"""
-        pass
+        FormData = {
+            "snow_type": snow_type,
+            "page": page
+        }
+        result = self.action(c='treasure',m='rob_list',body=FormData)
+        return result
+    def rob(self):
+        """三种类型1,2,3"""
+        for i in range(1,4):
+            rob_list = self.rob_list(i)
+            if rob_list['list']:
+                lists = rob_list['list']
+                pages= rob_list['pages']
+                for i in reversed(pages):
+                    pass
+                id = 4
+                FormData = {
+                    "id": id,
+                    "check": 1
+                }
+                status = 11
+                while status != 1:
+                    status = self.action(c='treasure', m='rob', body=FormData)['status']
+                    print self.user, status
+                    time.sleep(0.5)
+                    if status == -8:
+                        break
+                FormData = {
+                    "id": id,
+                }
+                self.action(c='treasure', m='rob', body=FormData)
+
+
     def boss_index(self):
         """打boss"""
-        pass
+        try:
+            result = self.action(c='treasure',m='boss_index')
+            if result['act_blood'] != result['all_blood']:
+                robnum = int(result['robnum'])
+                for i in range(robnum):
+                    while True:
+                        status = self.action(c='treasure', m='boss_fight')
+                        if status['status'] == 1:
+                            break
+            else:
+                result = self.action(c='treasure', m='get_boss_reward',id=1)
+                result = self.action(c='treasure', m='get_boss_reward', id=2)
+                result = self.action(c='treasure', m='get_boss_reward', id=3)
+                result = self.action(c='treasure', m='get_boss_reward', id=4)
+                result = self.action(c='treasure', m='get_boss_reward', id=5)
+        except KeyError as e:
+            print self.user,result
 def task(user, apass, addr):
     action = treasure(user, apass, addr)
-    action.pick_list()
+    #action.choice_snow()
+    #action.pick_list()
+    action.boss_index()
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))
-    cont = ['alluser.txt']
+    cont = ['user.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
@@ -117,12 +168,12 @@ if __name__ == '__main__':
                     name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    addr = 150
+                    #addr = 150
                     t1 = threading.Thread(target=task, args=(name, passwd, addr))
                     q.put(t1)
     while not q.empty():
         thread = []
-        for i in xrange(5):
+        for i in xrange(6):
             try:
                 thread.append(q.get_nowait())
             except Exception as e:

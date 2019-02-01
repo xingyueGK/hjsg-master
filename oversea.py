@@ -125,7 +125,6 @@ def main(file, addr, flag, FlushCount=40):
                     if FlushCount > 0:
                         t1 = threading.Thread(target=jierihaiyun, args=(user, passwd, addr, flag))
                         t1.start()
-                        time.sleep(0.5)
                         FlushCount -= 1
                         times = int(userTimes) - 1
                         _redis.hset(key, user, times)
@@ -136,4 +135,4 @@ def main(file, addr, flag, FlushCount=40):
 
 
 if __name__ == '__main__':
-    main('haiyun.txt', 21, True,5 )
+    main('gmhy.txt', 147, True,10 )

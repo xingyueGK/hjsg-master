@@ -112,5 +112,15 @@ class SaoDangFb(object):
         print '角色信息'
         act_info = self.action(c='member', m='index')
         return act_info
+    def getWeek(self):
+        week = time.strftime("%w", time.localtime())
+        return week
+    def general_book(self):
+        try:
+            index = self.action(c='general_book', m='index',perpage=18)
+            addition = index['addition']
+            return addition
+        except:
+            return None
 if __name__ == '__main__':
     pass
