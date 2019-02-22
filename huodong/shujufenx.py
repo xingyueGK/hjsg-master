@@ -346,9 +346,11 @@ class fuben(SaoDangFb):
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = fuben(user, apass, addr)
-        for id in [251000222530,2701000026161,251000218144,
-                   251000218143,2701000026162]:
-            action.strengthen(id)
+        result = action.action(c='pack',m='index',type=1)
+        for item in result['list']:
+            if item['quality'] == "6":
+                id = item['id']
+                action.strengthen(id)
         # # action.general(1)
         # # action.mingjiang()
         # for i in ['孙权','张梁','张角',

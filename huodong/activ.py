@@ -914,7 +914,21 @@ class activity(fuben):
                         print self.action(c='advanced',m='level_up',gid=gid,t=t)
                 self.p(self.action(c='advanced', m='start_advanced', gid=gid))
 
-
+    def newyearshop(self):
+        print 'aaaaaa'
+        index = self.action(c='newyear_act',m='shop')
+        fuka = index['fuka']
+        print '福币数',fuka
+        if fuka > '100':
+            count = int(fuka)%100
+            num = int(fuka)//100
+            for i in range(num):
+                self.action(c='newyear_act', m='exchange', id=34)
+            for i in range(count):
+                self.action(c='newyear_act',m='exchange',id=33)
+        else:
+            for i in range(int(fuka)):
+                self.action(c='newyear_act',m='exchange',id=33)
 # 周年比购物start_advanced
 
 # def wx():#五行竞猜刷数据
@@ -989,7 +1003,7 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         # action.leigu()
         # action.shenshu()
-        action.actjubao()
+        action.newyearshop()
 
 
     def fanpai(user, apass, addr):
@@ -1160,7 +1174,7 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         action.advance()
     def chuan():
-        with open('../users/1000share.txt', 'r') as f:
+        with open('../users/149gmjrhy.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1172,8 +1186,8 @@ if __name__ == '__main__':
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
-                    #addr = 150
-                    t1 = threading.Thread(target=jion, args=(name, passwd, addr))
+                    addr = 148
+                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
                     q.put(t1)
 
 
@@ -1227,4 +1241,4 @@ if __name__ == '__main__':
             i.start()
             # i.join()
         for i in thread:
-          i.join()
+         i.join()
