@@ -458,10 +458,12 @@ class task(SaoDangFb):
         print '通天塔每日奖励和扫荡'
         # 获取每日奖励
         try:
+            index = self.action(c='heaven',m='index')
+            id = index['index']
             self.action(c='heaven', m='get_reward')
             self.times = self.action(c='heaven', m='index')['times']
             if self.times:
-                self.action(c='heaven', m='mop_up', id=87, times=self.times)
+                self.action(c='heaven', m='mop_up', id=id, times=self.times)
         except Exception as e:
             print e
 
@@ -691,6 +693,19 @@ class task(SaoDangFb):
                     self.action(c='act_kemari', m='action', type=2)
                 elif i['id'] == 1 and i['times'] != 0 and i['cd'] == 0:
                     self.action(c='act_kemari', m='action', type=1)
+
+            endtime = index['time'].split('-')[1]
+            current_tiem = time.strftime("%m月%d日")
+            if endtime == current_tiem:
+                #购买奖券
+                result = self.action(c='act_kemari', m='get_lottery')
+                lottery_num = result['lottery_num']
+                if lottery_num > 80:
+                    for id in range(10,15):
+                        self.action(c='act_kemari', m='action_lottery', id=id)
+                else:
+                    for id in range(1,8):
+                        self.action(c='act_kemari', m='action_lottery', id=id)
         except Exception as e:
             print e
 
@@ -985,9 +1000,9 @@ class task(SaoDangFb):
                     # for monster_id in range(1,11): #此选项为攻击所有小怪
                     # 遍历十次小兵
                     times = self.action(c="map", m="mission", l=18, s=s, id=id)['info']['nowmaxtimes']
-                    if times > "0":
+                    if times > 0:
                         print  "开始扫荡小兵"
-                        self.action(c="map", m="action", l=18, s=s, id=id, times=int(times))
+                        self.p(self.action(c="map", m="action", l=18, s=s, id=id, times=int(times)))
         except Exception as e:
             print e
 
@@ -1088,7 +1103,7 @@ def run(user, apass, addr):
     #     action.workshop()  # 玉石采集
     #     action.exploit_tree()  # 木材采集
     #     action.exploit_stone()  # 石头采集
-    if 100 < level:
+    # if 100 < level:
     #     if country != '0':
     #         action.overseastrade()  # 海外贸易
     #         action.country()  # 国家奖励
@@ -1099,13 +1114,13 @@ def run(user, apass, addr):
     #     action.assist_card()#助阵系统
     #     action.heaven()  # 通天塔
     #     action.herothrone()  # 英雄王座
-        action.sanctum()  # 每日宝石领奖
+    #     action.sanctum()  # 每日宝石领奖
     #     action.generaltask()  #
     #     action.mount_stone()  # 每日大马副本
     #     action.awaken_copy()  # 觉醒奖励
     #     action.essence_map()#经脉丹药扫荡
-    # if 220 < level:
-    #     action.mission()  # 战鼓精魂
+    if 220 < level:
+        action.mission()  # 战鼓精魂
     # action.act_fight()  # 征战八方
     # if activity['act_travel'] == 1:
     #     for i in range(3):

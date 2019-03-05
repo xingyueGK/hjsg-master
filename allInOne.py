@@ -22,6 +22,8 @@ class eight(SaoDangFb):
 
     def eight_index(self):
         now_level = self.action(c='eight_diagram', m='index')['now_level']
+        if now_level == "0":
+            now_level = 1
         level_index = self.action(c='eight_diagram', m='level_index', level=now_level)
         return level_index,now_level
 
@@ -68,6 +70,7 @@ def run(user,apass, addr,mid,level):
     ei = eight(num=addr, user=user, passwd=apass, level=level)
     ei.use_matrix(mid)  # 使用固定阵法
     index,now_level = ei.eight_index()
+
     reset_times = int(index['reset_times'])
     point = index['cost']['point']
     print '%s 八卦等级 %s 当前位置%s 重置八卦次数%s'%(user,now_level,point,reset_times)
@@ -90,7 +93,7 @@ def run(user,apass, addr,mid,level):
     ei.use_matrix(4)
 if __name__ == '__main__':
     filepath = os.path.dirname(os.path.abspath(__file__))
-    cont = ['eight.txt']
+    cont = ['alluser.txt']
     for t in cont:
         with open('%s/users/%s'%(filepath,t),'r') as f:
             for i in f:
@@ -98,7 +101,6 @@ if __name__ == '__main__':
                         name = i.split()[0]
                         passwd = i.split()[1]
                         addr = i.split()[2]
-                        mid = i.split()[3]
-                        level = i.split()[4]
-                        t1 = threading.Thread(target=run, args=(name, passwd, addr,mid,level))
+
+                        t1 = threading.Thread(target=run, args=(name, passwd, addr,4,2))
                         t1.start()

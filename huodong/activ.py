@@ -170,13 +170,37 @@ class activity(fuben):
         self.action(c='act_mooncake', m='action', type=3)
 
     def generalpool(self):  # 武将池
-        #self.action(c='act_generalpool', m='index')
+        # id 350 董卓，351 神文丑  282 神鲁肃 353 神卢植 281 神刘表 279 神袁尚
+        self.action(c='act_generalpool', m='index')
         #result = self.action(c='act_generalpool', m='general_chip')
 
         # 免费武将1谋士，2武将
         #self.action(c='act_generalpool', m='lottery', type=1)
         #self.action(c='act_generalpool', m='lottery', type=2)
-        self.action(c='act_generalpool', m='lottery_ten', type=1,shop=2)#10次卢植刘璋
+        # chip = self.action(c='act_generalpool', m='general_chip')
+        # for i in chip['own_chip']:
+        while True:
+            try:
+                info = self.action(c='act_generalpool', m='general_chip_info', gid=352)
+                if info['general']['is_exist'] ==1 :
+                    print '已招募'
+                    break
+                print self.user,"已有碎片{}，剩余碎片{}".format(info['own_chip'],info['need_chip'])
+                own_chip = int(info['own_chip'])
+                need_chip = int(info['need_chip'])
+                if own_chip < need_chip:
+                    result = self.action(c='act_generalpool', m='lottery_ten', type=1,shop=2)#10次文丑， type 1 谋士，2 武将
+                    if result['status'] != 1:
+                        break
+                else:
+                    print 'hecheng'
+                    self.action(c='act_generalpool', m='recruit', gid=352)
+                    break
+            except Exception as e:
+                status = self.action(c='act_generalpool', m='lottery_ten', type=1, shop=2)
+                print self.user,status['status']
+                break
+
         #self.action(c='act_generalpool', m='recruit', gid=gid)合成武将
     def messages(self):
         print  self.action(c='message', m='get_notice')
@@ -929,6 +953,83 @@ class activity(fuben):
         else:
             for i in range(int(fuka)):
                 self.action(c='newyear_act',m='exchange',id=33)
+
+
+    def tavern(self):
+        #self.action(c='tavern', m='get_list', page=1,perpage=9,tab=4)
+        self.action(c='tavern',m='buy',generalid='105')#神甘宁
+    def matrix(self):
+        result = self.action(c='matrix',m='get_info',mid=4)
+        m_level = int(result['matrix']['level'])
+        if m_level < 5:
+            for i in range(5-m_level):
+                self.action(c='matrix', m='levelup', mid=4)
+    def gomuster(self):#武将出征
+        index = self.action(c='muster',m='index',page=1,perpage=999)
+
+        for k,v in index['list'].items():
+            if v['name'] in ["神卢植","神文丑","神董卓","神刘璋","神周仓","神甘宁"]:
+                gid = v['id']
+                self.action(c='muster', m='go_battle',gid=gid,confrim=0)
+    def update_matrix(self, uid1, uid2, uid3, uid4, uid5, mid=4):
+
+        genral_dict = {}
+        matrix_index = self.action(c='matrix', m='index')
+        general = matrix_index['general']
+        for k, v in general.items():
+            name = v['name']
+            genral_dict[name] = v['id']
+        genral_info = genral_dict
+        try:
+            lists2 = '%s,%s,%s,-1,%s,-1,-1,%s,-1' % (
+                genral_info[uid1],
+                genral_info[uid2],
+                genral_info[uid3],
+                genral_info[uid4],
+                genral_info[uid5],
+            )
+            lists4 = '%s,-1,%s,-1,%s,-1,%s,-1,%s' % (
+                genral_info[uid1],
+                genral_info[uid2],
+                genral_info[uid3],
+                genral_info[uid4],
+                genral_info[uid5],
+            )
+            if mid == 2:
+                self.action(c='matrix', m='update_matrix', list=lists2, mid=mid)
+            elif mid == 4:
+                self.action(c='matrix', m='update_matrix', list=lists4, mid=mid)
+        except:
+            print self.user
+    def copies(self):
+        # 扫荡副本需要传递的参数
+        # id 是副本名字id ，self.role_info
+        # diff_id是困难级别分别为1,2,3个级别
+        # monster_id 是第几个怪物，1-10个，
+        # times 扫荡的次数
+        try:
+            for id in range(1, 4):
+                # 遍历三个副本，
+                print '开始扫荡副本:%s' % id
+                for diff_id in range(1, 4):
+                    print '开始扫关卡:%s' % diff_id
+                    # 遍历三个难度，普通，困难，英雄
+                    # for monster_id in range(1,11): #此选项为攻击所有小怪
+                    for monster_id in range(1,11):  # 攻击精英怪
+                        # 遍历十次小兵
+                        try:
+                            first_kill = self.action(c="copies", m="get_monster_info", id=id, diff_id=diff_id,
+                                                     monster_id=monster_id,d="newequip")['info']['first_kill']
+                            if first_kill == 1:
+                                status = self.action(c="copies", m="pk", id=id, diff_id=diff_id,
+                                            monster_id=monster_id, d="newequip")
+                                if status['status'] != 1:
+                                    break
+                        except Exception as e:
+                            print e
+
+        except Exception as e:
+            print e
 # 周年比购物start_advanced
 
 # def wx():#五行竞猜刷数据
@@ -980,7 +1081,7 @@ if __name__ == '__main__':
         # action.shenshu()
         #action.qiandao()
         # action.actjubao()
-        action.zhengshou()
+        action.copies()
         # action.guyu()
         # action.gongxiang()
         # action.usebuff()
@@ -1173,8 +1274,11 @@ if __name__ == '__main__':
     def wjc(user, apass, addr):#石头合成
         action = activity(user, apass, addr)
         action.advance()
+    def pool(user, apass, addr):#武将池
+        action = activity(user, apass, addr)
+        action.update_matrix(u'神甘宁',u'神刘璋',u'神卢植',u'神周仓',u'神文丑',)
     def chuan():
-        with open('../users/149gmjrhy.txt', 'r') as f:
+        with open('../users/1000share.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1186,8 +1290,8 @@ if __name__ == '__main__':
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
-                    addr = 148
-                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
+                    #addr = 148
+                    t1 = threading.Thread(target=gongxian, args=(name, passwd, addr))
                     q.put(t1)
 
 
@@ -1239,6 +1343,6 @@ if __name__ == '__main__':
                 pass
         for i in thread:
             i.start()
-            # i.join()
-        for i in thread:
-         i.join()
+            i.join()
+        #for i in thread:
+         #i.join()

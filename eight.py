@@ -79,7 +79,7 @@ class eight(SaoDangFb):
 
 
 def run(user,apass, addr):
-    ei = eight(num=addr, user=user, passwd=apass, level=3)
+    ei = eight(num=addr, user=user, passwd=apass, level=1)
     # ei.use_matrix(4)  # 使用固定阵法
     cond = ei.condition()
     if not cond:
@@ -116,7 +116,7 @@ def run(user,apass, addr):
     # ei.use_matrix(4)
 if __name__ == '__main__':
     filepath = os.path.dirname(os.path.abspath(__file__))
-    cont = ['eight.txt']
+    cont = ['alluser.txt']
     for t in cont:
         with open('%s/users/%s'%(filepath,t),'r') as f:
             for i in f:
