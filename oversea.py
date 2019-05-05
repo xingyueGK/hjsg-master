@@ -106,7 +106,7 @@ def makeTask(name, passwd, addr):
     t1.start()
 
 
-def main(file, addr, flag, FlushCount=40):
+def main(file, flag,FlushCount=40,addr=False,):
     """
     :param FlushCount: 每次同时刷船次数,默认1个
     """
@@ -116,6 +116,10 @@ def main(file, addr, flag, FlushCount=40):
             if i.strip():
                 user = i.split()[0]
                 passwd = i.split()[1]
+                if addr:
+                    addr = addr
+                else:
+                    addr = i.split()[2]
                 key = 'overseastrade' + str(addr)
                 if _redis.hget(key, user):
                     userTimes = _redis.hget(key, user)
@@ -135,4 +139,6 @@ def main(file, addr, flag, FlushCount=40):
 
 
 if __name__ == '__main__':
-    main('gmhy.txt', 147, True,10 )
+    main('gmhy.txt', True,16
+         ,149
+         )

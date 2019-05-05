@@ -47,7 +47,7 @@ class task(SaoDangFb):
         #城市人数 5 8 15 20 30
         OCCUPY = 'newyear:occupy' + str(self.num)
         #citylist = [1,6,11,3,7,4,5,8,9]
-        citylist = [ 4, 5,8]
+        citylist = [1,6,11,3,7,4,5,8]
         for id in citylist:
             print '遍历城市',id
             result = self.action(c='newyear_act', m='city', id=id)
@@ -76,13 +76,13 @@ class task(SaoDangFb):
             print self.user,'占矿剩余时间',result['remain_time']
             exit(1)
     def rob(self):
-        citylist = [4,5,8]
+        citylist = [1, 6, 11, 3, 7, 4, 5, 8]
         ROB = 'newyear:rob' + str(self.num)
         for id in citylist:
             print '遍历城市',id
             result = self.action(c='newyear_act', m='occupy_list', id=id)
             for item in result['list']:
-                if item['country'] in  ["杰克吃翔",'year','共产党'] and item['reward']['num2'] >= 8:
+                if item['country'] in  ["杰克吃翔",'杰克喝sui','杰克喝尿','year','共产党',"是你学姐"] and item['reward']['num2'] >= 12:
                     uid = item['id']
                     cid = id
                     status = self.action(c='newyear_act',m='rob',id=uid,cid=cid)
@@ -102,7 +102,8 @@ class task(SaoDangFb):
                     #遍历完成后没有为1项，表示没有占领任何矿
                     if item['is_on'] == 1:
                         id = item['id']
-                        self.harvest(id)
+                        if not self.user.startswith('gmhy'):
+                            self.harvest(id)
                 self.occupy_city()
             elif rob > '0':
                 self.action(c='newyear_act', m='index')
@@ -110,7 +111,8 @@ class task(SaoDangFb):
                 for item in city_index['city']:
                     if item['is_on'] == 1:
                         id = item['id']
-                        self.harvest(id)
+                        if not self.user.startswith('gmhy'):
+                            self.harvest(id)
                 self.rob()
             else:
                 print '没有次数，查看是否占矿未收'
@@ -119,7 +121,8 @@ class task(SaoDangFb):
                 for item in city_index['city']:
                     if item['is_on'] == 1:
                         id = item['id']
-                        self.harvest(id)
+                        if not self.user.startswith('gmhy'):
+                            self.harvest(id)
         except Exception as e:
             print e
 if __name__ == '__main__':
@@ -127,7 +130,7 @@ if __name__ == '__main__':
         action = task(user,apass,addr)
         action.run()
     filepath = os.path.dirname(os.path.abspath(__file__))
-    #cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']
+    #cont = ['21user.txt', 'autouser.txt', 'user.txt', 'alluser.txt','gmhy.txt']
     cont = ['gmhy.txt']
     for t in cont:
         with open('%s/users/%s'%(filepath,t),'r') as f:
@@ -136,7 +139,7 @@ if __name__ == '__main__':
                     name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    addr = 147
+                   # addr = 147
                     t1 = threading.Thread(target=act, args=(name,passwd,addr))
                     t1.start()
                     time.sleep(0.2)

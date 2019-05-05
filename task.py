@@ -377,9 +377,13 @@ class task(SaoDangFb):
             vip = self.action(c='member', m='index')['vip']
             if int(vip) < 9:
                 status = self.action(c='herothrone', m='index')['status']
+                print(status)
                 if status != 1:
                     return None
                 for i in range(3):
+                    print(
+                        'gongjiiiiiiii'
+                    )
                     self.action(c='herothrone', m='start')  # 开始王座
                     # 攻击:
                     while True:
@@ -390,7 +394,7 @@ class task(SaoDangFb):
             else:
                 self.action(c='herothrone', m='index')
                 for i in range(3):
-                    self.action(c='herothrone', m='start')  # 开始王座
+                    self.action(c='herothrone', m='start') # 开始王座
                     self.action(c='herothrone', m='end_battle')
                     self.action(c='herothrone', m='go_back')
 
@@ -1088,7 +1092,6 @@ def run(user, apass, addr):
     #     action.qiandao()  # 每日签到
     #     action.hitegg()  # 砸蛋
     #     action.island()  # 金银洞
-    #     action.lottery()  # 每日抽奖
     #     action.mouth_card()  # 月卡奖励
     #     action.drink()  # 每日军令饮
     # if 50 < level < 180 :
@@ -1103,7 +1106,7 @@ def run(user, apass, addr):
     #     action.workshop()  # 玉石采集
     #     action.exploit_tree()  # 木材采集
     #     action.exploit_stone()  # 石头采集
-    # if 100 < level:
+    if 100 < level:
     #     if country != '0':
     #         action.overseastrade()  # 海外贸易
     #         action.country()  # 国家奖励
@@ -1113,14 +1116,15 @@ def run(user, apass, addr):
     #         action.japan()  # 征战东瀛
     #     action.assist_card()#助阵系统
     #     action.heaven()  # 通天塔
-    #     action.herothrone()  # 英雄王座
+        action.herothrone()  # 英雄王座
     #     action.sanctum()  # 每日宝石领奖
     #     action.generaltask()  #
     #     action.mount_stone()  # 每日大马副本
     #     action.awaken_copy()  # 觉醒奖励
     #     action.essence_map()#经脉丹药扫荡
-    if 220 < level:
-        action.mission()  # 战鼓精魂
+    #     action.lottery()  # 每日抽奖
+    # if 220 < level:
+    #     action.mission()  # 战鼓精魂
     # action.act_fight()  # 征战八方
     # if activity['act_travel'] == 1:
     #     for i in range(3):
@@ -1159,8 +1163,8 @@ def run(user, apass, addr):
     #     action.loginreward()
     # if activity['newyear_act'] == 1:#新年活动
     #     action.newyear_act()
-    if activity['lantern_festival'] == 1:#猜灯谜
-        action.lantern_festival()
+    # if activity['lantern_festival'] == 1:#猜灯谜
+    #     action.lantern_festival()
 
 if __name__ == '__main__':
     q = Queue()

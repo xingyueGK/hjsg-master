@@ -112,11 +112,11 @@ def run(user, apass, addr,lockpwd):
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__)).rsplit('\\',1)[0]
-    cont = ['user.txt']
+    cont = ['alluser.txt','user.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
-                if i.strip():
+                if i.strip() and not i.startswith('#'):
                     name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]

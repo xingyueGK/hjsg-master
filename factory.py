@@ -13,27 +13,29 @@ class task(SaoDangFb):
     def workshop(self):  # 玉石收集
         # 收取
         print '玉石收集'
-        for i in range(1, 10):
-            try:
-                self.action(c='workshop', m='get_reward', s=i)
-            except Exception as e:
-                print e
+        try:
+            self.action(c='workshop', m='index')
+            self.action(c='workshop', m='onekey_get_reward')
+        except Exception as e:
+            print e
 
     def exploit_tree(self):  # 木材收集
         print '木材收集'
         try:
             # exploit_stone，m:{gather收集,action，采集}site:1,第一个框,有三个
             index = self.action(c='exploit_tree', m='index')
-            for item in index['list']:
-                if item['cd'] == 0 :
-                    task.p(self.action(c='exploit_tree', m='gather', site=item['site']))
-                    print self.action(c='exploit_tree', m='action', site=item['site'])
-                elif item['cd'] <100:
-                    time.sleep(item['cd']+4)
-                    task.p(self.action(c='exploit_tree', m='gather', site=item['site']))
-                    task.p(self.action(c='exploit_tree', m='action', site=item['site']))
-                else:
-                    print '需要',item['cd']
+            self.action(c='exploit_tree', m='onekey_gather')
+            self.action(c='exploit_tree', m='onekey_action')
+            # for item in index['list']:
+            #     if item['cd'] == 0 :
+            #         task.p(self.action(c='exploit_tree', m='gather', site=item['site']))
+            #         print self.action(c='exploit_tree', m='action', site=item['site'])
+            #     elif item['cd'] <100:
+            #         time.sleep(item['cd']+4)
+            #         task.p(self.action(c='exploit_tree', m='gather', site=item['site']))
+            #         task.p(self.action(c='exploit_tree', m='action', site=item['site']))
+            #     else:
+            #         print '需要',item['cd']
         except Exception as e:
             print e
 
@@ -42,16 +44,18 @@ class task(SaoDangFb):
         try:
             # exploit_stone，m:{gather收集,action，采集}site:1,第一个框,有三个
             index = self.action(c='exploit_stone', m='index')
-            for item in index['list']:
-                if item['cd'] == 0 :
-                    task.p(self.action(c='exploit_stone', m='gather', site=item['site']))
-                    print self.action(c='exploit_stone', m='action', site=item['site'])
-                elif item['cd'] <100:
-                    time.sleep(item['cd']+4)
-                    task.p(self.action(c='exploit_stone', m='gather', site=item['site']))
-                    task.p(self.action(c='exploit_stone', m='action', site=item['site']))
-                else:
-                    print '需要',item['cd']
+            index = self.action(c='exploit_stone', m='onekey_gather')
+            index = self.action(c='exploit_stone', m='onekey_action')
+            # for item in index['list']:
+            #     if item['cd'] == 0 :
+            #         task.p(self.action(c='exploit_stone', m='gather', site=item['site']))
+            #         print self.action(c='exploit_stone', m='action', site=item['site'])
+            #     elif item['cd'] <100:
+            #         time.sleep(item['cd']+4)
+            #         task.p(self.action(c='exploit_stone', m='gather', site=item['site']))
+            #         task.p(self.action(c='exploit_stone', m='action', site=item['site']))
+            #     else:
+            #         print '需要',item['cd']
         except Exception as e:
             print e
 
@@ -69,7 +73,7 @@ if __name__ == '__main__':
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
-                if i.strip():
+                if i.strip() and not i.startswith('#'):
                     name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]

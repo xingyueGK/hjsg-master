@@ -34,8 +34,8 @@ def userinfo(username, password, addr):
     gold = memberInfo['gold']  # 元宝
     vip = memberInfo['vip']
     reputation = memberInfo['reputation']  # 声望
-    print '\n账号 %s 名字 %s 等级 %s vip %s 国家 %s 军令 %s 银币 %s 元宝 %s 黄宝石 %s 紫宝石 %s 声望 %s 签到 %s' % (
-        username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'],
+    print '\n账号 %s 名字 %s 等级 %s vip %s 国家 %s 大区 %s 军令 %s 银币 %s 元宝 %s 黄宝石 %s 紫宝石 %s 声望 %s 签到 %s' % (
+        username, name, level, vip, countryName, addr,act, silver, gold, info['info']['get2'], info['info']['get3'],
         reputation, sign_times)
     userlist = [username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'],
                 reputation, sign_times]
@@ -421,7 +421,10 @@ class activity(fuben):
             print self.action(c='worldarena', m='get_server_reward')
 
     def betray(self):  # 叛国
-        self.action(c='country', m='betray')
+        if int(self.level) > 170 :
+            return None
+        else:
+            self.action(c='country', m='betray')
 
     def jioncountry(self, name):  # 加入国家
         self.action(c='member', m='index')
@@ -859,10 +862,10 @@ class activity(fuben):
             self.action(c='arena', m='send_to_chat', touid = touid,report=report,win=win)
     def information(self,uid):#获取角色vip
         #top = self.action(c='worldarena',m='index')#演武榜top10
-        top = self.action(c='country', m='get_member_list')#国家列表
+        #top = self.action(c='country', m='get_member_list')#国家列表
         #top = self.action(c='act_kemari', m='kemari_rank')#蹴鞠排行榜
-        #top = self.action(c='friend',m='index',p=1,l=100)#好友列表
-        print json.dumps(top)
+        top = self.action(c='friend',m='index',p=1,l=100)#好友列表
+        #print json.dumps(top)
         # for info in top['top']:
         for info in top['list']:
             try:
@@ -1030,6 +1033,12 @@ class activity(fuben):
 
         except Exception as e:
             print e
+
+    def financing(self):
+        #购买理财
+        formdata = {"product_id":6}
+        self.action(c='financing', m='index')
+        self.p(self.action(c='financing',m='purchase',body=formdata))
 # 周年比购物start_advanced
 
 # def wx():#五行竞猜刷数据
@@ -1122,7 +1131,7 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry(u'是你学姐')
+        action.jioncountry(u'haiyun3')
 
 
     def gongxian(user, apass, addr):
@@ -1160,9 +1169,9 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         #action.chat('sssssse')
         #action.gxinfo()
-        #action.information(123)
+        action.information(123)
         #action.get_audit_list()
-        action.chat(u"悍将三国六周年快乐")
+        #action.chat(u"悍将三国六周年快乐")
 
 
     def upmatrix(user, apass, addr):  # 更新出征武将
@@ -1183,9 +1192,10 @@ if __name__ == '__main__':
     def rolename(user, apass, addr):  # 更新出征武将
         action = activity(user, apass, addr)
         #nickname = 'mmp' + user.split('y0')[1]
-        nicklist = ['天','下','无','贼','越']
+        #nicklist = ['天','下','无','贼','越']
+        nicklist = ['降临贡献']
         #nicklist = ['G更健康','G更好','G你倒是处理啊','哎呦喂G']
-        name = user.split(r'duo',1)
+        name = user.split(r'gx',1)
         if name[0] == 'gmsd':
             nickname = 'gmsd' + user.split(r'0',1)[1]
             print nickname
@@ -1277,8 +1287,13 @@ if __name__ == '__main__':
     def pool(user, apass, addr):#武将池
         action = activity(user, apass, addr)
         action.update_matrix(u'神甘宁',u'神刘璋',u'神卢植',u'神周仓',u'神文丑',)
+
+    def licai(user, apass, addr):#理财
+        action = activity(user, apass, addr)
+        action.financing()
+
     def chuan():
-        with open('../users/1000share.txt', 'r') as f:
+        with open('../users/rush.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1290,8 +1305,8 @@ if __name__ == '__main__':
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
-                    #addr = 148
-                    t1 = threading.Thread(target=gongxian, args=(name, passwd, addr))
+                    #addr = 21
+                    t1 = threading.Thread(target=chats, args=(name, passwd, addr))
                     q.put(t1)
 
 
@@ -1343,6 +1358,6 @@ if __name__ == '__main__':
                 pass
         for i in thread:
             i.start()
-            i.join()
-        #for i in thread:
-         #i.join()
+            # i.join()
+        for i in thread:
+         i.join()
