@@ -98,6 +98,9 @@ class SaoDangFb(object):
         """
         action_data = kwargs
         serverinfo = self.post_url(body,action_data)
+        if serverinfo == 403:
+            print self.user,'账号异常'
+            exit(4)
         return serverinfo
     def level(self):
         userinfo = self.action(c='member', m='index')
@@ -122,5 +125,19 @@ class SaoDangFb(object):
             return addition
         except:
             return None
+    def get_attribute(self):
+        act_info = self.get_act()
+        uid = act_info['uid']
+        gid = act_info['gid']
+        formdata = {
+            "uid":uid,
+        }
+        a = self.action(c='information',m='index',body=formdata)
+        wuli = int(a['list']['1']['wuliup'])
+        zhili = int(a['list']['1']['zhiliup'])
+        if wuli > zhili:
+            return  wuli
+        else:
+            return zhili
 if __name__ == '__main__':
     pass

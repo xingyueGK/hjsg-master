@@ -50,7 +50,7 @@ def run(user, apass, addr,lockpwd):
     action = blackmarket(user, apass, addr)
     action.unlock(lockpwd)
     # action.tavern()
-    action.buy(user,40)
+    action.buy(user,10)
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))

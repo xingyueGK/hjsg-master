@@ -31,7 +31,7 @@ class activity(SaoDangFb):
                 self.action(c='island',m='pk',id=i) #共计金银洞
         id_open = self.action(c='island', m='index')['list'][4]['openstatus']
         if count <= 10 and id_open == 1:
-            for i in range(5):
+            for i in range(100):
                 self.action(c='island', m='pk', id=85)#共计通过之后的最高金银洞5次
         else:
             print '今天已经攻击了10次不在攻打'
@@ -157,18 +157,7 @@ class activity(SaoDangFb):
             self.action(c='act_spring', m='sacrifice', type=3, resource_type=1)
 def main():
     action = activity(num=21,user='xingyue123',passwd='413728161')
-    action.tower()
-    action.overseastrade()
-    action.business()
-    action.worldboss()
-    action.herothrone()
     action.island()
-    action.qiandao()
-    action.hitegg()
-    action.arena()
-    action.lottery()
-    action.generaltask()
-    action.sanctum()
-    action.heaven()
+
 if __name__ == '__main__':
     main()

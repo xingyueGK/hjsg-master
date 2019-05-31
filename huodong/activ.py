@@ -875,7 +875,7 @@ class activity(fuben):
             player = self.action(c='information', m='index', uid=uid)['player']
             print '%s %s %s '%(player['nickname'],player['level'],player['vip'])
     def usurp(self):#国家升官
-        p(self.action(c='country', m='get_member_list'))
+        self.action(c='country', m='get_member_list')
         status = 1
         while status == 1:
             info = self.action(c='country', m='get_usurp_info')
@@ -908,7 +908,7 @@ class activity(fuben):
         self.action(c='god', m='entry')#报名
     def gjzb(self):#国家争霸
         self.action(c='country_gvg',m='index')
-        self.action(c='country_gvg',m='member_entry')
+        self.p(self.action(c='country_gvg',m='member_entry'))
     def war(self):#武斗会
         self.action(c='war', m='index')
         self.action(c='war', m='entry')  # 报名争霸
@@ -943,6 +943,7 @@ class activity(fuben):
 
     def newyearshop(self):
         print 'aaaaaa'
+        self.action(c='newyear_act', m='index')
         index = self.action(c='newyear_act',m='shop')
         fuka = index['fuka']
         print '福币数',fuka
@@ -1039,6 +1040,154 @@ class activity(fuben):
         formdata = {"product_id":6}
         self.action(c='financing', m='index')
         self.p(self.action(c='financing',m='purchase',body=formdata))
+    def act_parade(self):
+        #沙场点兵
+        index = self.action(c='act_parade',m='index')
+        if index['status'] != 1:
+            print index['msg']
+            return None
+        #self.p(index)
+        is_free = int(index['is_free'])
+        if is_free > 0:
+            self.action(c='act_parade', m='action',num=1)
+
+    def mult_(self):
+        #批量分解战鼓
+        ids = []
+        index = self.action(c='equip_forge',m='resolve_index',d='newequip',type=2)
+        for i in index['equiplist']:
+            if i['name'] == '铜腰鼓':
+                ids.append(i['id'])
+
+                formdata  = {
+                    "id": ids
+                }
+                result = self.action(c='drum_forge',m='resolve_mulit',body=formdata)
+                if result['status']!=1:
+                    print result['msg']
+                else:
+                    for item in result['get_materials']:
+                        print '获得 %s %s 个'%(item['name'],item['num'])
+
+    def zimap(self):#获取图片
+        #levev:7,11，14是红色sh关卡s:1-9，id:6
+        #扫荡金色以上5-9
+        #获取次数nowmaxtimes
+        for level in range(8,11):#遍历每一个图
+        #for level in range(14, 17):  # 遍历每一个图红色使用
+
+            print '开始攻击第 %s 个图'%level
+            site = len(self.action(c='map',m='get_scene_list',l=level)['list'])
+
+            for i in range(site):#遍历关卡图次数
+                print '攻击第 %s 个关卡' %(i+1)
+                for id in range(5,10):  # 遍历5个小兵
+                #for id in range(4,9):#遍历5个小兵红色使用
+                    #判断当前次数是否为0次，如果为0 则不扫荡
+                    if level==8 and id !=4:
+                        continue
+                    times = self.action(c='map',m='mission',l=level,s=i+1,id=id)['info']['nowmaxtimes']
+                    #times = self.action(c='map', m='mission', l=level, s=i + 1, id=id)['info']['maxtimes']#红色天赋
+                    print '剩余扫荡次数 %s' %times
+                    if times !=0:
+                        #print 'gongji',level,i+1,id,times
+                        print self.action(c='map',m='action',l=level,s=i+1,id=id,times=times)
+    def hongmap(self):#获取图片
+        #levev:7,11，14是红色sh关卡s:1-9，id:6
+        #扫荡金色以上5-9
+        #获取次数nowmaxtimes
+        #for level in range(8,11):#遍历每一个图
+        for level in range(14, 17):  # 遍历每一个图红色使用
+
+            print '开始攻击第 %s 个图'%level
+            site = len(self.action(c='map',m='get_scene_list',l=level)['list'])
+
+            for i in range(site):#遍历关卡图次数
+                print '攻击第 %s 个关卡' %(i+1)
+                #for id in range(5,10):  # 遍历5个小兵
+                for id in range(4,9):#遍历5个小兵红色使用
+                    #判断当前次数是否为0次，如果为0 则不扫荡
+                    try:
+                        print self.action(c='map',m='mission',l=level,s=i+1,id=id)['info']
+                    except KeyError:
+                        continue
+
+                    times = self.action(c='map',m='mission',l=level,s=i+1,id=id)['info']['nowmaxtimes']
+                    #times = self.action(c='map', m='mission', l=level, s=i + 1, id=id)['info']['maxtimes']#红色天赋
+                    print '剩余扫荡次数 %s' %times
+                    if times !=0:
+                        #print 'gongji',level,i+1,id,times
+                        print self.action(c='map',m='action',l=level,s=i+1,id=id,times=times)
+
+    def get_talent(self):
+        #获取关卡地图
+        levelmap = [6,7,8,9,10,14,15,16,17,19]
+        try:
+            #for l in range(18,25):
+            for l in levelmap:
+                site = len(self.action(c='map',m='get_scene_list',l=l)['list'])
+                for i in range(1,site+1):#遍历关卡图次数
+                    for id in range(1,11):
+                        result = self.action(c='map', m='mission', l=l, s=i , id=id)
+                        if result['status'] != 1:
+                            self.p(result)
+                            print l, i, id
+                            continue
+                        info = result['info']
+                        try:
+                            getitemname = info['getitemname']
+                            quality = info['quality']
+                            #print getitemname
+                            if '天赋' in getitemname:
+                                #self.p(result)
+                                print l, i, id,quality,getitemname
+                        except KeyError as e:
+                            pass
+        except KeyError as e :
+            print e
+            self.p(result)
+
+    def get_reputatio(self):
+        # 获取关卡地图
+        levelmap = [6, 7, 8, 9, 10, 14, 15, 16, 17, 19]
+        try:
+            for l in range(12,25):
+            # for l in levelmap:
+                site = len(self.action(c='map', m='get_scene_list', l=l)['list'])
+                for s in range(1, site + 1):  # 遍历关卡图次数
+                    for id in range(1, 11):
+                        result = self.action(c='map', m='mission', l=l, s=s, id=id)
+                        if result['status'] != 1:
+                            self.p(result)
+                            print l, s, id
+                            continue
+                        info = result['info']
+                        try:
+                            getitemname = int(info['gexp'])
+                            exp = info['exp']
+                            nowmaxtimes = info['nowmaxtimes']
+                            print l, s, id, nowmaxtimes,getitemname,exp
+                            #self.p(result)
+                        except KeyError as e:
+                            pass
+        except KeyError as e:
+            print e
+            self.p(result)
+
+    def island(self):#金银洞活动
+        #获取当前攻击的次数和金银守护者5的状态，是否为攻击过，如果为1则为可以攻击，为0 则表示不可以
+        count = self.action(c='island',m='get_mission',id=85)['info']['act']
+        id_open = self.action(c='island',m='index')['list'][4]['openstatus']
+        if count <= 10 and id_open != 1:
+            for i in range(81,86):#每日共计5次
+                self.action(c='island',m='pk',id=i) #共计金银洞
+        id_open = self.action(c='island', m='index')['list'][4]['openstatus']
+        if count <= 100 and id_open == 1:
+            for i in range(100):
+                print i
+                self.action(c='island', m='pk', id=85)#共计通过之后的最高金银洞5次
+        else:
+            print '今天已经攻击了10次不在攻打'
 # 周年比购物start_advanced
 
 # def wx():#五行竞猜刷数据
@@ -1076,7 +1225,7 @@ if __name__ == '__main__':
 
     def act(user, apass, addr):
         action = activity(user, apass, addr)
-        action.gold_time()
+        action.get_talent()
 
 
     def task(user, apass, addr):  # 节节高买突飞
@@ -1090,7 +1239,7 @@ if __name__ == '__main__':
         # action.shenshu()
         #action.qiandao()
         # action.actjubao()
-        action.copies()
+        action.island()
         # action.guyu()
         # action.gongxiang()
         # action.usebuff()
@@ -1131,7 +1280,7 @@ if __name__ == '__main__':
 
     def jion(user, apass, addr):  # 加入腐败天朝
         action = activity(user, apass, addr)
-        action.jioncountry(u'haiyun3')
+        action.jioncountry(u'是你学姐')
 
 
     def gongxian(user, apass, addr):
@@ -1273,7 +1422,7 @@ if __name__ == '__main__':
         action.god()
     def country_zb(user, apass, addr):#国家争霸
         action = activity(user, apass, addr)
-        action.gjzb()
+        action.guozhan()
     def warentry(user, apass, addr):#武斗会报名
         action = activity(user, apass, addr)
         action.war()
@@ -1292,8 +1441,16 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         action.financing()
 
+    def dianbing(user, apass, addr):#沙场点兵
+        action = activity(user, apass, addr)
+        action.act_parade()
+
+    def tianfu(user, apass, addr):#天赋碎片
+        action = activity(user, apass, addr)
+        action.zimap()
+        action.hongmap()
     def chuan():
-        with open('../users/rush.txt', 'r') as f:
+        with open('../users/user.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1306,7 +1463,7 @@ if __name__ == '__main__':
                     except:
                         lockpwd = None
                     #addr = 21
-                    t1 = threading.Thread(target=chats, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
                     q.put(t1)
 
 
