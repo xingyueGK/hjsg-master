@@ -11,6 +11,7 @@ import os, json
 from Queue import Queue
 
 
+
 class task(SaoDangFb):
     def copies(self):
         # 扫荡副本需要传递的参数

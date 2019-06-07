@@ -91,25 +91,43 @@
 #     except Exception as e:
 #         pass
 # print proxys
+#
+# class Book(object):
+#
+#     def __init__(self, title):
+#         self.title = title
+#
+#     @classmethod
+#     def create(cls, title):
+#         book = cls(title=title)
+#         return book
+#
+# book1 = Book("python")
+# book2 = Book.create("python and django")
+# print(book1.title)
+# print(book2.title)
 
 
 
+class Foo(object):
+    X = 3
+    Y = 5
 
-class A:
-    def func(self):
-        print 'name'
+    @staticmethod
+    def averag(*mixes):
+        return sum(mixes) / len(mixes)
 
+    @staticmethod
+    def static_method():
+        return Foo.averag(Foo.X, Foo.Y)
 
+    @classmethod
+    def class_method(cls):
+        return cls.averag(cls.X, cls.Y)
 
-a = A()
-
-a.name = 'faad'
-
-
-
-
-
-
+foo = Foo()
+print(foo.static_method())
+print(foo.class_method())
 
 
 

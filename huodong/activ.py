@@ -1450,7 +1450,7 @@ if __name__ == '__main__':
         action.zimap()
         action.hongmap()
     def chuan():
-        with open('../users/user.txt', 'r') as f:
+        with open('../users/fubai.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
