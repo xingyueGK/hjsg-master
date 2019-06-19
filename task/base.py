@@ -109,8 +109,8 @@ class SaoDangFb(object):
     def unlock(self, pwd):  # 解锁密码
         self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
     @classmethod
-    def p(cls,message):
-        print json.dumps(message, ensure_ascii=False)
+    def p(cls,message,c='cls'):
+        print '方法：%s, json: %s'%(c ,json.dumps(message, ensure_ascii=False))
     def get_act(self):#角色信息
         print '角色信息'
         act_info = self.action(c='member', m='index')
@@ -128,7 +128,6 @@ class SaoDangFb(object):
     def get_attribute(self):
         act_info = self.get_act()
         uid = act_info['uid']
-        gid = act_info['gid']
         formdata = {
             "uid":uid,
         }
@@ -136,8 +135,8 @@ class SaoDangFb(object):
         wuli = int(a['list']['1']['wuliup'])
         zhili = int(a['list']['1']['zhiliup'])
         if wuli > zhili:
-            return  wuli
+            return  'wuli'
         else:
-            return zhili
+            return 'zhili'
 if __name__ == '__main__':
     pass
