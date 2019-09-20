@@ -109,7 +109,7 @@ def run(user, apass, addr,lockpwd):
         black.buy(user,blackmarkets)
     action.draw()
 if __name__ == '__main__':
-    q = Queue()
+
     filepath = os.path.dirname(os.path.abspath(__file__)).rsplit('\\',1)[0]
     cont = ['alluser.txt','user.txt']
     for t in cont:

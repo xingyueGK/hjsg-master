@@ -11,7 +11,7 @@ import os,time
 
 from task.base import  SaoDangFb
 from task.talent import  Talent
-from task.hero_soul import  DragonBoat
+from task.hero_soul import  DragonBoat,GoBoat
 from task.glory_front import  glory_front
 
 class run(SaoDangFb,Talent):
@@ -19,18 +19,34 @@ class run(SaoDangFb,Talent):
     pass
 
 class duanwu(SaoDangFb,DragonBoat):
-    '龙舟比赛'
+    #'龙舟比赛'
+    pass
+class longzhou(SaoDangFb,GoBoat):
     pass
 class dongxizhanxian(SaoDangFb,glory_front):
-    '东西战线'
+    #'东西战线'
     pass
 if __name__ == '__main__':
+    s1 = threading.Semaphore(3)
     def act(user, apass, addr):
+        s1.acquire()
         action = dongxizhanxian(user, apass, addr)
-        action.zhanxian()
+        t = action.get_attribute()
+        action.zhanxian(t)
+        s1.release()
+
+
+    def lz(user, apass, addr):
+        s1.acquire()
+        action = longzhou(user, apass, addr)
+        #action.buytimes(3)
+        action.longzhou()
+        #action.meter_reward()
+        s1.release()
+
     filepath = os.path.dirname(os.path.abspath(__file__))
     # cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']
-    cont = ['user.txt']
+    cont = ['gmuser.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
@@ -39,7 +55,5 @@ if __name__ == '__main__':
                     passwd = i.split()[1]
                     addr = i.split()[2]
                     # addr = 147
-                    t1 = threading.Thread(target=act, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=lz, args=(name, passwd, addr))
                     t1.start()
-                    t1.join()
-                    time.sleep(0.2)

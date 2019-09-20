@@ -227,8 +227,13 @@ class fuben(SaoDangFb):
         if exit_code == 1:
             for level in range(missionlevel, num):  # 遍历每一个图
                 print '开始攻击第 %s 个图' % level
-                self.action(c='map', m='get_scene_list', l=level)
-                site = len(self.action(c='map', m='get_scene_list', l=level)['list']) + 1
+                result = self.action(c='map', m='get_scene_list', l=level)
+                try:
+                    site = len(result['list']) + 1
+                except KeyError as e:
+                    print e
+                    self.p(result)
+                    return
                 for i in range(missionstage, site):  # 遍历关卡图次数
                     print '关卡', i
                     status = 1
@@ -346,22 +351,10 @@ class fuben(SaoDangFb):
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = fuben(user, apass, addr)
-        result = action.action(c='pack',m='index',type=1)
-        for item in result['list']:
-            if item['quality'] == "6":
-                id = item['id']
-                action.strengthen(id)
-        # # action.general(1)
-        # # action.mingjiang()
-        # for i in ['孙权','张梁','张角',
-        #           '张宝','鲁肃','小乔','曹洪',
-        #           '韩遂', '张梁', '张角', '周泰',
-        #           '周泰', '张梁', '张角', '周泰'
-        #           ]:
-        #     action.tufei(i,300)
+        action.saodang(25)
 
 
-    with open('../users/rush.txt', 'r') as f:
+    with open('../users/user.txt', 'r') as f:
         for i in f:
             if i.strip() and not i.startswith('#'):
                 str = i.strip().split()[0]

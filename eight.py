@@ -32,7 +32,7 @@ class eight(SaoDangFb):
 
     def reset(self):
         self.action(c='eight_diagram', m='reset_point')
-        self.action(c='eight_diagram', m='level_index', level=self.level)  # level：八卦等级，分为1,2,3重
+        self.action(c='eight_diagram', m='level_index', level=self.level)  # level：八卦等级，分为1,2,3,4,5重
 
     def eight_index(self):
         now_level = self.action(c='eight_diagram', m='index')['now_level']
@@ -52,9 +52,13 @@ class eight(SaoDangFb):
             genral_dict[name] = v['id']
         return genral_dict
 
-    def use_matrix(self, mid=4):
+    def use_matrix(self, mid=4,case=2):
         # boss固定4
-        self.action(c='matrix', m='use_matrix', mid=mid)
+        formdata = {
+            "mid":mid,
+            "case":case,
+        }
+        self.action(c='matrix', m='use_case',body=formdata)
 
     def update_matrix(self, uid1, uid2, uid3, uid4, uid5, mid=2):
         genral_info = self.matrix()
@@ -78,13 +82,13 @@ class eight(SaoDangFb):
             self.action(c='matrix', m='update_matrix', list=lists4, mid=mid)
 
 
-def run(user,apass, addr):
-    ei = eight(num=addr, user=user, passwd=apass, level=1)
-    # ei.use_matrix(4)  # 使用固定阵法
-    cond = ei.condition()
-    if not cond:
-        #不符合三重条件
-        exit(3)
+def run(user,apass, addr,level):
+    ei = eight(num=addr, user=user, passwd=apass, level=level)
+    # # ei.use_matrix(4)  # 使用固定阵法
+    # cond = ei.condition()
+    # if not cond:
+    #     #不符合三重条件
+    #     exit(3)
     # ei.update_matrix(u'神甘宁',u'神刘璋',u'神袁尚',u'神刘表',u'神卢植',4)
     index,now_level = ei.eight_index()
     reset_times = int(index['reset_times'])
@@ -95,34 +99,41 @@ def run(user,apass, addr):
     # else:
     #     print '已经通关没有次数了'
     #     exit(1)
-    # for i in range(12):
-    #     index, now_level = ei.eight_index()
-    #     point = index['cost']['point']
-    #     if point == '7':#武将减低
-    #         # 上谋士 u'神刘表'
-    #         try:
-    #             ei.update_matrix(cond[0],cond[1],cond[2],cond[3], 4)
-    #         except:
-    #             ei.update_matrix(cond[0], cond[1], cond[2], cond[3], 4)
-    #         ei.pk()
-    #         print '当前位置', point
-    #     elif point == '8':#谋士降低
-    #         ei.update_matrix(cond[0], cond[1], cond[2], cond[3], 4)
-    #         ei.pk()
-    #     else:
-    #         ei.pk()
-    #         print '当前位置', point
-    # ei.update_matrix(cond[0], cond[1], cond[2], cond[3], 4)
-    # ei.use_matrix(4)
+    for i in range(12):
+        index, now_level = ei.eight_index()
+        point = int(index['cost']['point'])
+        if point == 1:#武将减低
+            # 上谋士 u'神刘表'
+            ei.use_matrix(mid=1,case=2)
+            ei.pk()
+            print '当前位置', point
+        elif point == 2:#谋士降低
+            ei.use_matrix(mid=2, case=2)
+            ei.pk()
+            print '当前位置', point
+        elif point == 3:  # 谋士降低
+            ei.use_matrix(mid=1, case=2)
+            ei.pk()
+            print '当前位置', point
+        elif point == 4:  # 谋士降低
+            print '当前位置', point
+            ei.use_matrix(mid=2, case=2)
+            ei.pk()
+        else:  # 谋士降低
+            print '当前位置', point
+            ei.use_matrix(mid=1, case=1)
+            ei.pk()
+    ei.use_matrix(4)
 if __name__ == '__main__':
     filepath = os.path.dirname(os.path.abspath(__file__))
-    cont = ['alluser.txt']
+    cont = ['five.txt']
     for t in cont:
         with open('%s/users/%s'%(filepath,t),'r') as f:
             for i in f:
-                if i.strip() :
+                if i.strip() and not i.startswith('#'):
                     name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    t1 = threading.Thread(target=run, args=(name, passwd, addr))
+                    level = i.split()[3]
+                    t1 = threading.Thread(target=run, args=(name, passwd, addr,level))
                     t1.start()

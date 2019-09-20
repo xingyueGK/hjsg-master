@@ -248,55 +248,7 @@ class SaoDangFb(object):
     def arena(self):#
         self.action(c='arena', m='index')
         self.action(c='arena',m='get_reward')
-    def zimap(self):#获取图片
-        #levev:7,11，14是红色sh关卡s:1-9，id:6
-        #扫荡金色以上5-9
-        #获取次数nowmaxtimes
-        for level in range(8,11):#遍历每一个图
-        #for level in range(14, 17):  # 遍历每一个图红色使用
 
-            print '开始攻击第 %s 个图'%level
-            site = len(self.action(c='map',m='get_scene_list',l=level)['list'])
-
-            for i in range(site):#遍历关卡图次数
-                print '攻击第 %s 个关卡' %(i+1)
-                for id in range(5,10):  # 遍历5个小兵
-                #for id in range(4,9):#遍历5个小兵红色使用
-                    #判断当前次数是否为0次，如果为0 则不扫荡
-                    if level==8 and id !=4:
-                        continue
-                    times = self.action(c='map',m='mission',l=level,s=i+1,id=id)['info']['nowmaxtimes']
-                    #times = self.action(c='map', m='mission', l=level, s=i + 1, id=id)['info']['maxtimes']#红色天赋
-                    print '剩余扫荡次数 %s' %times
-                    if times !=0:
-                        #print 'gongji',level,i+1,id,times
-                        print self.action(c='map',m='action',l=level,s=i+1,id=id,times=times)
-    def hongmap(self):#获取图片
-        #levev:7,11，14是红色sh关卡s:1-9，id:6
-        #扫荡金色以上5-9
-        #获取次数nowmaxtimes
-        #for level in range(8,11):#遍历每一个图
-        for level in range(14, 17):  # 遍历每一个图红色使用
-
-            print '开始攻击第 %s 个图'%level
-            site = len(self.action(c='map',m='get_scene_list',l=level)['list'])
-
-            for i in range(site):#遍历关卡图次数
-                print '攻击第 %s 个关卡' %(i+1)
-                #for id in range(5,10):  # 遍历5个小兵
-                for id in range(4,9):#遍历5个小兵红色使用
-                    #判断当前次数是否为0次，如果为0 则不扫荡
-                    try:
-                        print self.action(c='map',m='mission',l=level,s=i+1,id=id)['info']
-                    except KeyError:
-                        continue
-
-                    times = self.action(c='map',m='mission',l=level,s=i+1,id=id)['info']['nowmaxtimes']
-                    #times = self.action(c='map', m='mission', l=level, s=i + 1, id=id)['info']['maxtimes']#红色天赋
-                    print '剩余扫荡次数 %s' %times
-                    if times !=0:
-                        #print 'gongji',level,i+1,id,times
-                        print self.action(c='map',m='action',l=level,s=i+1,id=id,times=times)
     def guyu(self):#获取古玉购买
         print self.action(c='actguyu',m='reward_index',id=22,num=1)
     def mount_stone(self):

@@ -109,25 +109,87 @@
 
 
 
-class Foo(object):
-    X = 3
-    Y = 5
+# class Foo(object):
+#     X = 3
+#     Y = 5
+#
+#     @staticmethod
+#     def averag(*mixes):
+#         return sum(mixes) / len(mixes)
+#
+#     @staticmethod
+#     def static_method():
+#         return Foo.averag(Foo.X, Foo.Y)
+#
+#     @classmethod
+#     def class_method(cls):
+#         return cls.averag(cls.X, cls.Y)
+#
+# foo = Foo()
+# print(foo.static_method())
+# print(foo.class_method())
 
-    @staticmethod
-    def averag(*mixes):
-        return sum(mixes) / len(mixes)
 
-    @staticmethod
-    def static_method():
-        return Foo.averag(Foo.X, Foo.Y)
-
-    @classmethod
-    def class_method(cls):
-        return cls.averag(cls.X, cls.Y)
-
-foo = Foo()
-print(foo.static_method())
-print(foo.class_method())
+# -*- coding: utf-8 -*-
+# Time: 2018/10/13 19:01:30
+# File Name: ex_interval.py
+import time
+import datetime
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 
+# def job1(f):
+#     print time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())), f
+#
+# def job2(arg1, args2, f):
+#     print time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+#     f.add_job(job2, next_run_time=(datetime.datetime.now() + datetime.timedelta(minutes=0.1)), args=('s','b',f,),
+#                       id='test_job3')
+#     print f.get_job('test_job3')
+#
+#
+# def job3(**args):
+#     print args
+#
+#
+# scheduler = BlockingScheduler()
+#
+# #一次性任务示例
+# print datetime.datetime.now()
+# print datetime.datetime.now() + datetime.timedelta(minutes=0.6)
+# scheduler.add_job(job2, next_run_time=(datetime.datetime.now() + datetime.timedelta(minutes=0.1)), args=('s','b',scheduler,),
+#                       id='test_job3')
+# print scheduler.get_job('test_job3')
+# scheduler.start()
+# print 'fffffffffffffff'
+# scheduler.add_job(job1, next_run_time=(datetime.datetime.now() + datetime.timedelta(minutes=0.6)), args=('一次',), id='tesadjob3')
+#
+#
+# print scheduler.get_jobs()
+import threading,random
+from threading import  Semaphore,Thread
+def func():
+    sm.acquire()
+    print('%s get sm' )%threading.activeCount()
 
+    time.sleep(random.randint(1,9))
+    print('fffffffffff')
+    sm.release()
+if __name__ == '__main__':
+    sm=Semaphore(3)
+    with open('users/gmuser.txt', 'r') as f:
+        # with open('../users/duguyi.txt', 'r') as f:
+        for i in f:
+            if i.strip() and not i.startswith('#'):
+                name = i.split()[0]
+                # name = i.split()[0]
+                passwd = i.split()[1]
+                addr = i.split()[2]
+                try:
+                    lockpwd = i.split()[3]
+                except:
+                    lockpwd = None
+                # addr = 21
+                t1 = threading.Thread(target=func,)
+                t1.start()

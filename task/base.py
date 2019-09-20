@@ -4,8 +4,10 @@
 import requests
 import time
 import json
-import  sys
+import  sys,os
 import  redis
+from logging.handlers import RotatingFileHandler
+import logging
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import threading
@@ -36,10 +38,10 @@ class SaoDangFb(object):
         self.user = user
         self.passwd = passwd
         self.rand = int(time.time()*1000)
-        self.token_uid = '210000353508'
+        self.token_uid = ''
         self.token = self.get_token(self.num, self.user, self.passwd)
         #POST基础URL地址
-        self.url = 'http://s{0}.game.hanjiangsanguo.com/index.php?v=0&channel=150&lang=zh-cn&token={1}&token_uid={2}&rand={3}&'.format(self.num,self.token,self.token_uid,self.rand)
+        self.url = 'http://s{0}.game.hanjiangsanguo.com/index.php?{1}&v=0&channel=150&lang=zh-cn&token={2}&token_uid={3}&rand={4}'.format(self.num,'{data}',self.token,self.token_uid,self.rand)
     @staticmethod
     def get_token(num, user, passwd):
         url = 'http://s{num}.game.hanjiangsanguo.com/index.php?c=login&&m=user&u={user}&p={passwd}&v=2018083101&token=&channel=11&lang=zh-cn&rand=150959405499450'.format(
@@ -75,18 +77,18 @@ class SaoDangFb(object):
         self.data = ''
         for k,v in data.items():
             self.data += '&%s=%s'%(k,v)
-        self.url = 'http://s%s.game.hanjiangsanguo.com/index.php?%s&v=2017111501&v=2017111501&channel=11&imei=NoDeviceId&platform=android&lang=zh-cn&token=%s&token_uid=%s&rand=%s' % (
-            self.num, self.data, self.token, self.token_uid, self.rand)
+        url =  self.url.format(data=self.data)
         keep_request = True
         while keep_request:
             try:
                 if body:
-                    r = requests.post(self.url, headers=postheaders,data=body,timeout=20)
+                    r = requests.post(url, headers=postheaders,data=body,timeout=20)
                 else:
-                    r = requests.post(self.url,headers=headers,timeout=20)
+                    r = requests.post(url,headers=headers,timeout=20)
                 keep_request = False
                 if r.status_code != 200:
-                    r = requests.post(self.url, headers=headers,timeout=20)
+                    r = requests.post(url, headers=headers,timeout=20)
+                    r.encoding = 'utf-8'
                     return r.json(encoding="UTF-8")
                 else:
                     return r.json( encoding="UTF-8")
@@ -100,7 +102,7 @@ class SaoDangFb(object):
         serverinfo = self.post_url(body,action_data)
         if serverinfo == 403:
             print self.user,'账号异常'
-            exit(4)
+            return 403
         return serverinfo
     def level(self):
         userinfo = self.action(c='member', m='index')
@@ -112,7 +114,6 @@ class SaoDangFb(object):
     def p(cls,message,c='cls'):
         print '方法：%s, json: %s'%(c ,json.dumps(message, ensure_ascii=False))
     def get_act(self):#角色信息
-        print '角色信息'
         act_info = self.action(c='member', m='index')
         return act_info
     def getWeek(self):
@@ -138,5 +139,49 @@ class SaoDangFb(object):
             return  'wuli'
         else:
             return 'zhili'
-if __name__ == '__main__':
-    pass
+
+import logging
+class ContextFilter(logging.Filter):
+
+    username = 'USER'
+    addr = 'ADDR'
+
+    def filter(self, record):
+
+        record.addr = self.addr
+        record.username = self.username
+        return True
+
+class MyLog(object):
+    def my_listener(self,event):
+        if event.exception:
+            print('The job crashed :(') # or logger.fatal('The job crashed :(')
+        else:
+            print('The job worked :)')
+
+    def MyLog(self,logpath=None,logname='mylog.log'):
+        """
+        :param logpath: dir
+        :param logname: str(name)
+        :return: logger
+        """
+        if logpath :
+            if  not os.path.exists(logpath):
+                os.makedirs(logpath)
+                _log = os.path.join(logpath,logname)
+            else:
+                _log = os.path.join(logpath,logname)
+        else:
+            _log = logname
+
+        format = logging.Formatter('%(asctime)s %(filename)s[line:%(lineno)d] [%(username)s:%(addr)s] %(levelname)s %(message)s')
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+        handler = RotatingFileHandler(_log,mode='a',maxBytes=1024*1024,backupCount=3,encoding='utf-8')
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(format)
+        logger.addHandler(handler)
+        filter = ContextFilter()
+        logger.addFilter(filter)
+        return logger
+

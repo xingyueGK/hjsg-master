@@ -105,3 +105,4 @@ class Talent(object):
         else:
             self.map_action(l, s, id, times)
 
+

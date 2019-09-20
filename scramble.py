@@ -17,6 +17,7 @@ _redis = redis.StrictRedis(connection_pool=pool)
 lock = threading.RLock()
 
 class task(SaoDangFb):
+    """enter : 需要使用以下url"""
     def index(self):
         index = self.action(c='scramble',m='index')
         # signId = hex_md5(hex_md5(xGame.token) + hex_md5(B.serverid) + hex_md5(B.uid) + B.authkey)
@@ -24,7 +25,7 @@ class task(SaoDangFb):
         return index,signId
     def enter(self):
         A,signId = self.index()
-        self.p(A)
+        self.url = 'http://war.game.hanjiangsanguo.com//index.php?{data}'
         formdata = {
             "diy" :0 ,
             "serverid" :  A['serverid'],
@@ -41,7 +42,9 @@ class task(SaoDangFb):
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = task(user, apass, addr)
+        action.oldurl = action.url
         action.enter()
+        action.url = action.oldurl
         action.move()
     filepath = os.path.dirname(os.path.abspath(__file__))
     #cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']

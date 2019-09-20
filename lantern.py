@@ -28,27 +28,40 @@ class task(SaoDangFb):
                 "28": "a", "40": "c", "26": "a", "36": "b", "44": "b", "1": "c",
                 "38": "b", "11": "b", "34": "c", "19": "d", "8": "d"
             }
-            for i in range(1, 16):
-                resutl = self.action(c='lantern_festival', m='question_index', position=i)
+            resutl = self.action(c='guess_lantern', m='answer_index')
+            self.p(resutl)
+            total_num = int(resutl['total_num'])
+            for i in range(total_num):
                 questiont = resutl['question']
                 id = questiont['id']
-                anserresutl = self.action(c='lantern_festival', m='answer', position=i, answer=answer[id])
-                if anserresutl['right_num'] >= "8":
-                    return None
-                if anserresutl['is_right'] == 0:
+                try:
+                    formdata={
+                        'right':answer[id]
+                    }
+                except KeyError as e:
                     self.p(questiont)
-        except:
+                    formdata = {
+                        'right': 'a'
+                    }
+                resutl = self.action(c='guess_lantern', m='check',body=formdata)
+                self.p(resutl)
+                if resutl['is_right'] == 0:
+                    self.p(questiont)
+        except KeyError as e:
+            print e
             pass
-
+    def get_reward(self):
+        self.action(c='guess_lantern',m='get_reward',id=1)
 
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = task(user, apass, addr)
         action.lantern_festival()
+        action.get_reward()
 
     filepath = os.path.dirname(os.path.abspath(__file__))
     # cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']
-    cont = ['21user.txt']
+    cont = ['user.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:

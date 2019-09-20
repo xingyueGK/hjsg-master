@@ -76,7 +76,8 @@ class country(SaoDangFb):
     def countrysacrifice(self):#每日贡献
         self.action(c='countrysacrifice', m='index', id=1)
         self.action(c='countrysacrifice',m='action',id=1)
-    def guoyan(self):#每日任务
+    def guoyan(self):#每日任务国宴
+
         index=self.action(c='banquet',m='index')#首页
         if index['list']:
             id=index['list'][0]['caption']
