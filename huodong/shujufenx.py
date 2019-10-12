@@ -225,8 +225,9 @@ class fuben(SaoDangFb):
         map = self.action(c='map', m='get_mission_list')
         exit_code = 1
         if exit_code == 1:
+            print num
             for level in range(missionlevel, num):  # 遍历每一个图
-                print '开始攻击第 %s 个图' % level
+                print 'action  %s mission' % level
                 result = self.action(c='map', m='get_scene_list', l=level)
                 try:
                     site = len(result['list']) + 1
@@ -235,7 +236,7 @@ class fuben(SaoDangFb):
                     self.p(result)
                     return
                 for i in range(missionstage, site):  # 遍历关卡图次数
-                    print '关卡', i
+                    print 'site', i
                     status = 1
                     for id in range(1, 11):  # 遍历10个小兵
                         try:
@@ -247,11 +248,11 @@ class fuben(SaoDangFb):
                             status = self.action(c='map', m='action', l=level, s=i, id=id)['status']
                             print status
                             if first == 1 and status == -5:
-                                print '退出'
+                                print 'exit'
                                 exit_code = 2
                                 return exit_code
                         else:
-                            print '已经击杀'
+                            print 'alredy kill '
         else:
             print 'dabuduole'
             return

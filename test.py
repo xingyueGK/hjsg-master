@@ -173,23 +173,23 @@ def func():
     sm.acquire()
     print('%s get sm' )%threading.activeCount()
 
-    time.sleep(random.randint(1,9))
-    print('fffffffffff')
-    sm.release()
-if __name__ == '__main__':
-    sm=Semaphore(3)
-    with open('users/gmuser.txt', 'r') as f:
-        # with open('../users/duguyi.txt', 'r') as f:
-        for i in f:
-            if i.strip() and not i.startswith('#'):
-                name = i.split()[0]
-                # name = i.split()[0]
-                passwd = i.split()[1]
-                addr = i.split()[2]
-                try:
-                    lockpwd = i.split()[3]
-                except:
-                    lockpwd = None
-                # addr = 21
-                t1 = threading.Thread(target=func,)
-                t1.start()
+#     time.sleep(random.randint(1,9))
+#     print('fffffffffff')
+#     sm.release()
+# if __name__ == '__main__':
+#     sm=Semaphore(3)
+#     with open('users/gmuser.txt', 'r') as f:
+#         # with open('../users/duguyi.txt', 'r') as f:
+#         for i in f:
+#             if i.strip() and not i.startswith('#'):
+#                 name = i.split()[0]
+#                 # name = i.split()[0]
+#                 passwd = i.split()[1]
+#                 addr = i.split()[2]
+#                 try:
+#                     lockpwd = i.split()[3]
+#                 except:
+#                     lockpwd = None
+#                 # addr = 21
+#                 t1 = threading.Thread(target=func,)
+#                 t1.start()

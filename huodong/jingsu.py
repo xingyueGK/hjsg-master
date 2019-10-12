@@ -53,19 +53,19 @@ def act(username,passwd,addr):
     if action.level() < 35:
         action.mapscene()#领取通关奖励
         action.levelgift()  # 领取30级奖励
-        action.muster()  # 武将出征并上阵，并突飞到30级
+        # action.muster()  # 武将出征并上阵，并突飞到30级
         #action.morra()#节节高
-        gid, uid = action.general(25)#获取三级装备，再次强化，并给武将穿戴上
-        for i in uid:
-            for etype, v in i.items():
-                action.strengthen(v)
-                action.equip(gid, v, etype)
-            action.saodang(2)  # 级失败退出
-        for i in uid:
-            for etype, v in i.items():
-                action.strengthen(v)
-                action.equip(gid, v, etype)
-        action.saodang(2)#30级失败退出从第二个图开始
+        # gid, uid = action.general(25)#获取三级装备，再次强化，并给武将穿戴上
+        # for i in uid:
+        #     for etype, v in i.items():
+        #         action.strengthen(v)
+        #         action.equip(gid, v, etype)
+        #     action.saodang(2)  # 级失败退出
+        # for i in uid:
+        #     for etype, v in i.items():
+        #         action.strengthen(v)
+        #         action.equip(gid, v, etype)
+        # action.saodang(2)#30级失败退出从第二个图开始
     if action.level()<50:
         for i  in range(2):
             action.mainquest()#获取所有活动
@@ -106,12 +106,12 @@ def act(username,passwd,addr):
             action.action(c='map',m='get_mission_reward',id=i)
     if action.level() < 130:  # 领取前60次奖励
        # action.muster(level=140)
-        action.saodang(10)
+        action.saodang(20)
     if action.level() < 140:  # 领取前60次奖励
        # action.muster(level=140)
-        action.saodang(10)
+        action.saodang(20)
 
-    if action.level() < 150:  # 领取前60次奖励
+    if action.level() < 170:  # 领取前60次奖励
         #action.mainquest()
         #action.tujian()
         #action.soul()
@@ -120,7 +120,7 @@ def act(username,passwd,addr):
         #获取竞速元宝
         # for i in range(10, 180, 10):
         #     a= action.action(c='map',m='get_mission_reward',id=i)
-        action.saodang(10)
+        action.saodang(20)
 def joi(username,passwd):
     #国家海外贸易
     action = fuben(username,passwd)
@@ -200,7 +200,7 @@ with open('../users/sunzi.txt', 'r') as f:
         if i.strip():
             str = i.strip().split()[0]
             name = str
-            addr = 145
+            addr = 150
             passwd = i.split()[1]
             t1 = threading.Thread(target=act,args=(name,passwd,addr))
             t1.start()

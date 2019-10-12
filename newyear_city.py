@@ -50,7 +50,7 @@ class task(SaoDangFb):
         #城市人数 5 8 15 20 30
         OCCUPY = 'newyear:occupy' + str(self.num)
         #citylist = [1,6,11,3,7,4,5,8,9]
-        citylist = [6,11,3,7,4]
+        citylist = [1,6,11]
         for id in citylist:
             print '遍历城市',id
             result = self.action(c='newyear_act', m='city', id=id)
@@ -84,7 +84,7 @@ class task(SaoDangFb):
     def rob(self):
         if  self.user.startswith('gmhy'):
             exit(5)
-        citylist = [ 6, 11, 3, 7, 4]
+        citylist = [ 1,6, 11]
         ROB = 'newyear:rob' + str(self.num)
         for id in citylist:
             print '打劫遍历城市',id
@@ -100,10 +100,15 @@ class task(SaoDangFb):
                         return None
                     else:
                         continue
+    def buy_rob(self):
+        for i in range(8):
+            self.action(c='newyear_act',m='buy_rob')
+
     def run(self):
         try:
+            self.buy_rob()
             occupy,rob = self.index()
-            if occupy > "0":#剩余占领次数不为0，继续占领
+            if  rob> "0":#剩余占领次数不为0，继续占领
                 self.action(c='newyear_act', m='index')
                 city_index = self.action(c='newyear_act', m='city_index')
                 for item in city_index['city']:
@@ -112,8 +117,8 @@ class task(SaoDangFb):
                         id = item['id']
                         if not self.user.startswith('gmhy'):
                             self.harvest(id)
-                self.occupy_city()
-            elif rob > '0':
+                self.rob()
+            elif occupy > '0':
                 self.action(c='newyear_act', m='index')
                 city_index = self.action(c='newyear_act', m='city_index')
                 for item in city_index['city']:
@@ -122,7 +127,7 @@ class task(SaoDangFb):
                         id = item['id']
                         if not self.user.startswith('gmhy'):
                             self.harvest(id)
-                self.rob()
+                self.occupy_city()
             else:
                 print '没有次数，查看是否占矿未收'
                 self.action(c='newyear_act', m='index')

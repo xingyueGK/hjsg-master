@@ -77,13 +77,13 @@ class country(SaoDangFb):
         self.action(c='countrysacrifice', m='index', id=1)
         self.action(c='countrysacrifice',m='action',id=1)
     def guoyan(self):#每日任务国宴
-
         index=self.action(c='banquet',m='index')#首页
-        if index['list']:
-            id=index['list'][0]['caption']
-            self.action(c='banquet',m='join_team',id=id)#加入宴会
-        else:
-            self.action(c='banquet', m='create_team', id=1)  # 创建宴会
+        self.p(index)
+        # if index['list']:
+        #     id=index['list'][0]['caption']
+        #     self.action(c='banquet',m='join_team',id=id)#加入宴会
+        # else:
+        #     self.action(c='banquet', m='create_team', id=1)  # 创建宴会
     def gongxian(self):#国家贡献
         self.action(c='country',m='get_member_list')
         self.action(c='country',m='storage')

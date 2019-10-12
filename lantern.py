@@ -7,57 +7,98 @@
 
 from task.base import SaoDangFb
 import threading
-import os,time
+import os, time
 import redis
 
 pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
 _redis = redis.StrictRedis(connection_pool=pool)
 lock = threading.RLock()
 
+
 class task(SaoDangFb):
 
     def lantern_festival(self):
         try:
             answer = {
-                "48": "c", "10": "c", "42": "a", "27": "b", "39": "b", "5": "d", "14": "c",
-                "50": "d", "47": "c", "33": "b", "23": "d", "45": "b", "15": "b", "4": "d",
-                "18": "c", "35": "d", "12": "b", "29": "c", "41": "a", "20": "b",
-                "32": "a", "6": "d", "3": "d", "22": "a", "17": "a", "37": "a",
-                "43": "a", "49": "d", "7": "a", "2": "a", "30": "a", "9": "a",
-                "46": "b", "21": "c", "31": "b", "16": "d", "25": "b", "13": "d",
-                "28": "a", "40": "c", "26": "a", "36": "b", "44": "b", "1": "c",
-                "38": "b", "11": "b", "34": "c", "19": "d", "8": "d"
+                "1": "a",
+                "2": "b",
+                "3": "c",
+                "4": "d",
+                "5": "b",
+                "6": "d",
+                "7": "d",
+                "8": "d",
+                "9": "d",
+                "10": "a",
+                "11": "a",
+                "12": "a",
+                "13": "b",
+                "14": "b",
+                "15": "a",
+                "16": "c",
+                "17": "b",
+                "18": "d",
+                "19": "a",
+                "20": "c",
+                "21": "c",
+                "22": "a",
+                "23": "d",
+                "24": "a",
+                "25": "a",
+                "26": "c",
+                "27": "a",
+                "28": "b",
+                "29": "a",
+                "30": "a",
+                "31": "a",
+                "32": "b",
+                "33": "b",
+                "34": "b",
+                "35": "c",
+                "36": "c",
+                "37": "d",
+                "38": "d",
+                "39": "c",
+                "40": "b",
             }
             resutl = self.action(c='guess_lantern', m='answer_index')
-            self.p(resutl)
+            self.p(resutl['question'])
             total_num = int(resutl['total_num'])
+            print total_num
             for i in range(total_num):
                 questiont = resutl['question']
                 id = questiont['id']
                 try:
-                    formdata={
-                        'right':answer[id]
+                    formdata = {
+                        'right': answer[id]
                     }
                 except KeyError as e:
-                    self.p(questiont)
+                    print 'id error ,chaoguo xianzhi '
+                    self.p(questiont,'id')
                     formdata = {
                         'right': 'a'
                     }
-                resutl = self.action(c='guess_lantern', m='check',body=formdata)
-                self.p(resutl)
-                if resutl['is_right'] == 0:
-                    self.p(questiont)
+                resutl = self.action(c='guess_lantern', m='check', body=formdata)
+                if resutl['stauts'] ==1:
+                    if resutl['right'] == 0:
+                        pass
+                    else:
+                        self.p(resutl,'check result')
+                time.sleep(0.5)
         except KeyError as e:
-            print e
+            self.p(resutl)
             pass
+
     def get_reward(self):
-        self.action(c='guess_lantern',m='get_reward',id=1)
+        self.action(c='guess_lantern', m='get_reward', id=1)
+
 
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = task(user, apass, addr)
         action.lantern_festival()
         action.get_reward()
+
 
     filepath = os.path.dirname(os.path.abspath(__file__))
     # cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']
@@ -69,7 +110,7 @@ if __name__ == '__main__':
                     name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    #addr = 147
+                    # addr = 21
                     t1 = threading.Thread(target=act, args=(name, passwd, addr))
                     t1.start()
                     time.sleep(0.2)

@@ -445,14 +445,14 @@ class activity(fuben):
         #     p(self.action(c='country', m='apply', id=id))
         # else:
         #     print '国家不存在'
-        info = self.action(c='country', m='search', name=name)
-
-        if info['status'] == 1:
-            uid = info['country']['id']
-            print uid
-            print self.action(c='country', m='apply', id=uid)
-            return
-        print 'assssssss'
+        # info = self.action(c='country', m='search', name=name)
+        # print info
+        # if info['status'] == 1:
+        #     uid = info['country']['id']
+        #     print uid
+        #     print self.action(c='country', m='apply', id=uid)
+        #     return
+        # print 'assssssss'
         for i in range(1, 85):
             info = self.action(c='country', m='get_rank', page=i)
             for item in info["list"]:
@@ -594,7 +594,7 @@ class activity(fuben):
                                     print '打劫失败'
                                     continue
                                 else:
-                                    print rob_result
+                                    self.p(rob_result)
                                     break
 
                 else:
@@ -611,7 +611,7 @@ class activity(fuben):
                                 print '打劫失败'
                                 continue
                             else:
-                                print rob_result
+                                self.p(rob_result)
                                 break
 
             except Exception as e:
@@ -1329,21 +1329,24 @@ class activity(fuben):
     def island(self):  # 金银洞活动
         # 获取当前攻击的次数和金银守护者5的状态，是否为攻击过，如果为1则为可以攻击，为0 则表示不可以
         index = self.action(c='island', m='index')
+        self.p(index)
         id = index['list'][4]['id']
         count = self.action(c='island', m='get_mission', id=id)['info']['act']
+        self.p(count)
         id_open = index['list'][4]['openstatus']
-        if count <= 10 and id_open != 1:
+        print id_open
+        if count <= 50 and id_open != 1:
             for item in index['list']:  # 每日共计5次
                 id_ = item['id']
-                self.action(c='island', m='pk', id=id_)  # 共计金银洞
+                status = self.action(c='island', m='pk', id=id_)  # 共计金银洞
+                self.p(status)
         id_open = self.action(c='island', m='index')['list'][4]['openstatus']
-        if count <= 400 and id_open == 1:
-            for i in range(50):
+        if count <=50 and id_open == 1:
+            for i in range(1):
                 print i
                 status = self.action(c='island', m='pk', id=id)  # 共计通过之后的最高金银洞5次
                 if status['status']!=1:
                     return
-
         else:
             print '今天已经攻击了10次不在攻打'
     def shuaisland(self):
@@ -1365,16 +1368,16 @@ class activity(fuben):
                 return
             for i in range(200 - num):
                 result = self.action(c='act_fight', m='lottery', body=formdata)
-
-            for item in result['reward']:
-                try:
-                    if int(item['status']) == 1:
-                        formdata = {
-                            "id": item['id']
-                        }
-                        result = self.action(c='act_fight', m='get_achievement_reward', body=formdata)
-                except:
-                    self.p(item)
+        self.p(result)
+        for item in result['reward']:
+            try:
+                if int(item['status']) == 1:
+                    formdata = {
+                        "id": item['id']
+                    }
+                    result = self.action(c='act_fight', m='get_achievement_reward', body=formdata)
+            except:
+                self.p(item)
 
     def collect_cards(self):
         card_info = {
@@ -1392,10 +1395,10 @@ class activity(fuben):
         card3 =int(user_info['card3'])
         card4 =int(user_info['card4'])
         card5 =int(user_info['card5'])
-        print "七%s 、周 %s、年 %s、快 %s、 乐%s" %(card1,card2,card3,card4,card5)
-        if card5 >= 1:
-            print self.user,'乐'
-            self.give_cards(5)
+        print "%s 七%s 、周 %s、年 %s、快 %s、 乐%s" %(self.user,card1,card2,card3,card4,card5)
+        # if card5 >= 1:
+        #     print self.user,'乐'
+        #     self.give_cards(5)
     def friend(self):
         formdata = {
             'f':14900008572777
@@ -1722,7 +1725,7 @@ if __name__ == '__main__':
     def yuanbao(user, apass, addr):  # 元宝
         s1.acquire()
         action = activity(user, apass, addr)
-        action.shuaisland()
+        action.island()
         s1.release()
 
 
@@ -1746,7 +1749,7 @@ if __name__ == '__main__':
 
 
     def chuan():
-        with open('../users/alluser.txt', 'r') as f:
+        with open('../users/gmuser.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1759,7 +1762,7 @@ if __name__ == '__main__':
                     except:
                         lockpwd = None
                     #addr = 21
-                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=dajie, args=(name, passwd, addr))
                     t1.start()
                     # q.put(t1)
 
@@ -1774,7 +1777,7 @@ if __name__ == '__main__':
                         passwd = i.split()[1]
                         addr = i.split()[2]
                         # addr = 149
-                        t1 = threading.Thread(target=kapian, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
                         # t1.start()
                         q.put(t1)
 
@@ -1802,8 +1805,8 @@ if __name__ == '__main__':
     # chat('pock520',5553230,149)
     # chat('123456789', 987654321, 135)
     # dg()
-    gm()
-    # chuan()
+    # gm()
+    chuan()
     while not q.empty():
         thread = []
         for i in xrange(50):

@@ -23,7 +23,8 @@ class MyThread(threading.Thread):
         self.arg = args
 
     def run(self):
-        self.func(*self.arg)
+        self.result = self.func(*self.arg)
+
 
 
 def timesCount(name, passwd, addr):  # 返回贸易次数
@@ -77,18 +78,19 @@ def jierihaiyun(name, passwd, addr, flag=True):  # 节日海外贸易
                 #     status = task.action(c="holiday_seatrade", m='join_team', id=0, place=4, site=2, page=1)
                 a = task.action(c="holiday_seatrade", m='trade', v=0)  # 开启
                 task.p(name, a) # 开启
-                return
+                return True
             else:
                 #有队伍直接开始
                 a = task.action(c="holiday_seatrade", m='trade', v=0)  # 开启
                 task.p(name, a) # 开启
-                return
+                return True
         except:
             print '获取组队列表错误%s'%name
     ite = task.action(c='holiday_seatrade', m='item_list')
 
     try:
         renew = ite['member_info']['renew']
+
     except:
         try :
             exit_flag = False
@@ -112,17 +114,17 @@ def jierihaiyun(name, passwd, addr, flag=True):  # 节日海外贸易
             return
         except:
             print name
-    # 购买粮食，花费银币的，id=1为粮食，id2-5为花费元宝的玛瑙等
+    # 购买粮食，花费银币的，id=1为粮食，id2-5为花费元宝的玛瑙等 ,元宝超过150就退出
     if int(index['info']['times']) > 0 and int(renew) <= 3:
         while True:
             try:
                 if flag:
                     info = task.action(c='holiday_seatrade', m='renew', v=2018061901)
-                    if info['status'] == -4:
+                    if info['status'] == -4 or int(info['renew']) > 150:#封顶200元宝，如果不限制元宝要注释renew
                         return
                     time.sleep(3)
                     print json.dumps(info)
-                    if info['reward'] > '3':  # and info['renew'] < '880':#封顶200元宝，如果不限制元宝要注释renew
+                    if info['reward'] > '3': #and int(info['renew']) < 150:
                         time.sleep(random.random())
                         task.action(c='holiday_seatrade', m='buy_item', id=int(info['reward']))
                         break
@@ -188,7 +190,7 @@ def makeTask(name, passwd, addr):
     t1.start()
 
 
-def main(file, flag,FlushCount=40,addr=None,):
+def main(file, flag,overkey,FlushCount=5,addr=None,):
     """
     :param FlushCount: 每次同时刷船次数,默认1个
     """
@@ -210,14 +212,19 @@ def main(file, flag,FlushCount=40,addr=None,):
                     print 'username {0} 还剩 {1}'.format(user, userTimes)
                     if int(userTimes) <= 0:
                         continue
+
                     if FlushCount > 0:
-                        time.sleep(random.random()
-                                )
-                        t1 = threading.Thread(target=jierihaiyun, args=(user, passwd, addr, flag))
-                        t1.start()
-                        FlushCount -= 1
-                        times = int(userTimes) - 1
-                        _redis.hset(key, user, times)
+                        if int(userTimes) >=  int(_redis.get(overkey)):
+                            time.sleep(random.random()
+                                    )
+                            t1 = threading.Thread(target=jierihaiyun, args=(user, passwd, addr, flag))
+                            t1.start()
+
+                            FlushCount -= 1
+                            times = int(userTimes) - 1
+                            _redis.hset(key, user, times)
+                        else:
+                            continue
                     else:
                         break
                 else:
@@ -225,16 +232,23 @@ def main(file, flag,FlushCount=40,addr=None,):
 
 
 if __name__ == '__main__':
-    _redis.flushall()
-    for i in range(300):
-        if i % 30 == 0:
-            _redis.flushall()
-        # main('haiyun.txt', True,200)
+    #_redis.flushall()
+    #哪个区设置哪个key，用来匹配贸易次数，
+    oversea = 'oversea:149'
+    _redis.set(oversea,2, ex=18000)
+    # if _redis.exists(oversea):
+    #     _redis.set('oversea:30', 5,ex=18000)
+    # else:
+    #      _redis.decr('oversea:30',1)
+    for i in range(30):
+        # if i % 30 == 0:
+        #     _redis.flushall()
+        # main('haiyun.txt', True,oversea,5)
         # main('dc.txt', True,20)
         # main('dc.txt', True,20)
-        # main('149cnm.txt', True,50)
-        main('didui.txt',True, 50)
-        # main('gmhy1.txt', True, 50,)
-        # main('gmhy.txt', True, 20,)
+        # main('149cnm.txt', True,oversea,5)
+        # main('didui.txt',True, oversea,50)
+        # main('gmhy1.txt', True,oversea, 5)
+        main('gmhy.txt', True,oversea, 5)
         # main('21user.txt', True, 50,)
         time.sleep(random.randint(10, 19))

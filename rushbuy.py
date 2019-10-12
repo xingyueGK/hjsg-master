@@ -17,17 +17,28 @@ _redis = redis.StrictRedis(connection_pool=pool)
 
 tasks = {}
 lock = threading.RLock()
+
+
 class task(SaoDangFb):
 
     def unlock(self, pwd):  # 解锁密码
         print json.dumps(self.action(c='member', m='resource_unlock',pwd=pwd)),self.user
 
-    def springshop(self, id):  # 周末武將商城
+    def springmap(self):
+        SpringMap = {}
+        self.index = self.action(c='springshop',m='index')
+        for i in self.index['list']:
+            SpringMap[i['name']] = i['id']
+        return SpringMap
+    def springshop(self, name):  # 周末武將商城
         # id 列表对应 1-20 即为购买武将1-20
+        #获取指定名字购买
+        d = self.springmap()
         global lock
-        _redis.hsetnx(self.user, id, 0)
-        print _redis.hget(self.user, id)
-        if _redis.hget(self.user, id) == '0':
+        _redis.hsetnx(self.user, name, 0)
+        print _redis.hget(self.user, name)
+        if _redis.hget(self.user, name) == '0':
+            id = d[name]
             result = self.action(c='springshop', m='buy', id=id)
             self.p(result)
             if result['status'] == 1:
@@ -39,25 +50,7 @@ class task(SaoDangFb):
                 timeStamp = int(time.mktime(timeArray))
                 lock.release()
                 _redis.expireat(self.user, timeStamp)
-    def countryshop(self):  # 抢购国家商城
-        # id 2 20税金，300蓝石头，13 40税金600蓝石头
-        # id 3 40税金150黄石头   14 80 300黄
-        # id 7 80两千声望   18 150 4000声望
-        shop_id = [2,3,7,13,14,18]
-        self.action(c='country_taxes_shop', m='index')
-        for id in shop_id:
-            print  self.action(c='country_taxes_shop', m='buy', id=id)
-    def SecKillInfo(self):
-        try:
-            num = 0
-            index = self.action(c='shopping_feast', m='index', time_limit=None)
-            cdtime = index['cd']
-            time_limit = index['time_limit']  # 抢购类型
-            rid1 = index['list'][0]['id']
-            rid2 = index['list'][1]['id']
-            return time_limit,rid1,rid2
-        except:
-            self.SecKillInfo()
+
     def shoppingFeastSecKill(self,time_limit, rid1, rid2):#双十一秒杀活动
         try:
             #print 'sleep secend time',cdtime
