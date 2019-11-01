@@ -1352,7 +1352,7 @@ class activity(fuben):
     def shuaisland(self):
         index = self.action(c='island', m='index')
         id = index['list'][0]['id']
-        for item in range(330):  # 每日共计5次
+        for item in range(1000):  # 每日共计5次
             print item
             self.action(c='island', m='pk', id=id)  # 共计金银洞
 
@@ -1744,12 +1744,17 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         action.message()
         s1.release()
+    def py(user, apass, addr):  # 征战八方抽奖
+        s1.acquire()
+        action = activity(user, apass, addr)
+        action.peiyang('神董卓')
+        s1.release()
     s1 = threading.Semaphore(10)
 
 
 
     def chuan():
-        with open('../users/gmuser.txt', 'r') as f:
+        with open('../users/user.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1762,7 +1767,7 @@ if __name__ == '__main__':
                     except:
                         lockpwd = None
                     #addr = 21
-                    t1 = threading.Thread(target=dajie, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
                     t1.start()
                     # q.put(t1)
 

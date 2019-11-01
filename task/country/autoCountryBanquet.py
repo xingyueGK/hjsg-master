@@ -103,6 +103,7 @@ class autoCountryBanquet(object):
                 if status['status'] != 1:
                     return False
                 bqk = self.get_banquet_key()
+                print 'success'
                 r.delete(bqk)
                 return True
             else:

@@ -1160,100 +1160,134 @@ class task(SaoDangFb):
             self.p(result)
             time.sleep(10)
             self.cake_index()
-
+    def undercity(self):
+        #地下城
+        index = self.action(c='undercity',m='index')
+        diff = index['diff_max']
+        for i in index['plate_mission']:
+            if i['status'] == 0:
+                plate = i['plate']
+                formdata = {
+                    "plate":plate,
+                    "diff":diff
+                }
+                plate = self.action(c='undercity',m='plate',body=formdata)
+                times = plate['times']
+                for item in plate['plate_mission']:
+                    if item['status'] == 0:
+                        id = int(item['id'])
+                        status = self.action(c='undercity',m='action',id=id)
+                        if status['win'] <= 1:
+                            #表示没有PK赢
+                            sweep_show = self.action(c='undercity', m='sweep_show', id=id - 1)
+                            if sweep_show['info']['fifty_sub'] == 0:
+                                sweep_show = self.action(c='undercity', m='sweep', id=id - 1,type =3)
+                            elif sweep_show['info']['five_sub'] == 0:
+                                sweep_show = self.action(c='undercity', m='sweep', id=id - 1, type=1)
+                            elif sweep_show['info']['ten_sub'] == 0:
+                                sweep_show = self.action(c='undercity', m='sweep', id=id - 1, type=2)
+                        else:
+                            #继续攻击
+                            continue
+                #终止任务，已经完成
+                break
 
 def run(user, apass, addr,act):
     action = task(user, apass, addr)
     activity = action.get_act()
     level = action.level()
     country = activity['country']
-    # if 30 < level:
-    #     action.arena()  # 获取每日演武奖
-    #     action.qiandao()  # 每日签到
-    #     action.hitegg()  # 砸蛋
-    #     action.island()  # 金银洞
-    #     action.mouth_card()  # 月卡奖励
-    #     action.drink()  # 每日军令饮
-    # if 50 < level < 180 :
-    #     action.lowtower()  # 低等级将魂星路推图
-    # else:
-    #     action.tower()  # 高级将魂星路扫荡精英
-    # if 60 < level and activity['act_solt'] !=1:
-    #     action.business()  # 每日通商
-    # if 70 < level:
-    #     action.beauty()  # 铜雀台互动
-    # if 90 < level:
-    #     action.workshop()  # 玉石采集
-    #     action.exploit_tree()  # 木材采集
-    #     action.exploit_stone()  # 石头采集
-    # if 100 < level:
-    #     if country != '0':
-    #         action.overseastrade()  # 海外贸易
-    #         action.country()  # 国家奖励
-    #         action.countrysacrifice()  # 每日免费贡献40
-    #         action.dice()  # 国家摇色子
-    #         action.gongxian(20)  # 国家贡献20次
-    #         action.japan()  # 征战东瀛
-    #     action.assist_card()#助阵系统
-    #     action.heaven(act)  # 通天塔
-    #     action.herothrone(act)  # 英雄王座
-    #     action.sanctum()  # 每日宝石领奖
-    #     action.generaltask()  #
-    #     action.mount_stone()  # 每日大马副本
-    #     action.awaken_copy()  # 觉醒奖励
-    #     action.essence_map()#经脉丹药扫荡
-    #     action.lottery()  # 每日抽奖
-    # if 220 < level and  activity['lantern_festival'] == 1:#猜灯谜
-    #     action.lantern_festival()
-    # action.act_fight()  # 征战八方
-    # if activity['act_travel'] == 1:
-    #     for i in range(3):
-    #         action.sanguo()  # 游历三国
-    # if activity['actkemari'] == 1:
-    #     action.cuju()  # 蹴鞠
-    # if activity['act_spring'] == 1:
-    #     action.jisi()  # 新年祭祀
-    # if activity['happy_guoqing'] == 1:
-    #     action.leigu()  # 欢度国庆
-    # if activity['chicken'] == 1:
-    #     action.chicken()  # 吃鸡
-    # if activity['holiday'] == 1:
-    #     action.holiday()  # 假日礼包
-    # if activity['sacredtree'] == 1:
-    #     action.shenshu()  # 神树
-    # if activity['lantern'] == 1:
-    #     action.yuanxiao()  # 元宵
-    # if activity['actjubao'] == 1:
-    #     action.actjubao()  # 聚宝
-    # if activity['years_guard'] == 1:
-    #     action.years_guard()  # 周年守护
-    # if activity['fukubukuro'] == 1:
-    #     action.fukubukuro()  # 福矿
-    # if activity['gold_time'] == 1:
-    #     action.gold_time()  # 黄金时间
-    # if activity['lucky_dice'] == 1:
-    #     action.lucky_dice()  # 摇骰子
-    # if activity['break_egg'] == 1:
-    #     action.break_egg()  # 砸蛋
-    # if activity['shopping_feast'] == 1:
-    #     action.shopping_feast()  # 双十一签到
-    # if activity['double_denier'] == 1:
-    #     action.double_denier()  # 双旦
-    # if activity['login_reward'] == 1:#登录签到礼
-    #     action.loginreward()
-    # if activity['newyear_act'] == 1:#新年活动
-    #     action.newyear_act()
-    # if activity['parade'] == 1:#沙场点兵
-    #     action.act_parade()
+    if 30 < level:
+        action.arena()  # 获取每日演武奖
+        action.qiandao()  # 每日签到
+        action.hitegg()  # 砸蛋
+        action.island()  # 金银洞
+        action.mouth_card()  # 月卡奖励
+        action.drink()  # 每日军令饮
+    if 50 < level < 180 :
+        action.lowtower()  # 低等级将魂星路推图
+    else:
+        action.tower(act)  # 高级将魂星路扫荡精英
+    if 60 < level and activity['act_solt'] !=1:
+        action.business()  # 每日通商
+    if 70 < level:
+        action.beauty()  # 铜雀台互动
+    if 90 < level:
+        action.workshop()  # 玉石采集
+        action.exploit_tree()  # 木材采集
+        action.exploit_stone()  # 石头采集
+    if 100 < level:
+        if country != '0':
+            action.overseastrade()  # 海外贸易
+            action.country()  # 国家奖励
+            action.countrysacrifice()  # 每日免费贡献40
+            action.dice()  # 国家摇色子
+            action.gongxian(20)  # 国家贡献20次
+            action.japan()  # 征战东瀛
+        action.assist_card()#助阵系统
+        action.heaven(act)  # 通天塔
+        action.herothrone(act)  # 英雄王座
+        action.sanctum()  # 每日宝石领奖
+        action.generaltask()  #
+        action.mount_stone()  # 每日大马副本
+        action.awaken_copy()  # 觉醒奖励
+        action.essence_map()#经脉丹药扫荡
+        action.lottery()  # 每日抽奖
+    if 220 < level and  activity['lantern_festival'] == 1:#猜灯谜
+        action.lantern_festival()
+    action.act_fight()  # 征战八方
+    if activity['act_travel'] == 1:
+        for i in range(3):
+            action.sanguo()  # 游历三国
+    if activity['actkemari'] == 1:
+        action.cuju()  # 蹴鞠
+    if activity['act_spring'] == 1:
+        action.jisi()  # 新年祭祀
+    if activity['happy_guoqing'] == 1:
+        action.leigu()  # 欢度国庆
+    if activity['chicken'] == 1:
+        action.chicken()  # 吃鸡
+    if activity['holiday'] == 1:
+        action.holiday()  # 假日礼包
+    if activity['sacredtree'] == 1:
+        action.shenshu()  # 神树
+    if activity['lantern'] == 1:
+        action.yuanxiao()  # 元宵
+    if activity['actjubao'] == 1:
+        action.actjubao()  # 聚宝
+    if activity['years_guard'] == 1:
+        action.years_guard()  # 周年守护
+    if activity['fukubukuro'] == 1:
+        action.fukubukuro()  # 福矿
+    if activity['gold_time'] == 1:
+        action.gold_time()  # 黄金时间
+    if activity['lucky_dice'] == 1:
+        action.lucky_dice()  # 摇骰子
+    if activity['break_egg'] == 1:
+        action.break_egg()  # 砸蛋
+    if activity['shopping_feast'] == 1:
+        action.shopping_feast()  # 双十一签到
+    if activity['double_denier'] == 1:
+        action.double_denier()  # 双旦
+    if activity['login_reward'] == 1:#登录签到礼
+        action.loginreward()
+    if activity['newyear_act'] == 1:#新年活动
+        action.newyear_act()
+    if activity['parade'] == 1:#沙场点兵
+        action.act_parade()
     if activity['seven_year'] == 1:#沙场点兵
         #action.seven_year()
         action.cake_index()
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))
-    cont = ['haiyun.txt']
-    # cont = ['149cnm.txt', '149dgj.txt', '149gx1.txt', '148gx.txt','149xx.txt',
-    #         '149xb.txt', '149lwzs.txt']
+    #
+
+
+
+    cont = ['user.txt']
+    cont = ['149cnm.txt', '149dgj.txt', '149gx1.txt', '148gx.txt','149xx.txt',
+            '149xb.txt', '149lwzs.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
@@ -1269,7 +1303,7 @@ if __name__ == '__main__':
                     q.put(t1)
     while not q.empty():
         thread = []
-        for i in xrange(7):
+        for i in xrange(50):
             try:
                 thread.append(q.get_nowait())
             except Exception as e:

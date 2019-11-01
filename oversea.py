@@ -235,7 +235,7 @@ if __name__ == '__main__':
     #_redis.flushall()
     #哪个区设置哪个key，用来匹配贸易次数，
     oversea = 'oversea:149'
-    _redis.set(oversea,2, ex=18000)
+    _redis.set(oversea,1, ex=18000)
     # if _redis.exists(oversea):
     #     _redis.set('oversea:30', 5,ex=18000)
     # else:
@@ -247,8 +247,8 @@ if __name__ == '__main__':
         # main('dc.txt', True,20)
         # main('dc.txt', True,20)
         # main('149cnm.txt', True,oversea,5)
-        # main('didui.txt',True, oversea,50)
+        main('didui.txt',True, oversea,50)
         # main('gmhy1.txt', True,oversea, 5)
-        main('gmhy.txt', True,oversea, 5)
+        # main('gmhy.txt', True,oversea, 5)
         # main('21user.txt', True, 50,)
         time.sleep(random.randint(10, 19))

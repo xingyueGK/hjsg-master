@@ -59,8 +59,8 @@ for t in cont:
                 # addr = 147
                 job_id = name + addr
                 # 添加任务，循环调用act 函数，以便动态添加定时任务
-                t1 = threading.Thread(target=act,args =(name,passwd,addr,schdeuler,job_id,r))
-                t1.start()
+                target=act(name,passwd,addr,schdeuler,job_id,r)
+
 
 schdeuler.start()
 while True:
