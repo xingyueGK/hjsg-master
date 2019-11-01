@@ -37,7 +37,7 @@ class country_taxes_shop(SaoDangFb):
                             print 'sold out'
                             continue
                         elif int(item['is_take']) == 1:
-                            self.action(c='country_taxes_shop',m='buy',id=item['id'])
+                            self.action(c='country_taxes_shop',m='buy',id=item['id'],buy_number=1)
                         elif int(item['is_take']) == 2:
                             self.log.info('your purchased ')
                     else:
@@ -46,8 +46,7 @@ class country_taxes_shop(SaoDangFb):
                             self.log.info(self.user + 'sold out')
                             continue
                         elif int(item['is_take']) == 1:
-                            for i in range(int(item['num'])):
-                                self.action(c='country_taxes_shop',m='buy',id=item['id'])
+                            self.action(c='country_taxes_shop',m='buy',id=item['id'],buy_number=int(item['num']))
             else:
                 self.log.debug('国家等级达到{}级开启'.format(item['openlevel']))
 
