@@ -50,7 +50,7 @@ class task(SaoDangFb):
         #城市人数 5 8 15 20 30
         OCCUPY = 'newyear:occupy' + str(self.num)
         #citylist = [1,6,11,3,7,4,5,8,9]
-        citylist = [1,6,11]
+        citylist = [3,7]
         for id in citylist:
             print '遍历城市',id
             result = self.action(c='newyear_act', m='city', id=id)
@@ -60,18 +60,15 @@ class task(SaoDangFb):
                 print '准备占领城市',id
                 lock.acquire()
                 status = self.action(c='newyear_act', m='occupy_city', id=id)
+                lock.release()
                 if status['status'] ==1:
                     print '占领成功'
                     _redis.hincrby(OCCUPY, self.user, -1)
-                    lock.release()
                     return  None
                 else:
                     print '占领失败，重新占领'
-                    lock.release()
                     #self.rob()
                     #self.occupy_city(flag='reset')
-        #如果全部占矿失败择打劫
-        self.rob()
     def harvest(self,id):#开始收矿
         result = self.action(c='newyear_act', m='city', id=id)
         if result['remain_time'] < 120:
@@ -84,59 +81,54 @@ class task(SaoDangFb):
     def rob(self):
         if  self.user.startswith('gmhy'):
             exit(5)
-        citylist = [ 1,6, 11]
+        citylist = [1,3, 6, 11]
         ROB = 'newyear:rob' + str(self.num)
         for id in citylist:
             print '打劫遍历城市',id
             result = self.action(c='newyear_act', m='occupy_list', id=id)
             for item in result['list']:
-                if item['country'] in  ["杰克吃翔",'杰克喝sui','杰克喝尿','year','共产党',"是你学姐"] and item['reward']['num2'] >= 10:
+                if item['country'] in  ["杰克吃翔",'杰克喝sui','杰克喝尿','year','共产党',"是你学姐","haiyun1","haiyun2","haiyun3"] and int(item['reward']['num2']) >= 14:
                     uid = item['id']
                     cid = id
                     status = self.action(c='newyear_act',m='rob',id=uid,cid=cid)
+                    _redis.hincrby(ROB, self.user, -1)
                     if status['status'] == 1:
-                        _redis.hincrby(ROB, self.user, -1)
                         print '打劫成功'
                         return None
                     else:
                         continue
-    def buy_rob(self):
-        for i in range(8):
-            self.action(c='newyear_act',m='buy_rob')
-
     def run(self):
         try:
-            self.buy_rob()
             occupy,rob = self.index()
-            if  rob> "0":#剩余占领次数不为0，继续占领
+            if occupy > "0":#剩余占领次数不为0，继续占领
                 self.action(c='newyear_act', m='index')
                 city_index = self.action(c='newyear_act', m='city_index')
-                for item in city_index['city']:
-                    #遍历完成后没有为1项，表示没有占领任何矿,查看是否占矿
-                    if item['is_on'] == 1:
-                        id = item['id']
-                        if not self.user.startswith('gmhy'):
-                            self.harvest(id)
-                self.rob()
-            elif occupy > '0':
-                self.action(c='newyear_act', m='index')
-                city_index = self.action(c='newyear_act', m='city_index')
-                for item in city_index['city']:
-                    if item['is_on'] == 1:
-                        # 遍历完成后没有为1项，表示没有占领任何矿,查看是否占矿
-                        id = item['id']
-                        if not self.user.startswith('gmhy'):
-                            self.harvest(id)
+#                for item in city_index['city']:
+#                    #遍历完成后没有为1项，表示没有占领任何矿,查看是否占矿
+#                    if item['is_on'] == 1:
+#                        id = item['id']
+#                        if not self.user.startswith('gmhy'):
+#                            self.harvest(id)
                 self.occupy_city()
-            else:
-                print '没有次数，查看是否占矿未收'
-                self.action(c='newyear_act', m='index')
-                city_index = self.action(c='newyear_act', m='city_index')
-                for item in city_index['city']:
-                    if item['is_on'] == 1:
-                        id = item['id']
-                        if not self.user.startswith('gmhy'):
-                            self.harvest(id)
+#            elif rob > '0':
+#                self.action(c='newyear_act', m='index')
+#                city_index = self.action(c='newyear_act', m='city_index')
+#                for item in city_index['city']:
+#                    if item['is_on'] == 1:
+#                        # 遍历完成后没有为1项，表示没有占领任何矿,查看是否占矿
+#                        id = item['id']
+#                        if not self.user.startswith('gmhy'):
+#                            self.harvest(id)
+#                self.rob()
+#            else:
+#                print '没有次数，查看是否占矿未收'
+#                self.action(c='newyear_act', m='index')
+#                city_index = self.action(c='newyear_act', m='city_index')
+#                for item in city_index['city']:
+#                    if item['is_on'] == 1:
+#                        id = item['id']
+#                        if not self.user.startswith('gmhy'):
+#                            self.harvest(id)
         except KeyError as e:
             print e
 if __name__ == '__main__':
@@ -144,8 +136,8 @@ if __name__ == '__main__':
         action = task(user,apass,addr)
         action.run()
     filepath = os.path.dirname(os.path.abspath(__file__))
-    #cont = ['21user.txt', 'autouser.txt', 'user.txt', 'alluser.txt','gmhy.txt']
-    cont = ['haiyun.txt']
+    cont = [ 'haiyun.txt','haiyun.txt']
+   # cont = ['user.txt','21user.txt','gmhy.txt']
     for t in cont:
         with open('%s/users/%s'%(filepath,t),'r') as f:
             for i in f:
@@ -153,7 +145,7 @@ if __name__ == '__main__':
                     name = i.split()[0]
                     passwd = i.split()[1]
                     addr = i.split()[2]
-                    #addr = 147
+                   # addr = 147
                     t1 = threading.Thread(target=act, args=(name,passwd,addr))
                     t1.start()
                     time.sleep(0.2)

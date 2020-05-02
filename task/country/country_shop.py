@@ -26,8 +26,10 @@ class country_taxes_shop(SaoDangFb):
         index = self.index()
         taxes = index['member_info']['info']['taxes']
         shop_list = index['shop_list']['list']
+        #购买蓝宝石
+        self.action(c='country_taxes_shop', m='buy', id=32, buy_number=5)
         for item in shop_list:
-            if item['is_open'] == 1:
+            if item['is_open'] == 1 and int(item['openlevel']) != 250:
                 if item['id'] ==1:
                     continue
                 else:

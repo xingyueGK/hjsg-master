@@ -154,9 +154,9 @@ class treasure(SaoDangFb):
             print self.user,result
 def task(user, apass, addr):
     action = treasure(user, apass, addr)
-    #action.choice_snow()
-    #action.pick_list()
-    action.boss_index()
+    action.choice_snow()
+    action.pick_list()
+    # action.boss_index()
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))

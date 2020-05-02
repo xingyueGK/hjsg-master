@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -8-
+# -*- coding:utf-8 -*-
 import threading
 import time
 import json
@@ -18,14 +18,14 @@ def p(message):
 
 def userinfo(username, password, addr):
     s1.acquire()
-    act = shujufenx.fuben(username, password, addr)
-    info = act.action(c='blackmarket', m='index')  # 获取黑市首页
-    memberInfo = act.action(c='member', m='index')
-    sign_index = act.action(c='sign', m='sign_index')
+    action = shujufenx.fuben(username, password, addr)
+    info = action.action(c='blackmarket', m='index')  # 获取黑市首页
+    memberInfo = action.action(c='member', m='index')
+    sign_index = action.action(c='sign', m='sign_index')
     sign_times = sign_index['sign_times']
     # sale_shop_reward = act.action(c='sign', m='sale_shop')['reward']
     # p(act.action(c='country', m='get_member_list'))
-    country = act.action(c='country', m='get_member_list')['country']
+    country = action.action(c='country', m='get_member_list')['country']
     if country:
         countryName = country['name']
     else:
@@ -38,7 +38,7 @@ def userinfo(username, password, addr):
     vip = memberInfo['vip']
     reputation = memberInfo['reputation']  # 声望
     print '\n账号 %s 名字 %s 等级 %s vip %s 国家 %s 大区 %s 军令 %s 银币 %s 元宝 %s 黄宝石 %s 紫宝石 %s 声望 %s 签到 %s' % (
-        username, name, level, vip, countryName, addr, act, silver, gold, info['info']['get2'], info['info']['get3'],
+        username, name, level, vip, countryName, action.num, act, silver, gold, info['info']['get2'], info['info']['get3'],
         reputation, sign_times)
     userlist = [username, name, level, vip, countryName, act, silver, gold, info['info']['get2'], info['info']['get3'],
                 reputation, sign_times]
@@ -275,7 +275,7 @@ class activity(fuben):
     def usebuff(self):
         self.action(c='country_taxes_shop', m='index')
         buy = self.action(c='country_taxes_shop', m='buy', id=1)
-        p(self.action(c='war_college', m='use_buff', need_general=1))
+        p(self.action(c='war_college', m='use_buff', need_general=4))
 
     def act_sword(self):  # 铸剑
         self.action(c='act_sword', m='start')
@@ -412,11 +412,36 @@ class activity(fuben):
 
     def yuanxiao(self):
         try:
-            index = self.action(c='act_lantern', m='index', v=2018021101)
-            if index['freetimes'] > 0:
-                self.action(c='act_lantern', m='buy', lid=1, mid=1, v=2018021101)
-                self.action(c='act_lantern', m='buy', lid=1, mid=2, v=2018021101)
-                self.action(c='act_lantern', m='buy', lid=1, mid=3, v=2018021101)
+            index = self.action(c='act_lantern', m='index')
+            if index['is_open'] == 1:
+                for item in index['list']:
+                    if item['l_status'] ==2:
+                        continue
+                    else:
+                        print 'jin'
+                        for i in range(1,4):
+                            lid = item['lid']
+                            mid = i
+                            formdata={
+                                'mid':mid,
+                                'lid':lid,
+                            }
+                            num = 0
+                            while num < 50:
+                                result = self.action(c='act_lantern',m='buy',body=formdata)
+                                self.p(result)
+                                if result['status'] ==1:
+                                    num = int(result['num%s'%i])
+                                elif result['status'] == -3:
+                                    break
+                                else:
+                                    time.sleep(0.5)
+                            self.action(c='act_lantern',m='eat',lid=lid)
+
+            # if index['freetimes'] > 0:
+            #     self.action(c='act_lantern', m='buy', lid=1, mid=1)
+            #     self.action(c='act_lantern', m='buy', lid=1, mid=2)
+            #     self.action(c='act_lantern', m='buy', lid=1, mid=3)
         except:
             pass
 
@@ -436,15 +461,8 @@ class activity(fuben):
 
     def jioncountry(self, name):  # 加入国家
         self.action(c='member', m='index')
-        # self.action(c='country', m='get_rank')
-        # search= self.action(c='country', m='search', name=name)
-        # p(search)
-        # if search['status'] == 1:
-        #     id = search['country']['id']
-        #     print id
-        #     p(self.action(c='country', m='apply', id=id))
-        # else:
-        #     print '国家不存在'
+        self.action(c='country', m='get_rank')
+
         # info = self.action(c='country', m='search', name=name)
         # print info
         # if info['status'] == 1:
@@ -1341,10 +1359,10 @@ class activity(fuben):
                 status = self.action(c='island', m='pk', id=id_)  # 共计金银洞
                 self.p(status)
         id_open = self.action(c='island', m='index')['list'][4]['openstatus']
-        if count <=50 and id_open == 1:
-            for i in range(1):
+        if count <=500 and id_open == 1:
+            for i in range(400):
                 print i
-                status = self.action(c='island', m='pk', id=id)  # 共计通过之后的最高金银洞5次
+                status = self. action(c='island', m='pk', id=id)  # 共计通过之后的最高金银洞5次
                 if status['status']!=1:
                     return
         else:
@@ -1352,7 +1370,7 @@ class activity(fuben):
     def shuaisland(self):
         index = self.action(c='island', m='index')
         id = index['list'][0]['id']
-        for item in range(1000):  # 每日共计5次
+        for item in range(200):  # 每日共计5次
             print item
             self.action(c='island', m='pk', id=id)  # 共计金银洞
 
@@ -1401,7 +1419,7 @@ class activity(fuben):
         #     self.give_cards(5)
     def friend(self):
         formdata = {
-            'f':14900008572777
+            'f':260000149847
         }
         self.action(c='friend',m='add_friend',body=formdata)
     def give_cards(self,card):
@@ -1411,7 +1429,18 @@ class activity(fuben):
         }
         status = self.action(c='seven_year',m='give_cards',body=formdata)
         self.p(status)
-
+    def seven_year(self):
+        #每日签到
+        self.action(c='seven_year',m='sign_index')
+        self.action(c='seven_year',m='sign')
+    def cake_index(self):
+        #瓜分元宝
+        index = self.action(c='seven_year',m='cake_index')
+        result = self.action(c='seven_year',m='join_cake')
+        if result['status'] == -3:
+            self.p(result)
+            time.sleep(10)
+            self.cake_index()
 # 周年比购物start_advanced
 
 # def wx():#五行竞猜刷数据
@@ -1476,7 +1505,7 @@ if __name__ == '__main__':
         # action.holiday()
         # action.chicken()
         # action.years_guard()
-        action.mult_()
+        action.yuanxiao()
 
 
     def zhujian(user, apass, addr):
@@ -1526,7 +1555,7 @@ if __name__ == '__main__':
         print '%s 获取锁' % user
         action = activity(user, apass, addr)
         action.rob(
-            ['体检了', '8523', '英雄', '是你学姐', '杰克傻bi', '杰克喝sui', '杰克喝尿', '杰克吃翔', 'haiyun1', 'haiyun2', 'haiyun3', '打船专用',
+            ['体检了', '8523', '英雄', '是你学姐', '杰克傻bi', '杰克喝sui', '杰克喝尿', '杰克吃翔', 'haiyun1', 'haiyun2', 'haiyun3','haiyun4', '打船专用',
              '我乐个趣',
              '喔喔喔噢',
              '溜溜溜',
@@ -1543,7 +1572,6 @@ if __name__ == '__main__':
              '炎黄天都',
              '明',
              '若溪若溪',
-             '爽爽就好'
              ], user)
         # time.sleep(0.3)
         print('%s 释放锁') % user
@@ -1732,6 +1760,8 @@ if __name__ == '__main__':
     def kapian(user, apass, addr):  # 周年卡片
         s1.acquire()
         action = activity(user, apass, addr)
+        # action.seven_year()
+        # action.cake_index()
         action.collect_cards()
         s1.release()
     def zhengzhangchoujiang(user, apass, addr):  # 征战八方抽奖
@@ -1739,7 +1769,7 @@ if __name__ == '__main__':
         action = activity(user, apass, addr)
         action.act_fight_lottery()
         s1.release()
-    def shijiejiangli(user, apass, addr):  # 征战八方抽奖
+    def shijiejiangli(user, apass, addr):  # 世界奖励领奖
         s1.acquire()
         action = activity(user, apass, addr)
         action.message()
@@ -1754,20 +1784,23 @@ if __name__ == '__main__':
 
 
     def chuan():
-        with open('../users/user.txt', 'r') as f:
+        with open('../users/xing.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
                     name = i.split()[0]
-                    # name = i.split()[0]
+                    # name = i.split()[0]zr
                     passwd = i.split()[1]
-                    addr = i.split()[2]
+                    try:
+                        addr = i.split()[2]
+                    except:
+                        addr = None
                     try:
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
-                    #addr = 21
-                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
+                    #addr = 147
+                    t1 = threading.Thread(target=task, args=(name, passwd, addr))
                     t1.start()
                     # q.put(t1)
 
@@ -1782,7 +1815,7 @@ if __name__ == '__main__':
                         passwd = i.split()[1]
                         addr = i.split()[2]
                         # addr = 149
-                        t1 = threading.Thread(target=userinfo, args=(user, passwd, addr))
+                        t1 = threading.Thread(target=kapian, args=(user, passwd, addr))
                         # t1.start()
                         q.put(t1)
 

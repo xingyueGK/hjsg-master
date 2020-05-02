@@ -53,7 +53,7 @@ class fuben(SaoDangFb):
         while status == 1 and freetimes != '0':#队伍将进行突飞
             if int(isturn) == 1 and int(wjlevel) <= 60:
                 print '武将转生'
-                print self.action(c='practice',m='turn',gid=gid)
+                print self.action(c='practice',m='onekey_turn',gid=gid)
             self.action(c='practice', m='mop', times = 100,gid=gid)
             self.action(c='practice', m='mop', times=50, gid=gid)
             self.action(c='practice', m='mop', times=10, gid=gid)
@@ -103,15 +103,7 @@ class fuben(SaoDangFb):
         self.action(c='general',m='index')
         self.action(c='strengthen',m='index')
         id_info = self.action(c='strengthen',m='strengthen_info',id=id)
-        newlevel = id_info['info']['level']#获取当前装备的强化等级
-        print '当前等级',newlevel
-        try:
-            while int(newlevel) < levelinfo :
-                strenthinfo = self.action(c='strengthen', m='strengthen_start', id=id, ratetype=0)
-                newlevel = strenthinfo['newlevel']
-               # print 'aaaaa',newlevel
-        except KeyError as e:
-            print '已经强化到最高级',e
+        self.action(c='strengthen', m='onekey_strenthen', id=id, ratetype=0)
     def eqip(self,gid,eid,etype):#给武将穿戴装备
         self.action(c='general',m='equip',gid=gid,eid=eid,etype=etype)
     def mapscene(self):#领取通关奖励
@@ -239,7 +231,7 @@ def act(username,passwd,addr):
         action.saodang1()
     # action.saodang1()
 def chuan():
-    with open('../users/jlgx1.txt', 'r') as f:
+    with open('../users/dd.txt', 'r') as f:
         # with open('../users/duguyi.txt', 'r') as f:
         for i in f:
             if i.strip():

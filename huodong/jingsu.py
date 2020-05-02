@@ -195,12 +195,12 @@ def wjleveup(username, passwd,addr):
 def peiyang(username,passwd,addr):
     action = activity(username, passwd,addr)
     action.peiyang('张昭')
-with open('../users/sunzi.txt', 'r') as f:
+with open('../users/xing.txt', 'r') as f:
     for i in f:
         if i.strip():
             str = i.strip().split()[0]
             name = str
-            addr = 150
+            addr = 144
             passwd = i.split()[1]
             t1 = threading.Thread(target=act,args=(name,passwd,addr))
             t1.start()

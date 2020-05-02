@@ -28,30 +28,26 @@ class autoCountryBanquet(object):
             return  'country:banquet:149'
         else:
             return 'country:banquet:30'
-    def join_team(self,r,id=None):#每日任务国宴
+    def join_team(self,id=None):#每日任务国宴
         info = self.index
-        bqk = self.get_banquet_key()
-        if r.exists(bqk):
-            print 'jion_team %s'%bqk
-            id = r.get(bqk)
-            if not self.is_team:
-                print 'start join banquet'
-                formdata = {
-                    "id":id
-                }
-                index = self.action(c='banquet', m='join_team', body=formdata)  # 首页
-                if index['status'] != 1:
-                    print 'join False'
-                    return False
-                print 'jion item %s'%id
-
-                return index
-            else:
-                self.p(self.is_team,self.user)
-                print '%s alredy jion team'%self.user
+        print 'jion_team '
+        if not self.is_team:
+            print 'start join banquet'
+            max_priced_item = max(info['list'], key=lambda x: x['now_number'])
+            formdata = {
+                "id":max_priced_item['caption']
+            }
+            index = self.action(c='banquet', m='join_team', body=formdata)  # 首页
+            if index['status'] != 1:
+                print 'join False'
                 return False
+            print 'jion item %s'%id
+
+            return index
         else:
-            print '%s not banquet'%bqk
+            self.p(self.is_team,self.user)
+            print '%s alredy jion team'%self.user
+            return False
     def dismiss_team(self):
         formdata = {
             "id":1
@@ -64,17 +60,10 @@ class autoCountryBanquet(object):
         :param id:
         :return: Ture 创建成功， False 创建失败
         """
-        bqk = self.get_banquet_key()
-        if r.exists(bqk):
-            #如果已经有创建的key 了则不再创建
-            print self.user,'allexit key'
-            return True
+
         item = self.is_team
         if item:
-            caption = item['team']['caption']
-            if r.setnx(bqk, caption):
-                print 'create_team %s' % (caption)
-                return caption
+            return  True
         formdata = {
             "id":id
         }
@@ -82,14 +71,7 @@ class autoCountryBanquet(object):
         print status
         if status['status'] ==1 :
             print 'create_team '
-            caption= status['team']['caption']
-            if r.setnx(bqk,caption):
-                print 'create_team %s'%(status['team']['caption'])
-                return status['team']['caption']
-            else:
-                #可能有其他创建好了队伍了，则取消自己创建的
-                self.dismiss_team()
-                return False
+            return True
         else:
             return False
     def start(self,r):

@@ -34,7 +34,7 @@ class TokenErr(Exception):
 class SaoDangFb(object):
     def  __init__(self,user,passwd,num):
         #随机请求参数
-        self.num = num
+        self.num = self.get_addr(num,user,passwd)
         self.user = user
         self.passwd = passwd
         self.rand = int(time.time()*1000)
@@ -42,6 +42,20 @@ class SaoDangFb(object):
         self.token = self.get_token(self.num, self.user, self.passwd)
         #POST基础URL地址
         self.url = 'http://s{0}.game.hanjiangsanguo.com/index.php?{1}&v=0&channel=150&lang=zh-cn&token={2}&token_uid={3}&rand={4}'.format(self.num,'{data}',self.token,self.token_uid,self.rand)
+    @staticmethod
+    def get_addr(num,u,p):
+        url = 'http://uc.game.hanjiangsanguo.com/index.php?&c=user&m=login&&token=&channel=150&lang=zh-cn&rand=157355135868932'
+        if num:
+           return num
+        else:
+            result = requests.post(url,data={"u":u,"p":p}).json()
+            if result['status'] !=1:
+                print(result['message'])
+                exit(result['status'])
+            else:
+                for item in result['serverlist']:
+                    if item['selected'] ==1:
+                        return int(item['id'])
     @staticmethod
     def get_token(num, user, passwd):
         url = 'http://s{num}.game.hanjiangsanguo.com/index.php?c=login&&m=user&u={user}&p={passwd}&v=2018083101&token=&channel=11&lang=zh-cn&rand=150959405499450'.format(
@@ -68,10 +82,10 @@ class SaoDangFb(object):
                         _redis.hset(num,user,token)
                         return token
                     else:
-                        print user,'账号密码不对'
+                        print(user,'账号密码不对')
                         exit(2)
                 except Exception as e:
-                    print e
+                    print(e)
 
     def post_url(self,body,data):
         self.data = ''
@@ -93,7 +107,7 @@ class SaoDangFb(object):
                 else:
                     return r.json( encoding="UTF-8")
             except Exception as e:
-                print e
+                print(e)
                 time.sleep(0.3)
     def action(self,body=0,**kwargs):
         """动作参数m={'index':'获取基础账号密码等信息',‘get_monster_list’：“获取副本怪物列表信息”}
@@ -101,7 +115,7 @@ class SaoDangFb(object):
         action_data = kwargs
         serverinfo = self.post_url(body,action_data)
         if serverinfo == 403:
-            print self.user,'账号异常'
+            print(self.user,u'账号异常')
             return 403
         return serverinfo
     def level(self):
@@ -112,13 +126,20 @@ class SaoDangFb(object):
         self.action(c='member', m='resource_unlock', token_uid=210000353508, pwd=pwd)
     @classmethod
     def p(cls,message,c='cls'):
-        print '方法：%s, json: %s'%(c ,json.dumps(message, ensure_ascii=False))
+        msg = '方法：%s, json: %s'%(c ,json.dumps(message, ensure_ascii=False))
+        print(msg)
+        return msg
     def get_act(self):#角色信息
         act_info = self.action(c='member', m='index')
         return act_info
     def getWeek(self):
         week = time.strftime("%w", time.localtime())
         return week
+
+    def get__function_name(self):
+        import inspect
+        '''获取正在运行函数(或方法)名称'''
+        return inspect.stack()[1][3]
     def general_book(self):
         try:
             index = self.action(c='general_book', m='index',perpage=18)

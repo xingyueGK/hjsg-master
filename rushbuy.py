@@ -21,9 +21,6 @@ lock = threading.RLock()
 
 class task(SaoDangFb):
 
-    def unlock(self, pwd):  # 解锁密码
-        print json.dumps(self.action(c='member', m='resource_unlock',pwd=pwd)),self.user
-
     def springmap(self):
         SpringMap = {}
         self.index = self.action(c='springshop',m='index')
@@ -121,12 +118,9 @@ def run(name, passwd, addr,lockpwd,general):
     action.unlock(lockpwd)
     count =0
     while True:
-        count +=1
-        print count
-        threading.Thread(target=action.generalpool).start()
-        #for id in general:
-        #    threading.Thread(target=action.springshop, args=(id,)).start()
-        #time.sleep(0.3)
+        for id in general:
+           threading.Thread(target=action.springshop, args=(id,)).start()
+        time.sleep(0.3)
     # time_limit, rid1, rid2 = action.SecKillInfo()
     # while True:
     #     threading.Thread(target=action.shoppingFeastSecKill, args=(time_limit, rid1, rid2)).start()

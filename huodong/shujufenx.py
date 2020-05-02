@@ -125,29 +125,7 @@ class fuben(SaoDangFb):
         print self.action(c='country', m='search', name='%E6%98%AF%E4%BD%A0%E5%AD%A6%E5%A7%90')
         print self.action(c='country', m='apply', id=250000000286, page=1)
 
-    def overseastrade(self):  # 海外贸易
-        self.action(c='message', m='index')
-        self.action(c='overseastrade', m='index')
-        # 购买粮食，花费银币的，id=1为粮食，id2-5为花费元宝的玛瑙等
-        self.action(c='overseastrade', m='buy_item', id=1)
-        # 组队 ，检查是否有对， 有则加入，没有则创建 ，开始贸易
-        # 1获取组队列表
-        list_country = self.action(c='overseastrade', m='get_list_by_country', p=1)['list']
-        if list_country:  # 如果列表不为空，说明有组
-            # 自动加组贸易
-            for k, v in list_country.items():  # 判断第一个角色有值没有，有责加入第二个，没有则加入第一个#需要time_id
-                if v['member1'] != '0':  # 如果不为0 则说明角色有人，加入另一个，
-                    print '加入2'
-                    self.id = v['id']
-                    print self.action(c="overseastrade", m='join_team', id=self.id, place=int(k), site=2, page=1)
-                else:
-                    print '加入1'
-                    self.id = v['id']
-                    print self.action(c="overseastrade", m='join_team', id=self.id, place=int(k), site=1, page=1)
-                    # print list_country[k]['member1']
-        else:
-            # 加入贸易队伍，每页有四个框，为place：1-4，每个框有两个位置site:1-2，页数为page:1-10默认为1即可，
-            print self.action(c="overseastrade", m='join_team', id=0, place=4, site=2, page=1)
+
 
     def general(self, tpye=1):  # 获取武将id和装备id,并返回输入获取的等级
         # 装备信息栏
@@ -217,7 +195,7 @@ class fuben(SaoDangFb):
             if item['type'] == 1:
                 self.action(c='levelgift', m='get_reward', level=item['level'])  # 获取30级奖励
 
-    def saodang(self, num=18):  # 攻击小兵
+    def  saodang(self, num=18):  # 攻击小兵
         memberindex = self.action(c='member', m='index')
         missionlevel = int(memberindex['missionlevel'])
         missionsite = int(memberindex['missionsite'])
@@ -355,7 +333,7 @@ if __name__ == '__main__':
         action.saodang(25)
 
 
-    with open('../users/user.txt', 'r') as f:
+    with open('../users/xing.txt', 'r') as f:
         for i in f:
             if i.strip() and not i.startswith('#'):
                 str = i.strip().split()[0]

@@ -40,8 +40,11 @@ class glory_front(object):
         index = self.index()
         if index['status'] != 1:
             #释放锁
-            t.release()
-            exit(1)
+            try:
+                t.release()
+                exit(1)
+            except:
+                print self.user
         t = self.get_attribute()
         pk_times = int(index['pk_times'])
         group = ''
@@ -56,6 +59,8 @@ class glory_front(object):
             print '加入战线 西部'
             group = 1
         pvp = self.pvp_index(group)
+        if pvp['status'] !=1:
+            return  False
         all_page = pvp['all_page']
         page = int(pvp['page'])
         return group,all_page,page,pk_times

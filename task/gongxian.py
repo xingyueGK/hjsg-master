@@ -144,7 +144,7 @@ def xk(username,passwd,addr):
    # activ.caikuang()
     #activ.actjubao()
    # activ.leigu()
-  #  activ.generalpool()  #
+   # activ.generalpool()  #
     #activ.cuju()
 #    activ.shenshu()
     #activ.fuka()

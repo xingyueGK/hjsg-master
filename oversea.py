@@ -57,6 +57,7 @@ def jierihaiyun(name, passwd, addr, flag=True):  # 节日海外贸易
     task = SaoDangFb(name, passwd, addr)
     task.action(c='message', m='index')
     index = task.action(c='holiday_seatrade', m='index')
+
     if index['btn_status'] == 1 :#
         #已经购买，还没有来级的开始就退出了
         try:
@@ -87,10 +88,9 @@ def jierihaiyun(name, passwd, addr, flag=True):  # 节日海外贸易
         except:
             print '获取组队列表错误%s'%name
     ite = task.action(c='holiday_seatrade', m='item_list')
-
+    buys = int(ite['renew'])#花费元宝数量
     try:
         renew = ite['member_info']['renew']
-
     except:
         try :
             exit_flag = False
@@ -115,7 +115,7 @@ def jierihaiyun(name, passwd, addr, flag=True):  # 节日海外贸易
         except:
             print name
     # 购买粮食，花费银币的，id=1为粮食，id2-5为花费元宝的玛瑙等 ,元宝超过150就退出
-    if int(index['info']['times']) > 0 and int(renew) <= 3:
+    if (int(index['info']['times']) > 0 and int(renew) <= 3 and buys < 170):
         while True:
             try:
                 if flag:
@@ -190,7 +190,7 @@ def makeTask(name, passwd, addr):
     t1.start()
 
 
-def main(file, flag,overkey,FlushCount=5,addr=None,):
+def main(file, flag,overkey,FlushCount=5,ad=False,):
     """
     :param FlushCount: 每次同时刷船次数,默认1个
     """
@@ -200,12 +200,12 @@ def main(file, flag,overkey,FlushCount=5,addr=None,):
             if i.strip():
                 user = i.split()[0]
                 passwd = i.split()[1]
-                # if addr:
-                #     addr = addr
-                # else:
-                #     addr = i.split()[2]
-                addr = i.split()[2]
-                # addr = 148
+                if ad:
+                    addr = ad
+                else:
+                    addr = i.split()[2]
+                #addr = i.split()[2]
+                #addr = 147
                 key = 'holiday_seatrade' + str(addr)
                 if _redis.hget(key, user):
                     userTimes = _redis.hget(key, user)
@@ -235,20 +235,20 @@ if __name__ == '__main__':
     #_redis.flushall()
     #哪个区设置哪个key，用来匹配贸易次数，
     oversea = 'oversea:149'
-    _redis.set(oversea,1, ex=18000)
+    #_redis.set(缓存ken,第几次打船,过期时间)
+    _redis.set(oversea,5, ex=18000)
     # if _redis.exists(oversea):
     #     _redis.set('oversea:30', 5,ex=18000)
     # else:
     #      _redis.decr('oversea:30',1)
-    for i in range(30):
+    for i in range(40):
         # if i % 30 == 0:
-        #     _redis.flushall()
-        # main('haiyun.txt', True,oversea,5)
-        # main('dc.txt', True,20)
-        # main('dc.txt', True,20)
-        # main('149cnm.txt', True,oversea,5)
-        main('didui.txt',True, oversea,50)
-        # main('gmhy1.txt', True,oversea, 5)
-        # main('gmhy.txt', True,oversea, 5)
+       # _redis.flushdb()
+       #  main('haiyun.txt', True,oversea,5)
+       #  main('dc.txt', True,oversea,5)
+       #  main('149cnm.txt', True,oversea,5)
+       #  main('didui.txt',True, oversea,4,147)
+       #  main('gmhy1.txt', True,oversea, 5)
+        main('gmhy.txt', True,oversea, 5)
         # main('21user.txt', True, 50,)
         time.sleep(random.randint(10, 19))

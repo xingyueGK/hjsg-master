@@ -105,8 +105,11 @@ def run(user, apass, addr,lockpwd):
     if task1 < 1000:
         black = blackmarket(user, apass, addr)
         blackmarkets = (1000 - int(task1))//10+1
-        print 'aaaaaa',blackmarkets
-        black.buy(user,blackmarkets)
+        for i in range(blackmarkets):
+            print '刷新次数', i
+            black.buy(user, refresh=blackmarkets)
+            black.refresh()
+
     action.draw()
 if __name__ == '__main__':
 

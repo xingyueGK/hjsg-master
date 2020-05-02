@@ -161,3 +161,12 @@ class GoBoat(object):
                 'id': i
             }
             self.action(c='go_boating',m='meter_reward',body=formdata)
+
+    def bug_meter_reward(self):
+        for i in range(1,36):
+            formdata = {
+                'id': '10-%d'%i
+            }
+            result = self.action(c='go_boating',m='meter_reward',body=formdata)
+            self.p(result)
+            time.sleep(0.5)

@@ -17,8 +17,12 @@ lock = threading.RLock()
 
 class task(SaoDangFb):
     def lanternIndex(self):
-        self.action(c='lanter_festiva', m='index')
-
+        stats = self.action(c='guess_lantern', m='index')
+        if stats['status']== 1:
+            print '开始答题'
+        else:
+            self.p(stats)
+            exit(2)
     def lantern_festival(self):
         try:
             answer = {
@@ -102,9 +106,49 @@ class task(SaoDangFb):
                 "72": "a",
                 "79": "c",
                 "80": "a",
+                "81": "a",
+                "82": "d",
+                "83": "b",
+                "84": "a",
+                "85": "c",
+                "86": "b",
+                "87": "b",
+                "88": "b",
+                "89": "d",
+                "90": "d",
+                "91": "b",
+                "92": "c",
+                "93": "c",
+                "94": "b",
+                "95": "c",
+                "96": "a",
+                "97": "d",
+                "98": "d",
+                "99": "a",
+                "100": "c",
+                "101": "c",
+                "102": "a",
+                "103": "b",
+                "104": "a",
+                "105": "c",
+                "106": "a",
+                "107": "a",
+                "108": "b",
+                "109": "c",
+                "110": "b",
+                "111": "d",
+                "112": "b",
+                "113": "d",
+                "114": "b",
+                "115": "a",
+                "116": "a",
+                "117": "b",
+                "118": "b",
+                "119": "c",
+                "120": "d",
             }
             resutl = self.action(c='guess_lantern', m='answer_index')
-            self.p(resutl['question'])
+            time.sleep(0.5)
             total_num = int(resutl['total_num'])
             for i in range(total_num):
                 questiont = resutl['question']
@@ -115,20 +159,27 @@ class task(SaoDangFb):
                     }
                 except KeyError as e:
                     print 'id error ,chaoguo xianzhi '
-                    self.p(questiont, 'id')
+                    self.p(questiont, 'iderror')
                     formdata = {
                         'right': 'a'
                     }
                 resutl = self.action(c='guess_lantern', m='check', body=formdata)
-                if resutl['stauts'] == 1:
-                    if resutl['right'] == 0:
-                        pass
-                    else:
-                        self.p(resutl, 'check result')
-                time.sleep(0.5)
+                self.p(resutl,'resieeeeeeee')
+                while True:
+                    if resutl['status'] == 1:
+                        if resutl['right'] == 1:
+                            time.sleep(2)
+                            break
+                        else:
+                            self.p(resutl, 'check result')
+                            print formdata
+                            break
+                    elif resutl['status'] == -10:
+                        time.sleep(5)
+                        resutl = self.action(c='guess_lantern', m='check', body=formdata)
         except KeyError as e:
             self.p(resutl, 'error')
-            pass
+            print 'eeeee',e
 
     def get_reward(self):
         self.action(c='guess_lantern', m='get_reward', id=1)
@@ -137,14 +188,14 @@ class task(SaoDangFb):
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = task(user, apass, addr)
-        # action.lanternIndex()#开始答题
+        action.lanternIndex()#开始答题
         action.lantern_festival()
         action.get_reward()
 
 
     filepath = os.path.dirname(os.path.abspath(__file__))
     # cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']
-    cont = ['alluser.txt']
+    cont = ['user.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:

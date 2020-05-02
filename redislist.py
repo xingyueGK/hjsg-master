@@ -23,17 +23,20 @@ def get_redi_conn(host, port, passwd,db):
 
 
 
-def initvalue(r,keyname):
+def initvalue(r,keyname,value=None):
     """
     #初始值 如果redis “list:uid” 不存在 使用初始值，否则使用redis list key 最后一个值
     :param r: redis 连接实例化对象
     :param keyname: list Key
     :return: initvalue 插入的初始值
     """
-    if r.exists(keyname) :
-        initvalue = int(r.lindex(keyname,-1))
+    if value:
+        initvalue = 1000000000 + value
     else:
-        initvalue = 1000000000
+        if r.exists(keyname) :
+            initvalue = int(r.lindex(keyname,-1))
+        else:
+            initvalue = 1000000000
     return initvalue
 
 
@@ -66,6 +69,7 @@ def main():
     redis_port = 6379
     redis_passwd = ''
     redis_db = 11
+    value = None #初始值,默认从redis 取值
     #分成若干大小批量插入
     splistnum = 5000
     r = get_redi_conn(redis_host,redis_port,redis_passwd,redis_db)

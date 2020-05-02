@@ -211,7 +211,6 @@ class task(SaoDangFb):
     def tower(self,act):  # 将魂星路
         # 领取每日奖励
         print '将魂星路'
-
         try:
             if not act['tower']:
                 print '退出王座'
@@ -221,6 +220,12 @@ class task(SaoDangFb):
             pass
         try:
             # 领取奖励
+            # buylist = [i for i in range(2, 24, 2)]
+            # result = self.action(c='tower',m='get_price')
+            # price = int(result['price'])
+            # if price in buylist:
+            #     for i in  buylist[buylist.index(price):]:
+            #         self.action(c='tower', m='buy')
             self.action(c='tower', m='reward_info')
             self.action(c='tower', m='get_reward', type=3)
             index = self.action(c='tower', m='get_scene_list')
@@ -307,9 +312,9 @@ class task(SaoDangFb):
             #开启魔域
             self.p(index)
             moyupasslist = [1,1,1,1,1]
-            cmdcurrpasslist = [index['list'][str(i)]['pass'] for i in range(1,6)]
+            cmdcurrpasslist = [index['list'][str(i)]['pass'] for i in range(1,16)]
 
-            if moyupasslist == cmdcurrpasslist :#是否开启魔域 1 为开启 0 未开启
+            if moyupasslist == cmdcurrpasslist[5:10] :#是否开启圣域 1 为开启 0 未开启
                 print '魔域开启'
                 select_map = self.action(c='sanctum', m='select_map', l=6)
                 times = select_map['times']
@@ -904,10 +909,16 @@ class task(SaoDangFb):
             if assist_conjure['data']['const']['free_times'] == 1:
                 # 每日免费抽奖
                 self.action(c='assist_conjure', m='conjure', conjure_type=1)
-            # rest = self.action(c='assist_copy',m='index')
-            # if rest['data']['total_remain_times'] == 15 :
-            #     self.action(c='assist_copy',m='sweep',mission_id= 1,times=10)
-            #     self.action(c='assist_copy', m='sweep', mission_id=1, times=5)
+            rest = self.action(c='assist_copy',m='index')
+
+            t = self.get_attribute()
+            if t == 'wuli':
+                mission_id = 8
+            else:
+                mission_id = 4
+            if rest['data']['total_remain_times'] == 15 :
+                self.action(c='assist_copy',m='sweep',mission_id= mission_id,times=10)
+                self.action(c='assist_copy', m='sweep', mission_id=mission_id, times=5)
         except Exception:
             pass
 
@@ -1162,132 +1173,256 @@ class task(SaoDangFb):
             self.cake_index()
     def undercity(self):
         #地下城
-        index = self.action(c='undercity',m='index')
-        diff = index['diff_max']
-        for i in index['plate_mission']:
-            if i['status'] == 0:
-                plate = i['plate']
-                formdata = {
-                    "plate":plate,
-                    "diff":diff
-                }
-                plate = self.action(c='undercity',m='plate',body=formdata)
-                times = plate['times']
-                for item in plate['plate_mission']:
-                    if item['status'] == 0:
-                        id = int(item['id'])
-                        status = self.action(c='undercity',m='action',id=id)
-                        if status['win'] <= 1:
-                            #表示没有PK赢
+        try:
+            index = self.action(c='undercity',m='index')
+            diff = index['diff_max']
+            for i in index['plate_mission']:
+                if i['status'] == 0:
+                    plate = i['plate']
+                    formdata = {
+                        "plate":plate,
+                        "diff":diff
+                    }
+                    plate = self.action(c='undercity',m='plate',body=formdata)
+                    times = int(plate['times'])
+                    for item in plate['plate_mission']:
+                        if item['status'] == 0:
+                            id = int(item['id'])
                             sweep_show = self.action(c='undercity', m='sweep_show', id=id - 1)
-                            if sweep_show['info']['fifty_sub'] == 0:
-                                sweep_show = self.action(c='undercity', m='sweep', id=id - 1,type =3)
-                            elif sweep_show['info']['five_sub'] == 0:
+                            self.p(sweep_show)
+                            #type 1 就是扫荡5次，2就是10次，3就是50次
+                            if times >= 15:
                                 sweep_show = self.action(c='undercity', m='sweep', id=id - 1, type=1)
-                            elif sweep_show['info']['ten_sub'] == 0:
                                 sweep_show = self.action(c='undercity', m='sweep', id=id - 1, type=2)
-                        else:
-                            #继续攻击
-                            continue
-                #终止任务，已经完成
-                break
+                            elif times>=10:
+                                sweep_show = self.action(c='undercity', m='sweep', id=id - 1, type=2)
+                            elif times>=5:
+                                sweep_show = self.action(c='undercity', m='sweep', id=id - 1, type=1)
+                            status = self.action(c='undercity',m='action',id=id)
+                            # 终止任务，已经完成
+                            break
+                    #终止任务，已经完成
+                    break
+        except:
+            pass
+    def snow_ball(self):
+        index = self.action(c='snow_ball',m='index')
+        formdata = {
+            "ball":1
+        }
+        for i in range(10):
+            self.p(self.action(c='snow_ball',m='ball',body=formdata))
+            self.action(c='snow_ball', m='index')
+        for v in range(1,4):
+            stagedata= {
+                "stage":v
+            }
+            self.action(c='snow_ball',m='take_stage_reward',body=stagedata)
+        pack = self.action(c='snow_ball',m='pack')
+        if pack['own_box']:
+            for l in pack['own_box']:
+                self.action(c='snow_ball', m='open_box',box_id=l['rewardInfo']['id'])
+    def china_ny(self):#新年活动
+        print 'china_ny新年活动'
+        try:
+            index = self.action(c='china_ny',m='index')
+            if int(index['red_log']['take_time'])==0:
+                take_red_money = self.action(c='china_ny',m='take_red_money')
 
+            sign_index = self.action(c='china_ny', m='sign_index')
+            formdata = {
+                "sign_type":1
+            }
+            sign_index = self.action(c='china_ny', m='sign',body=formdata)
+            #竞猜
+            happy_quiz = self.action(c='china_ny', m='happy_quiz')
+
+            import random
+            num = random.sample([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 3)
+            sitedata = {
+                "site1":num[0],
+                "site2":num[1],
+                "site3":num[2],
+            }
+            bet = self.action(c='china_ny', m='bet',body=sitedata)
+            #目标
+            target_index = self.action(c='china_ny', m='target_index')
+            if int(target_index['now_day']) == 1 and int(target_index['user_target_info'][0]['is_take']) == 0:
+                #购买武将
+                data ={
+                   "page": 1,
+                   "perpage": 9,
+                   "tab": 4,
+                }
+                print data
+                target_index = self.action(c='tavern', m='get_list',body=data)
+                self.p(target_index)
+                for i in list(1,30):
+                    target_index = self.action(c='tavern', m='buy', generalid=id)
+                    self.p(target_index)
+                    if target_index['status'] ==1:
+                        break
+                self.action(c='china_ny', m='take_target')
+        except:
+            pass
+    def activity(self):
+        index = self.action(c='activity',m='index')
+        box_info = index['box_info']
+        for item in box_info:
+            if int(item['is_take']) == 1:
+                formdata = {
+                    "box_id":item['id']
+                }
+                self.p(self.action(c='activity',m='get_active_value_box',body=formdata))
+    def eaticecream(self):
+        try:
+            index = self.action(c='eaticecream',m='index')
+            ice1 = int(index['info']['ice1'])
+            ice2 = int(index['info']['ice2'])
+            ice3 = int(index['info']['ice3'])
+            if ice1 ==1:
+                data = {
+                    'type':1,
+                    'num':1
+                }
+                self.action(c='eaticecream',m='eat',body=data)
+            if ice2 ==1:
+                data = {
+                    'type':2,
+                    'num':1
+                }
+                self.action(c='eaticecream',m='eat',body=data)
+            if ice3 ==1:
+                data = {
+                    'type':3,
+                    'num':1
+                }
+                self.action(c='eaticecream',m='eat',body=data)
+        except:
+            pass
+    def prison(self):
+        try:
+            flag = 1
+            self.action(c='prison',m='index')
+            r = self.action(c='prison',m='get_target_list')
+            for item  in r['random']:
+                if  not item['master_info']:
+                    formdata = {
+                        "arrest_uid":item['uid'],
+                        "arrest_country":item['country'],
+                        "code":1,
+                    }
+                    r = self.action(c='prison',m='arrest',body=formdata)
+                    flag = 0
+            if flag == 1:
+                formdata = {
+                    "arrest_uid": r['random'][0]['uid'],
+                    "arrest_country": r['random'][0]['country'],
+                    "code": 1,
+                }
+                r = self.action(c='prison', m='arrest', body=formdata)
+
+        except:
+            pass
 def run(user, apass, addr,act):
     action = task(user, apass, addr)
     activity = action.get_act()
     level = action.level()
     country = activity['country']
-    if 30 < level:
-        action.arena()  # 获取每日演武奖
-        action.qiandao()  # 每日签到
-        action.hitegg()  # 砸蛋
-        action.island()  # 金银洞
-        action.mouth_card()  # 月卡奖励
-        action.drink()  # 每日军令饮
-    if 50 < level < 180 :
-        action.lowtower()  # 低等级将魂星路推图
-    else:
-        action.tower(act)  # 高级将魂星路扫荡精英
-    if 60 < level and activity['act_solt'] !=1:
-        action.business()  # 每日通商
-    if 70 < level:
-        action.beauty()  # 铜雀台互动
-    if 90 < level:
-        action.workshop()  # 玉石采集
-        action.exploit_tree()  # 木材采集
-        action.exploit_stone()  # 石头采集
+    # if 30 < level:
+    #     action.arena()  # 获取每日演武奖
+    #     action.qiandao()  # 每日签到
+    #     action.hitegg()  # 砸蛋
+    #     action.island()  # 金银洞
+    #     action.mouth_card()  # 月卡奖励
+    #     action.drink()  # 每日军令饮
+    # if 50 < level < 180 :
+    #     action.lowtower()  # 低等级将魂星路推图
+    # else:
+    #     action.tower(act)  # 高级将魂星路扫荡精英
+    # if 60 < level and activity['act_solt'] !=1:
+    #     action.business()  # 每日通商
+    # if 70 < level:
+    #     action.beauty()  # 铜雀台互动
+    # if 90 < level:
+    #     action.workshop()  # 玉石采集
+    #     action.exploit_tree()  # 木材采集
+    #     action.exploit_stone()  # 石头采集
     if 100 < level:
-        if country != '0':
-            action.overseastrade()  # 海外贸易
-            action.country()  # 国家奖励
-            action.countrysacrifice()  # 每日免费贡献40
-            action.dice()  # 国家摇色子
-            action.gongxian(20)  # 国家贡献20次
-            action.japan()  # 征战东瀛
-        action.assist_card()#助阵系统
-        action.heaven(act)  # 通天塔
-        action.herothrone(act)  # 英雄王座
-        action.sanctum()  # 每日宝石领奖
-        action.generaltask()  #
-        action.mount_stone()  # 每日大马副本
+        # if country != '0':
+            # action.overseastrade()  # 海外贸易
+            # action.country()  # 国家奖励
+            # action.countrysacrifice()  # 每日免费贡献40
+            # action.dice()  # 国家摇色子
+            # action.gongxian(20)  # 国家贡献20次
+            # action.japan()  # 征战东瀛
+            # action.prison() #国家小黑屋
+    #     action.assist_card()#助阵系统
+    #     action.heaven(act)  # 通天塔
+    #     action.herothrone(act)  # 英雄王座
+    #     action.sanctum()  # 每日宝石领奖
+    #     action.generaltask()  #
+    #     action.mount_stone()  # 每日大马副本
         action.awaken_copy()  # 觉醒奖励
-        action.essence_map()#经脉丹药扫荡
-        action.lottery()  # 每日抽奖
-    if 220 < level and  activity['lantern_festival'] == 1:#猜灯谜
-        action.lantern_festival()
-    action.act_fight()  # 征战八方
-    if activity['act_travel'] == 1:
-        for i in range(3):
-            action.sanguo()  # 游历三国
-    if activity['actkemari'] == 1:
-        action.cuju()  # 蹴鞠
-    if activity['act_spring'] == 1:
-        action.jisi()  # 新年祭祀
-    if activity['happy_guoqing'] == 1:
-        action.leigu()  # 欢度国庆
-    if activity['chicken'] == 1:
-        action.chicken()  # 吃鸡
-    if activity['holiday'] == 1:
-        action.holiday()  # 假日礼包
-    if activity['sacredtree'] == 1:
-        action.shenshu()  # 神树
-    if activity['lantern'] == 1:
-        action.yuanxiao()  # 元宵
-    if activity['actjubao'] == 1:
-        action.actjubao()  # 聚宝
-    if activity['years_guard'] == 1:
-        action.years_guard()  # 周年守护
-    if activity['fukubukuro'] == 1:
-        action.fukubukuro()  # 福矿
-    if activity['gold_time'] == 1:
-        action.gold_time()  # 黄金时间
-    if activity['lucky_dice'] == 1:
-        action.lucky_dice()  # 摇骰子
-    if activity['break_egg'] == 1:
-        action.break_egg()  # 砸蛋
-    if activity['shopping_feast'] == 1:
-        action.shopping_feast()  # 双十一签到
-    if activity['double_denier'] == 1:
-        action.double_denier()  # 双旦
-    if activity['login_reward'] == 1:#登录签到礼
-        action.loginreward()
-    if activity['newyear_act'] == 1:#新年活动
-        action.newyear_act()
-    if activity['parade'] == 1:#沙场点兵
-        action.act_parade()
+    #     action.essence_map()#经脉丹药扫荡
+    #     action.lottery()  # 每日抽奖
+    # if 220 < level and  activity['lantern_festival'] == 1:#猜灯谜
+    #     action.lantern_festival()
+    # action.activity()
+    # action.act_fight()  # 征战八方
+    # if activity['act_travel'] == 1:
+    #     for i in range(3):
+    #         action.sanguo()  # 游历三国
+    # if activity['actkemari'] == 1:
+    #     action.cuju()  # 蹴鞠
+    # if activity['act_spring'] == 1:
+    #     action.jisi()  # 新年祭祀
+    # if activity['happy_guoqing'] == 1:
+    #     action.leigu()  # 欢度国庆
+    # if activity['chicken'] == 1:
+    #     action.chicken()  # 吃鸡
+    # if activity['holiday'] == 1:
+    #     action.holiday()  # 假日礼包
+    # if activity['sacredtree'] == 1:
+    #     action.shenshu()  # 神树
+    # if activity['lantern'] == 1:
+    #     action.yuanxiao()  # 元宵
+    # if activity['actjubao'] == 1:
+    #     action.actjubao()  # 聚宝
+    # if activity['years_guard'] == 1:
+    #     action.years_guard()  # 周年守护
+    # if activity['fukubukuro'] == 1:
+    #     action.fukubukuro()  # 福矿
+    # if activity['gold_time'] == 1:
+    #     action.gold_time()  # 黄金时间
+    # if activity['lucky_dice'] == 1:
+    #     action.lucky_dice()  # 摇骰子
+    # if activity['break_egg'] == 1:
+    #     action.break_egg()  # 砸蛋
+    # if activity['shopping_feast'] == 1:
+    #     action.shopping_feast()  # 双十一签到
+    # if activity['double_denier'] == 1:
+    #     action.double_denier()  # 双旦
+    # if activity['login_reward'] == 1:#登录签到礼
+    #     action.loginreward()
+    # if activity['newyear_act'] == 1:#新年活动
+    #     action.newyear_act()
+    # if activity['parade'] == 1:#沙场点兵
+    #     action.act_parade()
     if activity['seven_year'] == 1:#沙场点兵
-        #action.seven_year()
+        action.seven_year()
         action.cake_index()
+    # if activity['snow_ball'] == 1:#扔雪球
+    #     action.snow_ball()
+    # if activity['china_ny'] == 1:#新年
+    #     action.china_ny()
+    #action.undercity()
 if __name__ == '__main__':
     q = Queue()
     filepath = os.path.dirname(os.path.abspath(__file__))
-    #
-
-
-
     cont = ['user.txt']
-    cont = ['149cnm.txt', '149dgj.txt', '149gx1.txt', '148gx.txt','149xx.txt',
-            '149xb.txt', '149lwzs.txt']
+    # cont = ['149cnm.txt', '149dgj.txt', '149gx1.txt', '148gx.txt','149xx.txt',
+    #         '149xb.txt', '149lwzs.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
