@@ -195,7 +195,7 @@ class fuben(SaoDangFb):
             if item['type'] == 1:
                 self.action(c='levelgift', m='get_reward', level=item['level'])  # 获取30级奖励
 
-    def  saodang(self, num=18):  # 攻击小兵
+    def  saodang(self, num=13):  # 攻击小兵
         memberindex = self.action(c='member', m='index')
         missionlevel = int(memberindex['missionlevel'])
         missionsite = int(memberindex['missionsite'])

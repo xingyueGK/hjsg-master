@@ -1784,7 +1784,7 @@ if __name__ == '__main__':
 
 
     def chuan():
-        with open('../users/xing.txt', 'r') as f:
+        with open('../users/haiyun.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1800,7 +1800,7 @@ if __name__ == '__main__':
                     except:
                         lockpwd = None
                     #addr = 147
-                    t1 = threading.Thread(target=task, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
                     t1.start()
                     # q.put(t1)
 

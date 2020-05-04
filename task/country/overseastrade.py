@@ -11,6 +11,13 @@ import threading
 import os, time
 
 class OverseaStrade(SaoDangFb):
+    reward_type ={
+        '2':'银币',
+        '4':'紫',
+        '7':'声望',
+        '33':'战功',
+    }
+
     def __init__(self, *args):
         super(OverseaStrade, self).__init__(*args)
         self.log = MyLog(logname='oversea.log')
@@ -21,6 +28,11 @@ class OverseaStrade(SaoDangFb):
 
     def world_index(self):
         index = self.action(c='overseastrade',m='world_index')
+        if index['status'] !=1:
+            self.log.error('world_index status not :%s'%index)
+            time.sleep(0.5)
+            index = self.action(c='overseastrade', m='world_index')
+        self.log.info('world_index　result %s'%index)
         return  index
 
     def world_refresh(self,page):
@@ -31,7 +43,7 @@ class OverseaStrade(SaoDangFb):
         return world_refresh
 
     def ship_list(self):
-        self.log.info('ship_list')
+        #商船选择
         ship_list = self.action(c='overseastrade',m='ship_list')
         self.log.info('ship_list status:%s'%ship_list)
         return ship_list
@@ -39,6 +51,7 @@ class OverseaStrade(SaoDangFb):
         #刷新商船
         ship_list = self.ship_list()
         price = int(ship_list['price'])
+        renovate_ship = ''
         while price == 0:
             renovate_ship = self.action(c='overseastrade',m='renovate_ship')
             try:
@@ -47,20 +60,80 @@ class OverseaStrade(SaoDangFb):
                 break
         return renovate_ship
 
-    def world_goods_list(self):
-        self.log.info('world_goods_list')
-        world_goods_list = self.action(c='overseastrade', m='world_goods_list')
-        return  world_goods_list
 
     def renovate_world_goods(self):
         self.log.info('renovate_world_goods')
-        result = self.action(c=self.get__function_name(), m='renovate_ship')
+        result = self.action(c='overseastrade', m=self.get__function_name())
         return  result
 
     def world_goods_list(self):
         self.log.info(self.get__function_name())
+        result = self.action(c='overseastrade',m=self.get__function_name())
+        self.log.info("%s:%s"%(self.get__function_name(),result))
+        return result
 
-        result = self.action(c=self.get__function_name(), m='renovate_ship')
+    def harbour_list(self):
+        result = self.action(c='overseastrade',m=self.get__function_name())
+        self.log.info("%s:%s"%(self.get__function_name(),result))
+        return result
+
+
+    def get_list_from_world(self,page=10):
+        formdata= {
+            "page":page
+        }
+        result = self.action(c='overseastrade',m=self.get__function_name(),body=formdata)
+        self.log.info("%s:%s"%(self.get__function_name(),result))
+        return result
+
+    def quit(self):
+        #退出
+        result = self.action(c='overseastrade',m=self.get__function_name())
+        self.log.info("%s:%s"%(self.get__function_name(),result))
+        return result
+
+    def choose_world_goods(self,goods_id=6):
+        #选择商品 1
+        #默认ID 6 为镔铁长刀
+        formdata= {
+            "goods_id":goods_id
+        }
+        result = self.action(c='overseastrade',m=self.get__function_name(),body=formdata)
+        self.log.info("%s:%s" % (self.get__function_name(), result))
+        self.choose_harbour()
+        return result
+
+    def choose_harbour(self,harbour_id=2):
+        #选择港口 1 银币 2 紫 3 声望 4战功
+        #默认ID 2 为紫石头加成
+        self.harbour_list()
+        formdata= {
+            "harbour_id":harbour_id
+        }
+        result = self.action(c='overseastrade',m=self.get__function_name(),body=formdata)
+        self.log.info("%s:%s"%(self.get__function_name(),result))
+        return result
+
+    def join_world_team(self,site,place,page,id=0):
+        #加入团队id 为0，创建队伍
+        self.harbour_list()
+        formdata= {
+            "id":id,
+            "site":site,
+            "place":place,
+            "page": page,
+        }
+        result = self.action(c='overseastrade',m=self.get__function_name(),body=formdata)
+        self.log.info("%s:%s"%(self.get__function_name(),result))
+        return result
+    def world_start(self):
+        #开始
+        print '开始跑船'
+        result = self.action(c='overseastrade',m=self.get__function_name())
+        if result['status']!=1:
+            self.log.error('world_start error %s' %result['msg'])
+            self.choose_harbour()
+            result = self.action(c='overseastrade', m=self.get__function_name())
         self.log.info("%s:%s"%(self.get__function_name(),result))
         return result
 

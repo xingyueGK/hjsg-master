@@ -49,7 +49,7 @@ def MyLog(logpath=None,logname='mylog.log'):
     format = logging.Formatter('%(asctime)s %(filename)s[line:%(lineno)d] [%(username)s:%(addr)s] %(levelname)s %(message)s')
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.INFO)
-    handler = RotatingFileHandler(_log,mode='a',maxBytes=1024*1024,backupCount=3,encoding='utf-8')
+    handler = RotatingFileHandler(_log,mode='a',maxBytes=1024*1024*1024,backupCount=3,encoding='utf-8')
     handler.setLevel(logging.INFO)
     handler.setFormatter(format)
     logger.addHandler(handler)
