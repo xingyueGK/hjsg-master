@@ -62,9 +62,21 @@ class OverseaStrade(SaoDangFb):
 
 
     def renovate_world_goods(self):
+        #刷新商品
+        """
+        :return:
+        """
         self.log.info('renovate_world_goods')
-        result = self.action(c='overseastrade', m=self.get__function_name())
-        return  result
+        num = 0
+        while num < 5:
+            result = self.action(c='overseastrade', m=self.get__function_name())
+            if result['status'] ==1:
+                return result
+            elif result['status'] ==11:
+                num += 1
+                time.sleep(0.5)
+            return ""
+
 
     def world_goods_list(self):
         self.log.info(self.get__function_name())
@@ -132,7 +144,9 @@ class OverseaStrade(SaoDangFb):
         result = self.action(c='overseastrade',m=self.get__function_name())
         if result['status']!=1:
             self.log.error('world_start error %s' %result['msg'])
-            self.choose_harbour()
+            for item in self.world_goods_list()['list']:
+                if int(item['status']) ==1:
+                    self.choose_harbour(item['harbour'])
             result = self.action(c='overseastrade', m=self.get__function_name())
         self.log.info("%s:%s"%(self.get__function_name(),result))
         return result

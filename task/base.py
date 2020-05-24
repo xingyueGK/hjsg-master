@@ -8,6 +8,7 @@ import  sys,os
 import  redis
 from logging.handlers import RotatingFileHandler
 import logging
+import hashlib
 reload(sys)
 sys.setdefaultencoding('utf-8')
 import threading
@@ -37,11 +38,14 @@ class SaoDangFb(object):
         self.num = self.get_addr(num,user,passwd)
         self.user = user
         self.passwd = passwd
-        self.rand = int(time.time()*1000)
+        self.rand = str(int(time.time()))
         self.token_uid = ''
         self.token = self.get_token(self.num, self.user, self.passwd)
         #POST基础URL地址
-        self.url = 'http://s{0}.game.hanjiangsanguo.com/index.php?{1}&v=0&channel=150&lang=zh-cn&token={2}&token_uid={3}&rand={4}'.format(self.num,'{data}',self.token,self.token_uid,self.rand)
+        self.a = self.token + self.rand
+        self.te = hashlib.md5(self.a).hexdigest()
+        self.signature = hashlib.md5(self.te + "a4c13b9ecf81").hexdigest()
+        self.url = 'http://s{0}.game.hanjiangsanguo.com/index.php?{1}&v=0&channel=150&lang=zh-cn&token={2}&token_uid={3}&rand={4}&signature={5}'.format(self.num,'{data}',self.token,self.token_uid,self.rand,self.signature)
     @staticmethod
     def get_addr(num,u,p):
         url = 'http://uc.game.hanjiangsanguo.com/index.php?&c=user&m=login&&token=&channel=150&lang=zh-cn&rand=157355135868932'

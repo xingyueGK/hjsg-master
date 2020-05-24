@@ -42,8 +42,7 @@ if __name__ == '__main__':
         if action.level()< 150:
             s1.release()
             return False
-        t = action.get_attribute()
-        action.zhanxian(t)
+        action.zhanxian(s1)
         s1.release()
 
     def flag(user, apass, addr):
@@ -91,6 +90,6 @@ if __name__ == '__main__':
                     passwd = i.split()[1]
                     addr = i.split()[2]
                     # addr = 147
-                    t1 = threading.Thread(target=lz, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=act, args=(name, passwd, addr))
                     t1.start()
       

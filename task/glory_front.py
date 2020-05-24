@@ -36,15 +36,28 @@ class glory_front(object):
         }
         resutl = self.action(c='glory_front', m='pk',body=formdata)
         return resutl
-    def pkinfo(self,t):
+    def pkinfo(self,s):
         index = self.index()
         if index['status'] != 1:
             #释放锁
             try:
-                t.release()
-                exit(1)
+                return False
             except:
                 print self.user
+        own_pk_info =index['own_pk_info']
+        if own_pk_info:
+            rank = int(own_pk_info['rank'])
+            group = own_pk_info['group']
+        else:
+            print '为参赛，退出',self.user
+            return False
+        if int(index['now_step']) == 2 and  rank>10:
+            print '第二阶段，未入选，助威'
+            formdata = {
+                'group':group
+            }
+            self.action(c='glory_front',m='support',body=formdata)
+            return False
         t = self.get_attribute()
         pk_times = int(index['pk_times'])
         group = ''
@@ -60,13 +73,17 @@ class glory_front(object):
             group = 1
         pvp = self.pvp_index(group)
         if pvp['status'] !=1:
+            self.p(pvp)
             return  False
         all_page = pvp['all_page']
         page = int(pvp['page'])
         return group,all_page,page,pk_times
     def zhanxian(self,t):
-        group, all_page, page,pk_times = self.pkinfo(t)
-        print '1111111111111'
+        re = self.pkinfo(t)
+        if re:
+            group, all_page, page,pk_times = re
+        else:
+            return False
         while pk_times > 0:
             print '页数',page
             get_pk_list = self.get_pk_list(group,page-1)

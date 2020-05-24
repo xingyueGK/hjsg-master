@@ -568,7 +568,7 @@ class activity(fuben):
         #     print u'%s' % message['nickname'] + ":" + u'%s' % message['message']
         print self.action(c='chat', m='send', message=ms)  # 发送消息
 
-    def rob(self, name, user):  # 海运打劫
+    def robholiday_seatrade(self, name, user):  # 海运打劫
         # name 就是打劫的国家[list]
         # authorization 需要 hd5key
         # udi:用户角色id信息 ，robkey：zykj
@@ -636,6 +636,73 @@ class activity(fuben):
                 #self.p(self.action(c='overseastrade', m='refresh', p=i + 1))
                 pass
 
+    def world_rob(self, name, user):  # 海运打劫
+        # name 就是打劫的国家[list]
+        # authorization 需要 hd5key
+        # udi:用户角色id信息 ，robkey：zykj
+        # "rob" + uid +robkey + robid)
+        uid = self.get_act()['uid']
+        robkey = "zykj"
+        robtimes = 1
+        while robtimes > 0:
+            time.sleep(random.random())
+            index_result = self.action(c='overseastrade', m='world_index')
+            try:
+                robtimes = int(index_result['info']['robtimes'])  # 获取打劫次数
+                print '{user} 剩余打劫次数 {robtimes}\r'.format(user=user, robtimes=robtimes)
+            except Exception as e:
+                break
+            try:
+                try:
+                    fromdata = {
+                        'p':1
+                    }
+                    refresh = self.action(c='overseastrade', m='world_refresh', body=fromdata) # 获取刷新船信息
+                    refresh_result = refresh['team']
+                except KeyError as e:
+                    refresh = self.action(c='overseastrade', m='world_refresh', body=fromdata)  # 获取刷新船信息
+                    refresh_result = refresh['team']
+                if refresh_result['allpage'] > 1:  # 船页数大于1页需要遍历
+                    for i in range(refresh_result['allpage']):
+                        try:
+                            aaa = self.action(c='overseastrade', m='world_refresh', p=i + 1)
+                            team_list = aaa['team']['list']
+                        except:
+                            team_list = self.action(c='overseastrade', m='world_index')['team']['list']
+                        for team in team_list:
+                            if team['country_name'] in name + ['皇家酒店%d'%i for i in range(1,80)] + ['dc%d'%i for i in range(1,20)]:
+                                id = team['id']
+                                key = "rob" + uid + robkey + id
+                                authorization = hashlib.md5(key).hexdigest()
+                                rob_result = self.action(c='overseastrade', m='world_rob',
+                                                         body={"id": id, "authorization": authorization})
+                                if rob_result['status'] != 1:
+                                    print '打劫失败'
+                                    continue
+                                else:
+                                    self.p(rob_result)
+                                    break
+
+                else:
+                    team_list = refresh_result['list']
+                    for team in team_list:
+                        print team['country_name']
+                        if team['country_name'] in name + ['皇家酒店%d'%i for i in range(1,80)] + ['dc%d'%i for i in range(1,20)]:
+                            id = team['id']
+                            key = "rob" + uid + robkey + id
+                            authorization = hashlib.md5(key).hexdigest()
+                            rob_result = self.action(c='overseastrade', m='world_rob',
+                                                     body={"id": id, "authorization": authorization})
+                            if rob_result['status'] != 1:
+                                print '打劫失败'
+                                continue
+                            else:
+                                self.p(rob_result)
+                                break
+
+            except Exception as e:
+                #self.p(self.action(c='overseastrade', m='refresh', p=i + 1))
+                pass
     def jierihaiyun(self, user):  # 节日海外贸易
         self.action(c='message', m='index')
         index = self.action(c='overseastrade', m='index')
@@ -1554,7 +1621,7 @@ if __name__ == '__main__':
         s1.acquire()
         print '%s 获取锁' % user
         action = activity(user, apass, addr)
-        action.rob(
+        action.world_rob(
             ['体检了', '8523', '英雄', '是你学姐', '杰克傻bi', '杰克喝sui', '杰克喝尿', '杰克吃翔', 'haiyun1', 'haiyun2', 'haiyun3','haiyun4', '打船专用',
              '我乐个趣',
              '喔喔喔噢',
@@ -1800,7 +1867,7 @@ if __name__ == '__main__':
                     except:
                         lockpwd = None
                     #addr = 147
-                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=shijiejiangli, args=(name, passwd, addr))
                     t1.start()
                     # q.put(t1)
 
