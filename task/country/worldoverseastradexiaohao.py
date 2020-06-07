@@ -54,7 +54,8 @@ def main(user, apass, addr,lockpwd):
             #表示获取到了设定的商品
             action.choose_world_goods(goods_id=id)
         else:#没有获取到设定的商品，只能获取最符合要求的
-            r = sorted(renovate['list'], key=lambda k: k['quality'], reverse=True)
+            world_goods_list = action.world_goods_list()
+            r = sorted(world_goods_list['list'], key=lambda k: k['quality'], reverse=True)
             for item in r :
                 if int(item['harbour']) in harbour:
                     id = item['id']
@@ -119,6 +120,7 @@ def main(user, apass, addr,lockpwd):
             else:
                 action.p(join_world_team)
                 join_world_team = action.join_world_team(1, 1, 10)
+                #表示未选择货物
                 team_id = join_world_team['team_id']
                 status = join_world_team['status']
             if status == 1:
@@ -157,7 +159,7 @@ if __name__ == '__main__':
 
     filepath = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     # cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']
-    cont = ['xing.txt']
+    cont = ['user.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:

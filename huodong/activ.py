@@ -649,7 +649,8 @@ class activity(fuben):
             index_result = self.action(c='overseastrade', m='world_index')
             try:
                 robtimes = int(index_result['info']['robtimes'])  # 获取打劫次数
-                print '{user} 剩余打劫次数 {robtimes}\r'.format(user=user, robtimes=robtimes)
+                allpage = index_result['team']['all_page']
+                print '{user} 剩余打劫次数 {robtimes}，现有海运{allpage}页\r'.format(user=user, robtimes=robtimes,allpage=allpage)
             except Exception as e:
                 break
             try:
@@ -662,14 +663,18 @@ class activity(fuben):
                 except KeyError as e:
                     refresh = self.action(c='overseastrade', m='world_refresh', body=fromdata)  # 获取刷新船信息
                     refresh_result = refresh['team']
-                if refresh_result['allpage'] > 1:  # 船页数大于1页需要遍历
-                    for i in range(refresh_result['allpage']):
+                self.p(refresh_result)
+                if refresh_result['all_page'] > 1:  # 船页数大于1页需要遍历
+                    for i in range(int(refresh_result['all_page'])):
                         try:
                             aaa = self.action(c='overseastrade', m='world_refresh', p=i + 1)
                             team_list = aaa['team']['list']
                         except:
                             team_list = self.action(c='overseastrade', m='world_index')['team']['list']
+                        self.p(team_list)
                         for team in team_list:
+                            #self.p(team)
+                            print team['country_name'],team['member2_name'],team['member2_name']
                             if team['country_name'] in name + ['皇家酒店%d'%i for i in range(1,80)] + ['dc%d'%i for i in range(1,20)]:
                                 id = team['id']
                                 key = "rob" + uid + robkey + id
@@ -702,6 +707,7 @@ class activity(fuben):
 
             except Exception as e:
                 #self.p(self.action(c='overseastrade', m='refresh', p=i + 1))
+                print e
                 pass
     def jierihaiyun(self, user):  # 节日海外贸易
         self.action(c='message', m='index')
@@ -1851,7 +1857,7 @@ if __name__ == '__main__':
 
 
     def chuan():
-        with open('../users/haiyun.txt', 'r') as f:
+        with open('../users/xing.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1866,8 +1872,8 @@ if __name__ == '__main__':
                         lockpwd = i.split()[3]
                     except:
                         lockpwd = None
-                    #addr = 147
-                    t1 = threading.Thread(target=shijiejiangli, args=(name, passwd, addr))
+                    #addr = 21
+                    t1 = threading.Thread(target=dajie, args=(name, passwd, addr))
                     t1.start()
                     # q.put(t1)
 

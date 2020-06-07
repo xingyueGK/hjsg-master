@@ -6,7 +6,7 @@
 
 
 class MagicpetExplore(object):
-
+    #魔宠探险
     def index(self):
 
         index = self.action(c='magicpet_explore',m='index')
@@ -18,8 +18,8 @@ class MagicpetExplore(object):
         self.logger.info('Get area_reward_into Index %s' % area_reward_into)
         return area_reward_into
 
-    def one_button_join(self):
-        self.action(c='magicpet_explore',m='one_button_join')
+    def one_button_join(self,area_id=1):
+        self.action(c='magicpet_explore',m='one_button_join',area_id=1)
 
     def explore_start(self,area_id=1):
         self.logger.info('explore_start')

@@ -4,6 +4,7 @@ from task.base import SaoDangFb
 import time, threading
 import os, json, sys
 
+
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
