@@ -32,6 +32,9 @@ def main(user, apass, addr,lockpwd):
     action.harbour_list()
     print '打开商店'
     world_goods_list = action.world_goods_list()
+    if world_goods_list['status'] !=1:
+        print world_goods_list['msg']
+        return  False
     if world_goods_list['choose_status'] != 1:
         print '开始选择商品'
         """
@@ -43,24 +46,47 @@ def main(user, apass, addr,lockpwd):
         quality = 3
         action.unlock(lockpwd)
         id = ""
-        for i in range(3):
-            #最多刷新3次
-            renovate = action.renovate_world_goods()
-            for item in renovate['list']:
-                if int(item['quality']) > quality and int(item['harbour']) in harbour:
-                    id = item['id']
-                    break
+        #选先看是否为刷新过了商品意外退出
+        for item in world_goods_list['list']:
+            if int(item['quality']) > quality and int(item['harbour']) in harbour:
+                action.log.console('console获取到了商品信息id {id}'.format(id))
+                id = item['id']
+                break
         if id:
+            action.log.info('获取到了商品信息id {id}'.format(id=id))
+            print '获取到了商品信息id {id}'.format(id=id)
             #表示获取到了设定的商品
             action.choose_world_goods(goods_id=id)
         else:#没有获取到设定的商品，只能获取最符合要求的
-            world_goods_list = action.world_goods_list()
-            r = sorted(world_goods_list['list'], key=lambda k: k['quality'], reverse=True)
-            for item in r :
-                if int(item['harbour']) in harbour:
-                    id = item['id']
-                    action.choose_world_goods(goods_id=id)
-                    break
+            print 'meiyougengfuhede'
+            flag = True
+            flush = 1
+            while flag and flush <6:
+                # 最多刷新6次
+                print '第{num}刷新商品'.format(num=flush)
+                renovate = action.renovate_world_goods()
+                for item in renovate['list']:
+                    print item['id'],item['name'],item['quality'],item['harbour']
+                    if int(item['quality']) > quality and int(item['harbour']) in harbour:
+                        print '刷新搞到了 65行出'
+                        id = item['id']
+                        flag = False
+                        break
+                flush +=1
+            if id:
+                print '获取到了合适的商品{id}'.format(id=id)
+                action.log.info('获取到了商品信息')
+                # 表示获取到了设定的商品
+                action.choose_world_goods(goods_id=id)
+            else:
+                print '没有符合要求的'
+                world_goods_list = action.world_goods_list()
+                r = sorted(world_goods_list['list'], key=lambda k: k['quality'], reverse=True)
+                for item in r :
+                    if int(item['harbour']) in harbour:
+                        id = item['id']
+                        action.choose_world_goods(goods_id=id)
+                        break
     else:
         for item in world_goods_list['list']:
             if item['status'] == 1:
@@ -159,7 +185,7 @@ if __name__ == '__main__':
 
     filepath = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     # cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']
-    cont = ['user.txt']
+    cont = ['haiyun.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
