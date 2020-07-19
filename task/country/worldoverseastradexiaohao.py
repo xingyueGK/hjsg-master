@@ -49,7 +49,8 @@ def main(user, apass, addr,lockpwd):
         #选先看是否为刷新过了商品意外退出
         for item in world_goods_list['list']:
             if int(item['quality']) > quality and int(item['harbour']) in harbour:
-                action.log.console('console获取到了商品信息id {id}'.format(id))
+                action.log.info('console获取到了商品信息{name}'.format(name=item['name']))
+                print 'console获取到了商品信息{name}'.format(name = item['name'])
                 id = item['id']
                 break
         if id:
@@ -99,11 +100,14 @@ def main(user, apass, addr,lockpwd):
     ip21 = [21,22,25,26,29,30]
     worldkey = 'set:worldstrade:{addr}'.format(addr=149)
     ip = int(addr)
+    oip = None
     if ip in ip149:
         print '大区为149'
+        oip = 149
         worldkey =  'set:worldstrade:{addr}'.format(addr=149)
     elif ip in ip21:
         print '大区为 21'
+        oip = 21
         worldkey = 'set:worldstrade:{addr}'.format(addr=21)
 
     #查看是否有这个ID 有返回1 ，没有返回0
@@ -126,8 +130,12 @@ def main(user, apass, addr,lockpwd):
         if join_world_team['status'] == 1:
             #第二个队友加入队伍后，调账号跑船
             print '组队成功'
+
             _redis.delete(worldkey)
+            print 'teamid{oip}'.format(oip=oip), id
             OverseaStrade(user, passwd, addr).world_start()
+            _redis.lpush('teamid{oip}'.format(oip=oip), id)
+            #_redis.lpush('teamid{oip}'.format(oip=oip), team_id)
         else:
             print '组队失败'
             action.p(join_world_team)
@@ -185,7 +193,7 @@ if __name__ == '__main__':
 
     filepath = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     # cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']
-    cont = ['haiyun.txt']
+    cont = ['user.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
