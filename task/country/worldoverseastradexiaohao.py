@@ -130,7 +130,6 @@ def main(user, apass, addr,lockpwd):
         if join_world_team['status'] == 1:
             #第二个队友加入队伍后，调账号跑船
             print '组队成功'
-
             _redis.delete(worldkey)
             print 'teamid{oip}'.format(oip=oip), id
             OverseaStrade(user, passwd, addr).world_start()

@@ -78,13 +78,12 @@ class task(SaoDangFb):
             index_result = self.action(c='overseastrade', m='index')
             try:
                 robtimes = int(index_result['info']['robtimes'])  # 获取打劫次数
-                msg = '剩余打劫次数{robtimes}'.format(robtimes=robtimes)
+                msg = '{user} 剩余打劫次数{robtimes}'.format(user=user,robtimes=robtimes)
                 print msg
             except Exception as e:
                 print e
             try:
                 teamid = _redis.rpop('teamid{oip}'.format(oip=oip))
-                print '获取Team_id',teamid
                 if teamid:
                     while True:
                         key = "world_rob" + uid + robkey + teamid
@@ -94,8 +93,14 @@ class task(SaoDangFb):
                                                  body={"id": teamid, "authorization": authorization})
                         msg = json.dumps(rob_result)
                         print msg
-                        if rob_result['status'] != 1:
+                        if rob_result['status'] == -7:
+                            #打劫失败换另一个队伍
+                            _redis.lpush('teamid{oip}'.format(oip=oip), teamid)
                             break
+                        elif rob_result['status'] == 1:
+                            break
+                        elif rob_result['status'] == 11:
+                            time.sleep(4)
                 else:
                     print '还没有船'
                 _redis.publish(publis_name, msg)

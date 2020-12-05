@@ -9,6 +9,10 @@ from random import choice
 import hashlib
 import random
 
+
+import redis
+pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
+_redis = redis.StrictRedis(connection_pool=pool)
 """每日不定期开展活动"""
 
 
@@ -604,7 +608,7 @@ class activity(fuben):
                         for team in team_list:
                             if team['country_name'] in name + ['皇家酒店%d'%i for i in range(1,80)] + ['dc%d'%i for i in range(1,20)]:
                                 id = team['id']
-                                key = "rob" + uid + robkey + id
+                                key = "world_rob" + uid + robkey + id
                                 authorization = hashlib.md5(key).hexdigest()
                                 rob_result = self.action(c='holiday_seatrade', m='rob',
                                                          body={"id": id, "authorization": authorization})
@@ -636,11 +640,56 @@ class activity(fuben):
                 #self.p(self.action(c='overseastrade', m='refresh', p=i + 1))
                 pass
 
+    def world_rob_redis(self,user,addr):
+        #直接从redis 获取id打劫3
+        # 如果redis 有key 则从redis 取，没有创建
+        # 判断大区是什么
+        ip149 = [i for i in range(145, 150)]
+        ip21 = [21, 22, 25, 26, 29, 30]
+        worldkey = 'set:worldstrade:{addr}'.format(addr=149)
+        ip = int(addr)
+        if ip in ip149:
+            print '大区为149'
+            worldkey = 'set:worldstrade:{addr}'.format(addr=149)
+        elif ip in ip21:
+            print '大区为 21'
+            worldkey = 'set:worldstrade:{addr}'.format(addr=21)
+        uid = self.get_act()['uid']
+        robkey = "zykj"
+        index_result = self.action(c='overseastrade', m='world_index')
+        try:
+            robtimes = int(index_result['info']['robtimes'])  # 获取打劫次数
+            allpage = index_result['team']['all_page']
+            print '{user} 剩余打劫次数 {robtimes}，现有海运{allpage}页\r'.format(user=user, robtimes=robtimes, allpage=allpage)
+        except Exception as e:
+            print e
+        while robtimes > 0:
+            v = _redis.get(worldkey)
+            if not v:
+                continue
+            id = v.split(':')[0]
+            key = "rob" + uid + robkey + id
+            authorization = hashlib.md5(key).hexdigest()
+            rob_result = self.action(c='overseastrade', m='world_rob',
+                                     body={"id": id, "authorization": authorization})
+            if rob_result['status'] != 1:
+                print '打劫失败'
+                try:
+                    print rob_result['msg']
+                except:
+                    pass
+                continue
+            else:
+                self.p(rob_result)
+                robtimes -= 1
+
+
     def world_rob(self, name, user):  # 海运打劫
         # name 就是打劫的国家[list]
         # authorization 需要 hd5key
         # udi:用户角色id信息 ，robkey：zykj
         # "rob" + uid +robkey + robid)
+
         uid = self.get_act()['uid']
         robkey = "zykj"
         robtimes = 1
@@ -663,48 +712,52 @@ class activity(fuben):
                 except KeyError as e:
                     refresh = self.action(c='overseastrade', m='world_refresh', body=fromdata)  # 获取刷新船信息
                     refresh_result = refresh['team']
-                self.p(refresh_result)
-                if refresh_result['all_page'] > 1:  # 船页数大于1页需要遍历
+                if allpage > 1:  # 船页数大于1页需要遍历
                     for i in range(int(refresh_result['all_page'])):
                         try:
                             aaa = self.action(c='overseastrade', m='world_refresh', p=i + 1)
                             team_list = aaa['team']['list']
                         except:
                             team_list = self.action(c='overseastrade', m='world_index')['team']['list']
-                        self.p(team_list)
-                        for team in team_list:
-                            #self.p(team)
-                            print team['country_name'],team['member2_name'],team['member2_name']
-                            if team['country_name'] in name + ['皇家酒店%d'%i for i in range(1,80)] + ['dc%d'%i for i in range(1,20)]:
-                                id = team['id']
-                                key = "rob" + uid + robkey + id
-                                authorization = hashlib.md5(key).hexdigest()
-                                rob_result = self.action(c='overseastrade', m='world_rob',
-                                                         body={"id": id, "authorization": authorization})
-                                if rob_result['status'] != 1:
-                                    print '打劫失败'
-                                    continue
-                                else:
-                                    self.p(rob_result)
-                                    break
+                        for k,team in team_list.items():
+                            for item in team:
+                                if item:
+                                    #只要有必定是两个船一起开
+                                    #print item['country_name'],item['member1_name'],item['member2_name']
+                                    if item['country_name'] in name + ['皇家酒店%d'%i for i in range(1,80)] + ['dc%d'%i for i in range(1,20)]:
+                                        id = item['id']
+                                        key = "rob" + uid + robkey + id
+                                        authorization = hashlib.md5(key).hexdigest()
+                                        rob_result = self.action(c='overseastrade', m='world_rob',
+                                                                 body={"id": id, "authorization": authorization})
+                                        if rob_result['status'] != 1:
+                                            print '打劫失败'
+                                            continue
+                                        else:
+                                            self.p(rob_result)
+                                            break
 
                 else:
                     team_list = refresh_result['list']
-                    for team in team_list:
-                        print team['country_name']
-                        if team['country_name'] in name + ['皇家酒店%d'%i for i in range(1,80)] + ['dc%d'%i for i in range(1,20)]:
-                            id = team['id']
-                            key = "rob" + uid + robkey + id
-                            authorization = hashlib.md5(key).hexdigest()
-                            rob_result = self.action(c='overseastrade', m='world_rob',
-                                                     body={"id": id, "authorization": authorization})
-                            if rob_result['status'] != 1:
-                                print '打劫失败'
-                                continue
-                            else:
-                                self.p(rob_result)
-                                break
-
+                    for k, team in team_list.items():
+                        for item in team:
+                            if item:
+                                # 只要有必定是两个船一起开
+                                # print item['country_name'],item['member1_name'],item['member2_name']
+                                if item['country_name'] in name + ['皇家酒店%d' % i for i in range(1, 80)] + ['dc%d' % i for
+                                                                                                          i in
+                                                                                                          range(1, 20)]:
+                                    id = item['id']
+                                    key = "rob" + uid + robkey + id
+                                    authorization = hashlib.md5(key).hexdigest()
+                                    rob_result = self.action(c='overseastrade', m='world_rob',
+                                                             body={"id": id, "authorization": authorization})
+                                    if rob_result['status'] != 1:
+                                        print '打劫失败'
+                                        continue
+                                    else:
+                                        self.p(rob_result)
+                                        break
             except Exception as e:
                 #self.p(self.action(c='overseastrade', m='refresh', p=i + 1))
                 print e
@@ -1514,6 +1567,10 @@ class activity(fuben):
             self.p(result)
             time.sleep(10)
             self.cake_index()
+    def poll_reward(self):#zongzi
+           self.action(c='quyuan_festival',m='poll_index')
+           self.action(c='quyuan_festival',m='poll_reward')
+           self.action(c='quyuan_festival',m='take_poll')
 # 周年比购物start_advanced
 
 # def wx():#五行竞猜刷数据
@@ -1578,7 +1635,7 @@ if __name__ == '__main__':
         # action.holiday()
         # action.chicken()
         # action.years_guard()
-        action.yuanxiao()
+        action.poll_reward()
 
 
     def zhujian(user, apass, addr):
@@ -1627,26 +1684,27 @@ if __name__ == '__main__':
         s1.acquire()
         print '%s 获取锁' % user
         action = activity(user, apass, addr)
-        action.world_rob(
-            ['体检了', '8523', '英雄', '是你学姐', '杰克傻bi', '杰克喝sui', '杰克喝尿', '杰克吃翔', 'haiyun1', 'haiyun2', 'haiyun3','haiyun4', '打船专用',
-             '我乐个趣',
-             '喔喔喔噢',
-             '溜溜溜',
-             '呵呵我来了啊',
-             '呃呃呃',
-             '打船专用',
-             '1512412',
-             '1241251',
-             '234234',
-             '12341',
-             'shabi',
-             'dc',
-             '悍龙',
-             '炎黄天都',
-             '明',
-             '若溪若溪',
-             ], user)
-        # time.sleep(0.3)
+        action.world_rob_redis(user,addr)
+        # action.world_rob(
+        #     ['体检了', '8523', '英雄', '是你学姐', '杰克傻bi', '杰克喝sui', '杰克喝尿', '杰克吃翔', 'haiyun1', 'haiyun2', 'haiyun3','haiyun4', '打船专用',
+        #      '我乐个趣',
+        #      '喔喔喔噢',
+        #      '溜溜溜',
+        #      '呵呵我来了啊',
+        #      '呃呃呃',
+        #      '打船专用',
+        #      '1512412',
+        #      '1241251',
+        #      '234234',
+        #      '12341',
+        #      'shabi',
+        #      'dc',
+        #      '悍龙',
+        #      '炎黄天都',
+        #      '明',
+        #      '若溪若溪',
+        #      ], user)
+        # # time.sleep(0.3)
         print('%s 释放锁') % user
         s1.release()
 
@@ -1857,7 +1915,7 @@ if __name__ == '__main__':
 
 
     def chuan():
-        with open('../users/xing.txt', 'r') as f:
+        with open('../users/user.txt', 'r') as f:
             # with open('../users/duguyi.txt', 'r') as f:
             for i in f:
                 if i.strip() and not i.startswith('#'):
@@ -1873,7 +1931,7 @@ if __name__ == '__main__':
                     except:
                         lockpwd = None
                     #addr = 21
-                    t1 = threading.Thread(target=dajie, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=userinfo, args=(name, passwd, addr))
                     t1.start()
                     # q.put(t1)
 

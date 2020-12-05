@@ -114,7 +114,7 @@ def run(user, apass, addr,lockpwd):
 if __name__ == '__main__':
 
     filepath = os.path.dirname(os.path.abspath(__file__)).rsplit('\\',1)[0]
-    cont = ['alluser.txt','user.txt']
+    cont = ['alluser.txt','xing.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:

@@ -28,6 +28,7 @@ class OverseaStrade(SaoDangFb):
 
     def world_index(self):
         index = self.action(c='overseastrade',m='world_index')
+        print index
         if index['status'] !=1:
             self.log.error('world_index status not :%s'%index)
             time.sleep(0.5)
@@ -75,7 +76,7 @@ class OverseaStrade(SaoDangFb):
             elif result['status'] ==11:
                 num += 1
                 time.sleep(0.5)
-            return ""
+        return ""
 
 
     def world_goods_list(self):
@@ -90,7 +91,7 @@ class OverseaStrade(SaoDangFb):
         return result
 
 
-    def get_list_from_world(self,page=10):
+    def get_list_from_world(self,page=1):
         formdata= {
             "page":page
         }
@@ -104,17 +105,6 @@ class OverseaStrade(SaoDangFb):
         self.log.info("%s:%s"%(self.get__function_name(),result))
         return result
 
-    def choose_world_goods(self,goods_id=6):
-        #选择商品 1
-        #默认ID 6 为镔铁长刀
-        formdata= {
-            "goods_id":goods_id
-        }
-        result = self.action(c='overseastrade',m=self.get__function_name(),body=formdata)
-        self.log.info("%s:%s" % (self.get__function_name(), result))
-        self.choose_harbour()
-        return result
-
     def choose_harbour(self,harbour_id=2):
         #选择港口 1 银币 2 紫 3 声望 4战功
         #默认ID 2 为紫石头加成
@@ -125,6 +115,19 @@ class OverseaStrade(SaoDangFb):
         result = self.action(c='overseastrade',m=self.get__function_name(),body=formdata)
         self.log.info("%s:%s"%(self.get__function_name(),result))
         return result
+    def choose_world_goods(self,goods_id=6):
+        #选择商品 1
+        #默认ID 6 为镔铁长刀
+        print 'choose_world_goods_id{goods_id}'.format(goods_id=goods_id)
+        formdata= {
+            "goods_id":goods_id
+        }
+        result = self.action(c='overseastrade',m=self.get__function_name(),body=formdata)
+        self.log.info("%s:%s" % (self.get__function_name(), result))
+        self.choose_harbour()
+        return result
+
+
 
     def join_world_team(self,site,place,page,id=0):
         #加入团队id 为0，创建队伍
@@ -143,6 +146,7 @@ class OverseaStrade(SaoDangFb):
         print '开始跑船'
         result = self.action(c='overseastrade',m=self.get__function_name())
         if result['status']!=1:
+
             self.log.error('world_start error %s' %result['msg'])
             for item in self.world_goods_list()['list']:
                 if int(item['status']) ==1:

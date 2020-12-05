@@ -331,10 +331,11 @@ class fuben(SaoDangFb):
 if __name__ == '__main__':
     def act(user, apass, addr):
         action = fuben(user, apass, addr)
-        action.saodang(25)
+        if action.level() <170:
+            action.saodang(25)
 
 
-    with open('../users/xing.txt', 'r') as f:
+    with open('../users/haiyun.txt', 'r') as f:
         for i in f:
             if i.strip() and not i.startswith('#'):
                 str = i.strip().split()[0]

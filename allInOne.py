@@ -65,9 +65,29 @@ class eight(SaoDangFb):
         elif mid == 4:
             self.action(c='matrix', m='update_matrix', list=lists4, mid=mid)
 
+    def use_case(self,mid=4,case=1):
+        formdata = {
+            "case": case,
+            "mid":mid,
+            "token": self.token
+        }
+        result = self.action(c='master',m=self.get__function_name(),body=formdata)
+        return  result
+
+    def case_index(self,case=1):
+        formdata = {
+            "case": case,
+            "token": self.token
+        }
+        result = self.action(c='matrix',m=self.get__function_name(),body=formdata)
+        return  result
 
 def run(user,apass, addr,mid,level):
     ei = eight(num=addr, user=user, passwd=apass, level=level)
+    #获取当前阵法信息
+    matrixcase = ei.get_act()['matrixcase']
+    case_index = ei.case_index(case=matrixcase)
+    usercase = case_index['case']
     ei.use_matrix(mid)  # 使用固定阵法
     index,now_level = ei.eight_index()
 
@@ -90,7 +110,7 @@ def run(user,apass, addr,mid,level):
         point = index['cost']['point']
         print point
         ei.pk()
-    ei.use_matrix(4)
+    ei.use_case(min=usercase['mid'],case=usercase['matrixcase'])
 if __name__ == '__main__':
     filepath = os.path.dirname(os.path.abspath(__file__))
     cont = ['alluser.txt']
@@ -101,6 +121,5 @@ if __name__ == '__main__':
                         name = i.split()[0]
                         passwd = i.split()[1]
                         addr = i.split()[2]
-
                         t1 = threading.Thread(target=run, args=(name, passwd, addr,4,2))
                         t1.start()

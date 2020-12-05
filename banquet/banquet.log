@@ -3042,3 +3042,8 @@
 2020-04-02 21:08:54,778 base.py[line:440] [USER:ADDR] INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
 2020-04-02 21:08:55,980 base.py[line:440] [USER:ADDR] INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
 2020-04-02 21:08:57,167 base.py[line:440] [USER:ADDR] INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2020-08-01 15:31:46,279 base.py[line:440] [USER:ADDR] INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2020-08-01 15:31:47,364 base.py[line:440] [USER:ADDR] INFO Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2020-08-01 15:31:47,365 base.py[line:881] [USER:ADDR] INFO Added job "banquet.a" to job store "default"
+2020-08-01 15:31:47,365 base.py[line:881] [USER:ADDR] INFO Added job "banquet.a" to job store "default"
+2020-08-01 15:31:47,365 base.py[line:166] [USER:ADDR] INFO Scheduler started

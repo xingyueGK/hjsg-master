@@ -69,9 +69,9 @@ if __name__ == '__main__':
     def lz(user, apass, addr):
         s1.acquire()
         action = longzhou(user, apass, addr)
-        # action.buytimes(1)
+        action.buytimes(200)
         action.longzhou()
-        action.meter_reward()
+        # action.meter_reward()
         # action.bug_meter_reward()
         s1.release()
     def guoyan(user, apass, addr):
@@ -81,7 +81,7 @@ if __name__ == '__main__':
         s1.release()
     filepath = os.path.dirname(os.path.abspath(__file__))
     # cont = ['21user.txt', 'autouser.txt','gmnewyear.txt', 'user.txt', 'alluser.txt']
-    cont = ['xing.txt']
+    cont = ['user.txt']
     for t in cont:
         with open('%s/users/%s' % (filepath, t), 'r') as f:
             for i in f:
@@ -90,6 +90,6 @@ if __name__ == '__main__':
                     passwd = i.split()[1]
                     addr = i.split()[2]
                     # addr = 147
-                    t1 = threading.Thread(target=act, args=(name, passwd, addr))
+                    t1 = threading.Thread(target=lz, args=(name, passwd, addr))
                     t1.start()
       
